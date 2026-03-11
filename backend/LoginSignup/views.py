@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, get_user_model
+from django.utils import timezone
+from datetime import timedelta
 User = get_user_model()
 from .models import Vendor
 
@@ -118,12 +120,18 @@ def login_user(request):
             user_obj = User.objects.get(email=email)
             user = authenticate(username=user_obj.username, password=password)
             if user:
-                token, _ = Token.objects.get_or_create(user=user)
-            if user:
+                # Check if user is suspended
+                if user.is_suspended():
+                    remaining = user.suspended_until - timezone.now()
+                    hours_left = int(remaining.total_seconds() // 3600)
+                    mins_left = int((remaining.total_seconds() % 3600) // 60)
+                    return JsonResponse({
+                        "error": f"Your account is suspended. Try again in {hours_left}h {mins_left}m."
+                    }, status=403)
+                
                 token, _ = Token.objects.get_or_create(user=user)
                 
                 role = user.role
-                # Fallback purely for safety if data is old/inconsistent, though we are resetting DB
                 if user.is_superuser:
                     role = "admin"
                 
@@ -303,6 +311,15 @@ def admin_users_list(request):
                 if u.is_superuser:
                     role = "admin"
                 
+                # Check suspension status
+                is_suspended = u.is_suspended()
+                if is_suspended:
+                    status = "suspended"
+                elif u.is_active:
+                    status = "active"
+                else:
+                    status = "inactive"
+                
                 users_data.append({
                     "id": u.id,
                     "username": u.username,
@@ -312,7 +329,9 @@ def admin_users_list(request):
                     "name": f"{u.first_name} {u.last_name}".strip() or u.username,
                     "role": role,
                     "is_active": u.is_active,
-                    "status": "active" if u.is_active else "inactive",
+                    "is_suspended": is_suspended,
+                    "suspended_until": u.suspended_until.isoformat() if u.suspended_until else None,
+                    "status": status,
                     "date_joined": u.date_joined.strftime("%Y-%m-%d"),
                 })
             
@@ -320,5 +339,178 @@ def admin_users_list(request):
 
         except Token.DoesNotExist:
             return JsonResponse({"error": "Invalid token"}, status=401)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def admin_suspend_user(request):
+    if request.method == "POST":
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+             return JsonResponse({"error": "Unauthorized"}, status=401)
+        
+        token_key = auth_header.split(' ')[1]
+        try:
+            token = Token.objects.get(key=token_key)
+            admin_user = token.user
+            if not (admin_user.is_superuser or admin_user.is_staff):
+                 return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
+            
+            data = json.loads(request.body)
+            user_id = data.get("user_id")
+            action = data.get("action")  # 'suspend' or 'unsuspend'
+            
+            if not user_id or not action:
+                return JsonResponse({"error": "Missing user_id or action"}, status=400)
+            
+            try:
+                target_user = User.objects.get(id=user_id)
+                
+                # Prevent suspending admin users
+                if target_user.is_superuser or target_user.role == 'admin':
+                    return JsonResponse({"error": "Cannot suspend admin users"}, status=400)
+                
+                if action == 'suspend':
+                    target_user.suspended_until = timezone.now() + timedelta(hours=24)
+                    target_user.save()
+                    return JsonResponse({"message": "User suspended for 24 hours"}, status=200)
+                elif action == 'unsuspend':
+                    target_user.suspended_until = None
+                    target_user.save()
+                    return JsonResponse({"message": "User unsuspended successfully"}, status=200)
+                else:
+                    return JsonResponse({"error": "Invalid action. Use 'suspend' or 'unsuspend'"}, status=400)
+                    
+            except User.DoesNotExist:
+                return JsonResponse({"error": "User not found"}, status=404)
+
+        except Token.DoesNotExist:
+            return JsonResponse({"error": "Invalid token"}, status=401)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+from .models import Product, Order
+from django.db.models import Sum, Count
+from datetime import date
+
+
+def _get_vendor_from_token(request):
+    """Helper to extract vendor from token auth. Returns (vendor, error_response)."""
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Token '):
+        return None, JsonResponse({"error": "Unauthorized"}, status=401)
+    
+    token_key = auth_header.split(' ')[1]
+    try:
+        token = Token.objects.get(key=token_key)
+        user = token.user
+        if not hasattr(user, 'vendor_profile'):
+            return None, JsonResponse({"error": "Vendor profile not found"}, status=404)
+        return user.vendor_profile, None
+    except Token.DoesNotExist:
+        return None, JsonResponse({"error": "Invalid token"}, status=401)
+
+
+@csrf_exempt
+def vendor_dashboard_stats(request):
+    if request.method == "GET":
+        vendor, error = _get_vendor_from_token(request)
+        if error:
+            return error
+        
+        total_revenue = Order.objects.filter(vendor=vendor).aggregate(
+            total=Sum('total_amount'))['total'] or 0
+        total_orders = Order.objects.filter(vendor=vendor).count()
+        products_listed = Product.objects.filter(vendor=vendor, is_active=True).count()
+        pending_orders = Order.objects.filter(vendor=vendor, status='pending').count()
+
+        return JsonResponse({
+            "total_revenue": float(total_revenue),
+            "total_orders": total_orders,
+            "products_listed": products_listed,
+            "pending_orders": pending_orders,
+        }, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def vendor_recent_orders(request):
+    if request.method == "GET":
+        vendor, error = _get_vendor_from_token(request)
+        if error:
+            return error
+        
+        orders = Order.objects.filter(vendor=vendor).select_related(
+            'product', 'customer')[:5]
+        
+        orders_data = []
+        for order in orders:
+            orders_data.append({
+                "id": f"#ORD-{order.id:04d}",
+                "customer": f"{order.customer.first_name} {order.customer.last_name}".strip() or order.customer.username,
+                "product": order.product.name,
+                "amount": float(order.total_amount),
+                "status": order.status,
+                "date": order.created_at.strftime("%Y-%m-%d"),
+            })
+        
+        return JsonResponse(orders_data, safe=False, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def vendor_top_products(request):
+    if request.method == "GET":
+        vendor, error = _get_vendor_from_token(request)
+        if error:
+            return error
+        
+        products = Product.objects.filter(vendor=vendor, is_active=True).annotate(
+            total_sales=Count('orders'),
+            total_revenue=Sum('orders__total_amount')
+        ).order_by('-total_sales')[:4]
+        
+        products_data = []
+        for product in products:
+            products_data.append({
+                "name": product.name,
+                "sales": product.total_sales,
+                "revenue": float(product.total_revenue or 0),
+                "image": product.image_url or "",
+            })
+        
+        return JsonResponse(products_data, safe=False, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def vendor_sales_chart(request):
+    if request.method == "GET":
+        vendor, error = _get_vendor_from_token(request)
+        if error:
+            return error
+        
+        today = date.today()
+        days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        chart_data = []
+        
+        for i in range(6, -1, -1):
+            day = today - timedelta(days=i)
+            daily_revenue = Order.objects.filter(
+                vendor=vendor,
+                created_at__date=day
+            ).aggregate(total=Sum('total_amount'))['total'] or 0
+            
+            chart_data.append({
+                "day": days[day.weekday()],
+                "sales": float(daily_revenue),
+            })
+        
+        return JsonResponse(chart_data, safe=False, status=200)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
