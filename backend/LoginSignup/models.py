@@ -10,6 +10,9 @@ class CustomUser(AbstractUser):
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
     suspended_until = models.DateTimeField(null=True, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
 
     def is_suspended(self):
         if self.suspended_until and self.suspended_until > timezone.now():

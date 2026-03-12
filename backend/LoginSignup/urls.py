@@ -15,4 +15,6 @@ urlpatterns = [
     path('vendor/dashboard/recent-orders/', views.vendor_recent_orders, name='vendor_recent_orders'),
     path('vendor/dashboard/top-products/', views.vendor_top_products, name='vendor_top_products'),
     path('vendor/dashboard/sales-chart/', views.vendor_sales_chart, name='vendor_sales_chart'),
+    path('vendor/products/add/', views.vendor_add_product, name='vendor_add_product'),
+    path('user/profile/', views.user_profile, name='user_profile'),
 ]

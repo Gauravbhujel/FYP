@@ -7,6 +7,8 @@ from .models import Vendor
 
 from django.views.decorators.csrf import csrf_exempt
 import json
+from rest_framework.authtoken.models import Token
+from .serializers import UserSerializer, ProductSerializer, UserProfileSerializer
 
 
 
@@ -512,5 +514,80 @@ def vendor_sales_chart(request):
             })
         
         return JsonResponse(chart_data, safe=False, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+@csrf_exempt
+def vendor_add_product(request):
+    if request.method == "POST":
+        vendor, error = _get_vendor_from_token(request)
+        if error:
+            return error
+        
+        try:
+            data = json.loads(request.body)
+            # Add vendor ID to data for serializer
+            data['vendor'] = vendor.id
+            
+            serializer = ProductSerializer(data=data)
+            if serializer.is_valid():
+                # Set the vendor explicitly during save
+                serializer.save(vendor=vendor)
+                return JsonResponse({
+                    "message": "Product added successfully",
+                    "product": serializer.data
+                }, status=201)
+            else:
+                return JsonResponse({"error": serializer.errors}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+@csrf_exempt
+def user_profile(request):
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Token '):
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+    
+    token_key = auth_header.split(' ')[1]
+    try:
+        token = Token.objects.get(key=token_key)
+        user = token.user
+
+        if request.method == "GET":
+            serializer = UserProfileSerializer(user)
+            return JsonResponse(serializer.data, status=200)
+        
+        elif request.method == "POST" or request.method == "PUT":
+            # Support both JSON and multipart/form-data
+            if request.content_type.startswith('multipart/form-data'):
+                # For multipart, we need to merge POST data and FILES
+                # Using a copy of POST to avoid modifying the original and then updating with FILES
+                data = request.POST.copy()
+                data.update(request.FILES)
+                serializer = UserProfileSerializer(user, data=data, partial=True)
+            else:
+                data = json.loads(request.body)
+                serializer = UserProfileSerializer(user, data=data, partial=True)
+                
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse({
+                    "message": "Profile updated successfully",
+                    "user": serializer.data
+                }, status=200)
+            return JsonResponse({"error": serializer.errors}, status=400)
+
+    except Token.DoesNotExist:
+        return JsonResponse({"error": "Invalid token"}, status=401)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
