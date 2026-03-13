@@ -1,0 +1,201 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0F5132;
+    /* Green */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo-icon {
+    background-color: #0F5132;
+    /* Green */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+}
+
+.navbar-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+    color: #0F5132;
+    /* Green */
+}
+
+.navbar-search {
+    display: flex;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    width: 300px;
+    border: 1px solid #ddd;
+}
+
+.navbar-search input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    margin-left: 0.5rem;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.search-icon {
+    color: #888;
+}
+
+.navbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.icon-link {
+    color: #333;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+.icon-link:hover {
+    color: #0F5132;
+    /* Green */
+}
+
+.auth-btn {
+    background-color: #0F5132;
+    /* Green */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.auth-btn:hover {
+    background-color: #198754;
+    /* Lighter Green */
+}
+
+/* Cart Badge Notification Style */
+.cart-icon-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #dc3545;
+    /* Red notification color */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    /* White ring to separate from icon */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Profile Dropdown Styles */
+.profile-menu-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-icon {
+    color: #333;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+.profile-icon:hover {
+    color: #0F5132;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 180px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 0.5rem 0;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eee;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    display: block;
+    width: 100%;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #0F5132;
+}
+
+.logout-btn {
+    border-top: 1px solid #eee;
+    color: #dc3545;
+}
+
+.logout-btn:hover {
+    background-color: #ffebee;
+    color: #a71d2a;
+}
