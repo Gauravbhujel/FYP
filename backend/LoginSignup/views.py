@@ -132,6 +132,11 @@ def login_user(request):
                         "error": f"Your account is suspended. Try again in {hours_left}h {mins_left}m."
                     }, status=403)
                 
+                if hasattr(user, 'vendor_profile') and user.vendor_profile.status == 'suspended':
+                    return JsonResponse({
+                        "error": "Your vendor account is suspended."
+                    }, status=403)
+                
                 token, _ = Token.objects.get_or_create(user=user)
                 
                 role = user.role
@@ -240,6 +245,13 @@ def admin_update_vendor_status(request):
                     vendor.status = 'approved'
                 elif action == 'reject':
                     vendor.status = 'rejected'
+                elif action == 'suspend':
+                    vendor.status = 'suspended'
+                elif action == 'unsuspend':
+                    vendor.status = 'approved'
+                elif action == 'delete':
+                    vendor.user.delete() # Casacades to vendor and products
+                    return JsonResponse({"message": "Vendor deleted successfully"}, status=200)
                 else:
                     return JsonResponse({"error": "Invalid action"}, status=400)
                 
@@ -448,6 +460,8 @@ def _get_vendor_from_token(request):
         user = token.user
         if not hasattr(user, 'vendor_profile'):
             return None, JsonResponse({"error": "Vendor profile not found"}, status=404)
+        if user.vendor_profile.status == 'suspended':
+            return None, JsonResponse({"error": "Your vendor account is suspended."}, status=403)
         return user.vendor_profile, None
     except Token.DoesNotExist:
         return None, JsonResponse({"error": "Invalid token"}, status=401)

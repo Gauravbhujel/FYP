@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   SearchIcon,
   FilterIcon,
   CheckCircleIcon,
   XCircleIcon,
   EyeIcon,
+  MoreVerticalIcon,
+  ShieldOffIcon,
+  ShieldCheckIcon,
+  Trash2Icon,
 } from "lucide-react";
 
 import { AdminLayout } from "../../components/admin/AdminLayout";
@@ -16,6 +20,19 @@ export function AdminVendorsPage() {
   const [vendors, setVendors] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const menuRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchVendors();
@@ -54,11 +71,14 @@ export function AdminVendorsPage() {
         alert(`Vendor ${action}d successfully`);
         fetchVendors();
       } else {
-        alert("Failed to update status");
+        const data = await response.json();
+        alert(data.error || "Failed to update status");
       }
     } catch (error) {
       console.error("Error updating status:", error);
+      alert("Network error. Make sure the backend is running.");
     }
+    setOpenMenuId(null);
   };
 
   const filteredVendors = vendors.filter((vendor) => {
@@ -211,28 +231,70 @@ export function AdminVendorsPage() {
                       </td>
 
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          {vendor.status === "pending" && (
-                            <>
-                              <button 
-                                onClick={() => handleVendorAction(vendor.id, 'approve')}
-                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
-                              >
-                                <CheckCircleIcon className="w-5 h-5" />
-                              </button>
-
-                              <button 
-                                onClick={() => handleVendorAction(vendor.id, 'reject')}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                              >
-                                <XCircleIcon className="w-5 h-5" />
-                              </button>
-                            </>
-                          )}
-
-                          <button className="p-2 text-slate-400 hover:text-blue-600">
-                            <EyeIcon className="w-5 h-5" />
+                        <div className="relative inline-block text-left" ref={openMenuId === vendor.id ? menuRef : null}>
+                          <button
+                            onClick={() =>
+                              setOpenMenuId(openMenuId === vendor.id ? null : vendor.id)
+                            }
+                            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                          >
+                            <MoreVerticalIcon className="w-4 h-4 text-slate-500" />
                           </button>
+
+                          {openMenuId === vendor.id && (
+                            <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+                              {vendor.status === "pending" && (
+                                <>
+                                  <button
+                                    onClick={() => handleVendorAction(vendor.id, 'approve')}
+                                    className="flex items-center w-full px-4 py-2.5 text-sm text-green-700 hover:bg-green-50 transition-colors"
+                                  >
+                                    <CheckCircleIcon className="w-4 h-4 mr-2" />
+                                    Approve Vendor
+                                  </button>
+                                  <button
+                                    onClick={() => handleVendorAction(vendor.id, 'reject')}
+                                    className="flex items-center w-full px-4 py-2.5 text-sm text-red-700 hover:bg-red-50 transition-colors"
+                                  >
+                                    <XCircleIcon className="w-4 h-4 mr-2" />
+                                    Reject Vendor
+                                  </button>
+                                  <div className="border-t border-slate-100 my-1"></div>
+                                </>
+                              )}
+                              
+                              <button className="flex items-center w-full px-4 py-2.5 text-sm text-blue-700 hover:bg-blue-50 transition-colors">
+                                <EyeIcon className="w-4 h-4 mr-2" />
+                                View Details
+                              </button>
+
+                              {vendor.status === "suspended" ? (
+                                <button
+                                  onClick={() => handleVendorAction(vendor.id, 'unsuspend')}
+                                  className="flex items-center w-full px-4 py-2.5 text-sm text-green-700 hover:bg-green-50 transition-colors"
+                                >
+                                  <ShieldCheckIcon className="w-4 h-4 mr-2" />
+                                  Unsuspend Vendor
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleVendorAction(vendor.id, 'suspend')}
+                                  className="flex items-center w-full px-4 py-2.5 text-sm text-orange-700 hover:bg-orange-50 transition-colors"
+                                >
+                                  <ShieldOffIcon className="w-4 h-4 mr-2" />
+                                  Suspend Vendor
+                                </button>
+                              )}
+
+                              <button
+                                onClick={() => handleVendorAction(vendor.id, 'delete')}
+                                className="flex items-center w-full px-4 py-2.5 text-sm text-red-700 hover:bg-red-50 transition-colors"
+                              >
+                                <Trash2Icon className="w-4 h-4 mr-2" />
+                                Delete Vendor
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>

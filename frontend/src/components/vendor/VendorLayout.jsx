@@ -32,6 +32,14 @@ export function VendorLayout({ children, currentPage }) {
 
         if (response.ok) {
           const data = await response.json();
+          if (data.status === 'suspended') {
+            alert("Your vendor account has been suspended by the admin.");
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            localStorage.removeItem("isAuthenticated");
+            window.location.href = "/login";
+            return;
+          }
           setVendor(data);
         } else {
           console.error("Failed to fetch vendor profile");
