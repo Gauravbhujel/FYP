@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import {
-  DollarSignIcon,
+  TrendingUpIcon,
   ShoppingBagIcon,
   UsersIcon,
-  TrendingUpIcon,
 } from "lucide-react";
-
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+
+const RsIcon = ({ className }) => (
+  <span className={`font-bold flex items-center justify-center ${className}`}>Rs</span>
+);
 
 const AdminReportsPage = () => {
   const [dateRange, setDateRange] = useState("this_month");
@@ -125,7 +127,7 @@ const AdminReportsPage = () => {
                 </div>
 
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <DollarSignIcon className="w-6 h-6 text-green-600" />
+                  <RsIcon className="w-6 h-6 text-green-600" />
                 </div>
               </div>
             </Card>

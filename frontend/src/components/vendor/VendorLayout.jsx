@@ -4,10 +4,13 @@ import {
   LayoutGridIcon,
   PackageIcon,
   ShoppingBagIcon,
-  DollarSignIcon,
   SettingsIcon,
   StoreIcon,
 } from "lucide-react";
+
+const RsIcon = ({ className }) => (
+  <span className={`font-bold flex items-center justify-center ${className}`}>Rs</span>
+);
 
 export function VendorLayout({ children, currentPage }) {
   const [vendor, setVendor] = useState(null);
@@ -56,7 +59,7 @@ export function VendorLayout({ children, currentPage }) {
     { icon: LayoutGridIcon, label: "Dashboard", href: "/vendor/dashboard", id: "dashboard" },
     { icon: PackageIcon, label: "Products", href: "/vendor/products", id: "products" },
     { icon: ShoppingBagIcon, label: "Orders", href: "/vendor/orders", id: "orders" },
-    { icon: DollarSignIcon, label: "Earnings", href: "/vendor/earnings", id: "earnings" },
+    { icon: RsIcon, label: "Earnings", href: "/vendor/earnings", id: "earnings" },
     { icon: SettingsIcon, label: "Settings", href: "/vendor/settings", id: "settings" },
   ];
 

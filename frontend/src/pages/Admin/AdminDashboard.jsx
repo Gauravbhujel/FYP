@@ -3,7 +3,6 @@ import {
   UsersIcon,
   StoreIcon,
   ShoppingBagIcon,
-  DollarSignIcon,
   TrendingUpIcon,
   AlertCircleIcon,
 } from "lucide-react";
@@ -12,6 +11,10 @@ import { MetricCard } from "../../components/dashboard/MetricCard";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
+
+const RsIcon = ({ className }) => (
+  <span className={`font-bold flex items-center justify-center ${className}`}>Rs</span>
+);
 
 const AdminDashboard = () => {
   const [pendingVendors, setPendingVendors] = React.useState([]);
@@ -174,7 +177,7 @@ const AdminDashboard = () => {
               title="Total Revenue"
               value={stats.total_revenue > 0 ? `Rs. ${stats.total_revenue.toLocaleString()}` : "Rs. 0"}
               change={0}
-              icon={DollarSignIcon}
+              icon={RsIcon}
               iconColor="text-green-600"
               iconBgColor="bg-green-100"
             />

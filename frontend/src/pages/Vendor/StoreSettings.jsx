@@ -23,7 +23,6 @@ export function StoreSettingsPage() {
     city: "",
     state: "",
     zipCode: "",
-    country: "",
   });
 
   const handleChange = (e) => {
@@ -219,7 +218,7 @@ export function StoreSettingsPage() {
                   required
                 />
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <input
                     type="text"
                     name="city"
@@ -249,19 +248,6 @@ export function StoreSettingsPage() {
                     className="px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
                     required
                   />
-
-                  <select
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                    className="px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                    required
-                  >
-                    <option value="">Select Country</option>
-                    <option value="Nepal">Nepal</option>
-                    <option value="India">India</option>
-                    <option value="United States">United States</option>
-                  </select>
                 </div>
               </div>
             </Card>

@@ -97,7 +97,7 @@ export function ManageProductsPage() {
                 Start adding products to your store to begin selling on GearUpNepal.
               </p>
               <Link to="/vendor/AddProduct">
-                <Button variant="primary" size="lg" className="px-8 rounded-xl font-bold">
+                <Button className="bg-primary hover:bg-secondary text-white px-8 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl active:scale-95 border-none" size="lg">
                   Add Your First Product
                 </Button>
               </Link>

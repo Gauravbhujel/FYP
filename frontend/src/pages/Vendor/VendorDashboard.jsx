@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  DollarSignIcon,
   ShoppingBagIcon,
   PackageIcon,
   TrendingUpIcon,
@@ -13,6 +12,10 @@ import { RecentOrders } from "../../components/dashboard/RecentOrders";
 import { QuickActions } from "../../components/dashboard/QuickActions";
 import { RecentProducts } from "../../components/dashboard/RecentProducts";
 import { Badge } from "../../components/ui/Badge";
+
+const RsIcon = ({ className }) => (
+  <span className={`font-bold flex items-center justify-center ${className}`}>Rs</span>
+);
 
 export const VendorDashboard = () => {
   const [stats, setStats] = useState({
@@ -80,7 +83,7 @@ export const VendorDashboard = () => {
               title="Total Revenue"
               value={`Rs. ${stats.total_revenue.toLocaleString()}`}
               change={0}
-              icon={DollarSignIcon}
+              icon={RsIcon}
               iconColor="text-green-600"
               iconBgColor="bg-green-100"
             />

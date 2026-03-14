@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import {
   GlobeIcon,
-  DollarSignIcon,
-  BellIcon,
-  ShieldIcon,
   WrenchIcon,
   SaveIcon,
 } from "lucide-react";
-
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+
+const RsIcon = ({ className }) => (
+  <span className={`font-bold flex items-center justify-center ${className}`}>Rs</span>
+);
 
 const AdminSettingsPage = () => {
   const [platformSettings, setPlatformSettings] = useState({
@@ -138,7 +138,7 @@ const AdminSettingsPage = () => {
           {/* Commission Settings */}
           <Card className="p-6">
             <div className="flex items-center space-x-2 mb-6">
-              <DollarSignIcon className="w-5 h-5 text-orange-600" />
+              <RsIcon className="w-5 h-5 text-orange-600" />
               <h2 className="text-lg font-bold text-slate-800">
                 Commission & Payouts
               </h2>
