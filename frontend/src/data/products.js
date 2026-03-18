@@ -77,7 +77,7 @@ export const products = [
     {
         id: 106,
         name: "Premium Yoga Mat",
-        category_name: "Fitness",
+        category_name: "Football",
         price: 39.99,
         image: "/assets/products/premium-yoga-mat.jpg",
         description: "Non-slip yoga mat with extra cushioning.",
@@ -106,7 +106,7 @@ export const products = [
     {
         id: 103,
         name: "Adjustable Dumbbells",
-        category_name: "Fitness",
+        category_name: "Football",
         price: 299.99,
         image: "/assets/products/adjustable-dumbbells-set.jpg",
         description: "Adjustable dumbbell set for home workouts.",
@@ -115,7 +115,7 @@ export const products = [
     {
         id: 107,
         name: "Kettlebell 16kg",
-        category_name: "Fitness",
+        category_name: "Football",
         price: 45.0,
         image: "/assets/products/kettlebell-16kg.jpg",
         description: "Cast iron kettlebell for full-body strength training.",

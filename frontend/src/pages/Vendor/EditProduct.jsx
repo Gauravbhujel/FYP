@@ -16,10 +16,9 @@ export function EditProductPage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    category: "fitness",
+    category: "football",
+    size: "free",
     price: "",
-    compare_price: "",
-    sku: "",
     quantity: "",
   });
 
@@ -36,9 +35,8 @@ export function EditProductPage() {
           name: product.name,
           description: product.description || "",
           category: product.category,
+          size: product.size || "free",
           price: product.price,
-          compare_price: product.compare_price || "",
-          sku: product.sku || "",
           quantity: product.quantity,
         });
         
@@ -201,27 +199,29 @@ export function EditProductPage() {
                     >
                       <option value="running">Running</option>
                       <option value="basketball">Basketball</option>
-                      <option value="soccer">Soccer</option>
+                      <option value="football">Football</option>
                       <option value="tennis">Tennis</option>
                       <option value="swimming">Swimming</option>
                       <option value="cycling">Cycling</option>
-                      <option value="fitness">Fitness & Gym</option>
-                      <option value="outdoor">Outdoor Sports</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      SKU
+                      Size
                     </label>
-                    <input
-                      type="text"
-                      name="sku"
-                      value={formData.sku}
+                    <select
+                      name="size"
+                      value={formData.size}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                      placeholder="PROD-001"
-                    />
+                    >
+                      <option value="free">Free Size</option>
+                      <option value="s">Small</option>
+                      <option value="m">Medium</option>
+                      <option value="l">Large</option>
+                      <option value="xl">Extra Large</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export function EditProductPage() {
             <Card className="p-6">
               <h2 className="text-lg font-bold text-slate-800 mb-4">Pricing & Inventory</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Price *
@@ -249,26 +249,6 @@ export function EditProductPage() {
                       className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
                       placeholder="0.00"
                       required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Compare Price
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500">
-                      Rs.
-                    </span>
-                    <input
-                      type="number"
-                      name="compare_price"
-                      value={formData.compare_price}
-                      onChange={handleChange}
-                      step="0.01"
-                      className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                      placeholder="0.00"
                     />
                   </div>
                 </div>

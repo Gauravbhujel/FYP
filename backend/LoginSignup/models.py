@@ -58,18 +58,17 @@ class Product(models.Model):
     CATEGORY_CHOICES = (
         ('running', 'Running'),
         ('basketball', 'Basketball'),
-        ('soccer', 'Soccer'),
         ('tennis', 'Tennis'),
         ('swimming', 'Swimming'),
         ('cycling', 'Cycling'),
-        ('fitness', 'Fitness & Gym'),
-        ('outdoor', 'Outdoor Sports'),
+        ('football', 'Football'),
     )
 
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='fitness')
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='football')
+    size = models.CharField(max_length=20, blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     compare_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     sku = models.CharField(max_length=50, blank=True)

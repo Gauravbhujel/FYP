@@ -36,49 +36,13 @@ export function AdminProductsPage() {
       status: "active",
     },
     {
-      id: "PRD-003",
-      name: "Premium Yoga Mat",
-      vendor: "Lululemon",
-      category: "Fitness",
-      price: 39.99,
-      stock: 0,
-      status: "out_of_stock",
-    },
-    {
       id: "PRD-004",
-      name: "Adjustable Dumbbells",
-      vendor: "Bowflex",
-      category: "Fitness",
-      price: 299.99,
-      stock: 12,
-      status: "active",
-    },
-    {
-      id: "PRD-005",
-      name: "Tennis Racket Pro",
-      vendor: "Wilson Sports",
-      category: "Tennis",
-      price: 189.99,
-      stock: 34,
-      status: "active",
-    },
-    {
-      id: "PRD-006",
-      name: "Soccer Ball",
+      name: "Pro Football",
       vendor: "Adidas Pro",
-      category: "Soccer",
+      category: "Football",
       price: 34.99,
       stock: 200,
       status: "active",
-    },
-    {
-      id: "PRD-007",
-      name: "Winter Snowboard",
-      vendor: "Burton",
-      category: "Outdoor",
-      price: 450.0,
-      stock: 5,
-      status: "draft",
     },
   ];
 
@@ -163,10 +127,8 @@ export function AdminProductsPage() {
                   <option value="all">All Categories</option>
                   <option value="running">Running</option>
                   <option value="basketball">Basketball</option>
-                  <option value="fitness">Fitness</option>
+                  <option value="football">Football</option>
                   <option value="tennis">Tennis</option>
-                  <option value="soccer">Soccer</option>
-                  <option value="outdoor">Outdoor</option>
                 </select>
               </div>
             </div>

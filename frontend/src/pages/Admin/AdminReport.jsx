@@ -33,22 +33,10 @@ const AdminReportsPage = () => {
       color: "bg-orange-500",
     },
     {
-      category: "Fitness & Gym",
-      revenue: 35800,
-      percentage: 24,
+      category: "Football",
+      revenue: 54700,
+      percentage: 37,
       color: "bg-blue-500",
-    },
-    {
-      category: "Basketball",
-      revenue: 22500,
-      percentage: 15,
-      color: "bg-green-500",
-    },
-    {
-      category: "Soccer",
-      revenue: 18900,
-      percentage: 13,
-      color: "bg-purple-500",
     },
     {
       category: "Tennis",

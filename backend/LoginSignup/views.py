@@ -629,6 +629,7 @@ def public_product_list(request):
                 "category_slug": product.category,
                 "price": float(product.price),
                 "compare_price": float(product.compare_price) if product.compare_price else None,
+                "size": product.size,
                 "image": image_url,
                 "is_new": (timezone.now() - product.created_at).days < 7,
                 "discount": int(((product.compare_price - product.price) / product.compare_price) * 100) if product.compare_price and product.compare_price > product.price else None,
@@ -1086,5 +1087,66 @@ def public_product_search(request):
             })
             
         return JsonResponse(products_data, safe=False, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def customer_orders(request):
+    if request.method == "GET":
+        user, error = _get_user_from_token(request)
+        if error: return error
+        
+        orders = Order.objects.filter(customer=user).select_related('product', 'vendor')
+        orders_data = []
+        for order in orders:
+            orders_data.append({
+                "id": f"#ORD-{order.id:04d}",
+                "product_name": order.product.name,
+                "vendor_name": order.vendor.store_name,
+                "amount": float(order.total_amount),
+                "status": order.status,
+                "date": order.created_at.strftime("%Y-%m-%d"),
+                "image": request.build_absolute_uri(order.product.image.url) if order.product.image else ""
+            })
+        return JsonResponse(orders_data, safe=False, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def change_password(request):
+    if request.method == "POST":
+        user, error = _get_user_from_token(request)
+        if error: return error
+        
+        try:
+            data = json.loads(request.body)
+            current_password = data.get("current_password")
+            new_password = data.get("new_password")
+            
+            if not user.check_password(current_password):
+                return JsonResponse({"error": "Incorrect current password"}, status=400)
+                
+            user.set_password(new_password)
+            user.save()
+            return JsonResponse({"message": "Password updated successfully"}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def delete_account(request):
+    if request.method == "DELETE":
+        user, error = _get_user_from_token(request)
+        if error: return error
+        
+        try:
+            user.delete()
+            return JsonResponse({"message": "Account deleted successfully"}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
