@@ -108,8 +108,31 @@ const ProfilePage = () => {
     setPasswordForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setSelectedFile(file);
+
+    if (!isEditingProfile) {
+      try {
+        const data = new FormData();
+        data.append("first_name", profileForm.first_name);
+        data.append("last_name", profileForm.last_name);
+        data.append("phone_number", contactForm.phone_number);
+        data.append("address", contactForm.address);
+        data.append("profile_picture", file);
+
+        await api.post("user/profile/", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        showMessage("Profile picture updated successfully!", "success");
+        fetchProfile();
+      } catch (err) {
+        showMessage(err.response?.data?.error || "Failed to update profile picture.", "error");
+      }
+    }
   };
 
   const handleSaveProfile = async (e) => {
@@ -302,13 +325,11 @@ const ProfilePage = () => {
                         ) : (
                           <FaUser className="text-4xl text-slate-300" />
                         )}
-                        {isEditingProfile && (
-                          <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
-                            <FaCamera className="text-xl mb-1" />
-                            <span className="text-[10px] font-medium uppercase tracking-wider">Upload</span>
-                            <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
-                          </label>
-                        )}
+                        <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                          <FaCamera className="text-xl mb-1" />
+                          <span className="text-[10px] font-medium uppercase tracking-wider">Upload</span>
+                          <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+                        </label>
                       </div>
                       {isEditingProfile && selectedFile && (
                         <span className="text-xs text-primary font-medium">{selectedFile.name}</span>
