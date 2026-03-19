@@ -74,6 +74,8 @@ class Product(models.Model):
     sku = models.CharField(max_length=50, blank=True)
     quantity = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='products/', null=True, blank=True)
+    image2 = models.ImageField(upload_to='products/', null=True, blank=True)
+    image3 = models.ImageField(upload_to='products/', null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -128,3 +130,27 @@ class WishlistItem(models.Model):
 
     def __str__(self):
         return f"{self.customer.email} - {self.product.name}"
+
+
+class ProductReview(models.Model):
+    RATING_CHOICES = (
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+    )
+
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('customer', 'product')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Review by {self.customer.username} on {self.product.name}"

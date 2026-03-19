@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { FaShoppingCart, FaStar, FaHeart } from 'react-icons/fa';
+import { FaShoppingCart, FaStar, FaHeart, FaEye } from 'react-icons/fa';
 import api from '../api';
 import { useCart } from '../context/CartContext';
 
@@ -11,9 +11,8 @@ const ProductCard = ({ product }) => {
 
     const handleAction = async (actionType) => {
         const token = localStorage.getItem("token");
-        
+
         if (!token) {
-            // Redirect to login with current path in state
             navigate('/login', { state: { from: location.pathname } });
             return;
         }
@@ -39,53 +38,106 @@ const ProductCard = ({ product }) => {
         }
     };
 
+    // Calculate discount percentage if compare_price is available
+    const discountPct = product.discount ||
+        (product.compare_price && product.price
+            ? Math.round((1 - product.price / product.compare_price) * 100)
+            : null);
+
     return (
-        <div className="bg-white rounded-xl overflow-hidden shadow-[0_5px_15px_rgba(0,0,0,0.05)] transition-all duration-300 flex flex-col h-full hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,0,0,0.1)] group">
-            <div className="relative h-[250px] bg-[#f8f9fa] overflow-hidden">
+        <div className="bg-white rounded-2xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 transition-all duration-350 flex flex-col h-full group hover:-translate-y-2 hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] hover:border-gray-200">
+
+            {/* Image Container */}
+            <div className="relative h-[260px] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                 <Link to={`/product/${product.id}`}>
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
+                    <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                    />
                 </Link>
-                
-                {/* Wishlist Button */}
-                <button 
-                    onClick={() => handleAction('wishlist')}
-                    className="absolute top-4 left-4 p-2.5 bg-white/90 backdrop-blur-sm text-[#888] rounded-full border-none cursor-pointer shadow-sm transition-all duration-200 hover:text-[#dc3545] hover:scale-110 z-10 flex items-center justify-center group/wishlist"
-                    title="Add to Wishlist"
-                >
-                    <FaHeart className="text-sm transition-colors group-hover/wishlist:scale-110" />
-                </button>
 
-                {product.discount && <span className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold z-10 bg-[#dc3545] text-white">-{product.discount}%</span>}
-                {product.is_new && <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full text-xs font-semibold z-10 bg-accent text-white">New</span>}
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 pointer-events-none" />
+
+                {/* Discount Badge – top left */}
+                {discountPct && (
+                    <span className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-rose-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md z-10">
+                        -{discountPct}%
+                    </span>
+                )}
+
+                {/* New Badge – top left (if no discount) */}
+                {!discountPct && product.is_new && (
+                    <span className="absolute top-3 left-3 bg-gradient-to-r from-[#ff6b00] to-[#ff9d3d] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md z-10">
+                        NEW
+                    </span>
+                )}
+
+                {/* Action Buttons – float in on hover */}
+                <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 z-10">
+                    <button
+                        onClick={() => handleAction('wishlist')}
+                        className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 shadow-md hover:text-red-500 hover:scale-110 transition-all duration-200 border border-white/50"
+                        title="Add to Wishlist"
+                    >
+                        <FaHeart className="text-sm" />
+                    </button>
+                    <Link
+                        to={`/product/${product.id}`}
+                        className="w-9 h-9 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 shadow-md hover:text-[#0f5132] hover:scale-110 transition-all duration-200 border border-white/50"
+                        title="Quick View"
+                    >
+                        <FaEye className="text-sm" />
+                    </Link>
+                </div>
             </div>
-            <div className="p-5 flex flex-col flex-grow">
-                <span className="text-sm text-[#888] mb-1 uppercase font-medium">{product.category}</span>
+
+            {/* Card Body */}
+            <div className="p-4 flex flex-col flex-grow">
+                {/* Category */}
+                <span className="text-[11px] text-[#ff6b00] font-semibold uppercase tracking-wider mb-1">
+                    {product.category}
+                </span>
+
+                {/* Product Name */}
                 <Link to={`/product/${product.id}`} className="no-underline">
-                    <h3 className="text-lg font-semibold mb-2 text-text-dark line-clamp-2 overflow-hidden hover:text-primary transition-colors">{product.name}</h3>
+                    <h3 className="text-[0.92rem] font-semibold mb-2 text-gray-800 line-clamp-2 leading-snug hover:text-[#0f5132] transition-colors">
+                        {product.name}
+                    </h3>
                 </Link>
 
-                <div className="flex items-center mb-4">
-                    <FaStar className="text-[#ffc107] text-sm" />
-                    <FaStar className="text-[#ffc107] text-sm" />
-                    <FaStar className="text-[#ffc107] text-sm" />
-                    <FaStar className="text-[#ffc107] text-sm" />
-                    <FaStar className="text-[#ffc107] text-sm" />
-                    <span className="text-[#888] text-xs ml-1.5">(24)</span>
+                {/* Rating */}
+                <div className="flex items-center gap-1 mb-3">
+                    {[...Array(5)].map((_, i) => (
+                        <FaStar key={i} className="text-amber-400 text-xs" />
+                    ))}
+                    <span className="text-[11px] text-gray-400 ml-1 font-medium">(24)</span>
                 </div>
 
-                <div className="mb-4 mt-auto">
-                    <div className="flex items-center">
-                        <span className="text-xl font-bold text-text-dark">Rs. {product.price}</span>
-                        {product.compare_price && <span className="text-sm text-[#999] line-through ml-2.5">Rs. {product.compare_price}</span>}
+                {/* Spacer */}
+                <div className="mt-auto">
+                    {/* Price */}
+                    <div className="flex items-baseline gap-2 mb-3">
+                        <span className="text-xl font-extrabold text-gray-900">
+                            Rs. {Number(product.price).toLocaleString()}
+                        </span>
+                        {product.compare_price && (
+                            <span className="text-sm text-gray-400 line-through font-medium">
+                                Rs. {Number(product.compare_price).toLocaleString()}
+                            </span>
+                        )}
                     </div>
-                </div>
 
-                <button 
-                    onClick={() => handleAction('cart')}
-                    className="w-full bg-accent text-white border-none py-3 rounded-md font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:brightness-110 hover:-translate-y-[2px]"
-                >
-                    <FaShoppingCart /> Add to Cart
-                </button>
+                    {/* Add to Cart Button */}
+                    <button
+                        onClick={() => handleAction('cart')}
+                        className="w-full bg-gradient-to-r from-[#ff6b00] to-[#ff8c38] text-white border-none py-2.5 rounded-xl font-semibold text-sm cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:from-[#cc5200] hover:to-[#ff6b00] hover:-translate-y-px hover:shadow-lg hover:shadow-orange-500/30 active:translate-y-0"
+                    >
+                        <FaShoppingCart className="text-sm" />
+                        Add to Cart
+                    </button>
+                </div>
             </div>
         </div>
     );

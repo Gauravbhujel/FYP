@@ -1,46 +1,149 @@
 import React from 'react';
-
-
 import { Link } from 'react-router-dom';
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTwitter,
+  FaYoutube,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaEnvelope,
+} from 'react-icons/fa';
 
 const Footer = () => {
-    return (
-        <footer className="bg-[#1a1a1a] text-white pt-16 pb-4 mt-auto">
-            <div className="max-w-[1200px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-12 mb-12 px-8">
-                <div className="footer-section">
-                    <h3 className="text-2xl mb-4 text-accent">GearUpNepal</h3>
-                    <p className="text-[#aaa] leading-relaxed">Your premium destination for top-quality sports gear and apparel. Elevate your game with us.</p>
-                </div>
-                <div className="footer-section">
-                    <h4 className="text-xl mb-5 text-[#f8f9fa]">Quick Links</h4>
-                    <ul className="list-none">
-                        <li className="mb-3"><Link to="/" className="text-[#aaa] no-underline transition-colors duration-300 hover:text-accent">Home</Link></li>
-                        <li className="mb-3"><Link to="/products" className="text-[#aaa] no-underline transition-colors duration-300 hover:text-accent">Shop</Link></li>
-                        <li className="mb-3"><Link to="/categories" className="text-[#aaa] no-underline transition-colors duration-300 hover:text-accent">Categories</Link></li>
-                    </ul>
-                </div>
-                <div className="footer-section">
-                    <h4 className="text-xl mb-5 text-[#f8f9fa]">Customer Care</h4>
-                    <ul className="list-none">
-                        <li className="mb-3 text-[#aaa] hover:text-accent transition-colors duration-300 cursor-pointer">Contact Us</li>
-                        <li className="mb-3 text-[#aaa] hover:text-accent transition-colors duration-300 cursor-pointer">Shipping Policy</li>
-                        <li className="mb-3 text-[#aaa] hover:text-accent transition-colors duration-300 cursor-pointer">Returns & Exchanges</li>
-                    </ul>
-                </div>
-                <div className="footer-section">
-                    <h4 className="text-xl mb-5 text-[#f8f9fa]">Connect With Us</h4>
-                    <div className="flex gap-4">
-                        <span className="bg-[#333] px-4 py-2 rounded pointer-events-auto cursor-pointer transition-colors duration-300 hover:bg-accent">Facebook</span>
-                        <span className="bg-[#333] px-4 py-2 rounded pointer-events-auto cursor-pointer transition-colors duration-300 hover:bg-accent">Instagram</span>
-                        <span className="bg-[#333] px-4 py-2 rounded pointer-events-auto cursor-pointer transition-colors duration-300 hover:bg-accent">Twitter</span>
-                    </div>
-                </div>
+  return (
+    <footer className="bg-[#0d1117] text-white mt-auto">
+      {/* Main Footer */}
+      <div className="max-w-6xl mx-auto px-6 pt-14 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+          {/* Brand Column */}
+          <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-[#0f5132] to-[#198754] rounded-lg shadow-md">
+                <span className="text-white font-black text-base leading-none">G</span>
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="text-white font-extrabold text-lg tracking-tight">GearUp</span>
+                <span className="text-[#ff6b00] font-bold text-xs tracking-widest uppercase">Nepal</span>
+              </div>
             </div>
-            <div className="text-center pt-8 border-t border-[#333] text-[#777] text-sm">
-                <p>&copy; {new Date().getFullYear()} GearUpNepal. All rights reserved.</p>
+            <p className="text-gray-400 text-sm leading-relaxed mb-5">
+              Nepal's premier multi-vendor sports destination. Quality gear from verified vendors, delivered to your door.
+            </p>
+            {/* Contact */}
+            <div className="flex flex-col gap-2.5">
+              {[
+                { icon: <FaMapMarkerAlt />, text: "Kathmandu, Nepal" },
+                { icon: <FaPhoneAlt />, text: "+977-1-XXXXXXX" },
+                { icon: <FaEnvelope />, text: "support@gearupnepal.com" },
+              ].map(({ icon, text }) => (
+                <div key={text} className="flex items-center gap-2.5 text-gray-400 text-sm">
+                  <span className="text-[#ff6b00] text-xs flex-shrink-0">{icon}</span>
+                  {text}
+                </div>
+              ))}
             </div>
-        </footer>
-    );
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#ff6b00] after:rounded">
+              Quick Links
+            </h4>
+            <ul className="list-none flex flex-col gap-3">
+              {[
+                { to: '/', label: 'Home' },
+                { to: '/products', label: 'Shop All Products' },
+                { to: '/categories', label: 'Browse Categories' },
+                { to: '/vendor/signup', label: 'Become a Vendor' },
+              ].map(({ to, label }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    className="text-gray-400 no-underline text-sm transition-all duration-200 hover:text-[#ff6b00] hover:pl-1 flex items-center gap-1.5 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-[#ff6b00] transition-colors flex-shrink-0" />
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Customer Care */}
+          <div>
+            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#ff6b00] after:rounded">
+              Customer Care
+            </h4>
+            <ul className="list-none flex flex-col gap-3">
+              {['Contact Us', 'Track My Order', 'Shipping Policy', 'Returns & Exchanges', 'FAQs'].map(
+                (item) => (
+                  <li key={item}>
+                    <span className="text-gray-400 text-sm transition-all duration-200 hover:text-[#ff6b00] hover:pl-1 cursor-pointer flex items-center gap-1.5 group">
+                      <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-[#ff6b00] transition-colors flex-shrink-0" />
+                      {item}
+                    </span>
+                  </li>
+                )
+              )}
+            </ul>
+          </div>
+
+          {/* Social + Payment */}
+          <div>
+            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#ff6b00] after:rounded">
+              Follow Us
+            </h4>
+            <div className="flex gap-3 mb-8">
+              {[
+                { icon: <FaFacebookF />, label: 'Facebook', color: 'hover:bg-[#1877f2]' },
+                { icon: <FaInstagram />, label: 'Instagram', color: 'hover:bg-gradient-to-br hover:from-[#f09433] hover:to-[#bc1888]' },
+                { icon: <FaTwitter />, label: 'Twitter', color: 'hover:bg-[#1da1f2]' },
+                { icon: <FaYoutube />, label: 'YouTube', color: 'hover:bg-[#ff0000]' },
+              ].map(({ icon, label, color }) => (
+                <button
+                  key={label}
+                  title={label}
+                  className={`w-10 h-10 rounded-full bg-white/8 border border-white/10 flex items-center justify-center text-gray-400 ${color} hover:text-white hover:border-transparent hover:shadow-lg transition-all duration-200 text-sm`}
+                >
+                  {icon}
+                </button>
+              ))}
+            </div>
+
+            <h5 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3">
+              Accepted Payments
+            </h5>
+            <div className="flex flex-wrap gap-2">
+              {['eSewa', 'Khalti', 'IME Pay', 'Cash on Delivery'].map((method) => (
+                <span
+                  key={method}
+                  className="bg-white/8 border border-white/10 text-gray-400 text-[11px] font-medium px-3 py-1.5 rounded-lg"
+                >
+                  {method}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-white/8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-gray-500 text-xs">
+            © {new Date().getFullYear()} GearUp Nepal. All rights reserved.
+          </p>
+          <div className="flex items-center gap-4 text-gray-500 text-xs">
+            <span className="cursor-pointer hover:text-gray-300 transition-colors">Privacy Policy</span>
+            <span className="w-px h-3 bg-gray-700" />
+            <span className="cursor-pointer hover:text-gray-300 transition-colors">Terms of Service</span>
+            <span className="w-px h-3 bg-gray-700" />
+            <span className="cursor-pointer hover:text-gray-300 transition-colors">Cookie Policy</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 };
 
 export default Footer;

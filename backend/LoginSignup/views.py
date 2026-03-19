@@ -8,8 +8,11 @@ from .models import Vendor
 from django.views.decorators.csrf import csrf_exempt
 import json
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, ProductSerializer, UserProfileSerializer, CartItemSerializer, WishlistItemSerializer
-from .models import Vendor, Product, CartItem, WishlistItem
+from .serializers import (
+    ProductSerializer, UserProfileSerializer, VendorSerializer, 
+    CartItemSerializer, WishlistItemSerializer, ProductReviewSerializer
+)
+from .models import CustomUser, Vendor, Product, Order, CartItem, WishlistItem, ProductReview
 
 
 
@@ -621,6 +624,8 @@ def public_product_list(request):
         products_data = []
         for product in products:
             image_url = request.build_absolute_uri(product.image.url) if product.image else ""
+            image2_url = request.build_absolute_uri(product.image2.url) if product.image2 else ""
+            image3_url = request.build_absolute_uri(product.image3.url) if product.image3 else ""
                 
             products_data.append({
                 "id": product.id,
@@ -631,6 +636,8 @@ def public_product_list(request):
                 "compare_price": float(product.compare_price) if product.compare_price else None,
                 "size": product.size,
                 "image": image_url,
+                "image2": image2_url,
+                "image3": image3_url,
                 "is_new": (timezone.now() - product.created_at).days < 7,
                 "discount": int(((product.compare_price - product.price) / product.compare_price) * 100) if product.compare_price and product.compare_price > product.price else None,
             })
@@ -661,6 +668,8 @@ def public_product_detail(request, product_id):
         try:
             product = Product.objects.get(id=product_id, is_active=True)
             image_url = request.build_absolute_uri(product.image.url) if product.image else ""
+            image2_url = request.build_absolute_uri(product.image2.url) if product.image2 else ""
+            image3_url = request.build_absolute_uri(product.image3.url) if product.image3 else ""
             
             data = {
                 "id": product.id,
@@ -671,15 +680,59 @@ def public_product_detail(request, product_id):
                 "price": float(product.price),
                 "compare_price": float(product.compare_price) if product.compare_price else None,
                 "image": image_url,
+                "image2": image2_url,
+                "image3": image3_url,
                 "sku": product.sku,
                 "quantity": product.quantity,
                 "is_new": (timezone.now() - product.created_at).days < 7,
                 "discount": int(((product.compare_price - product.price) / product.compare_price) * 100) if product.compare_price and product.compare_price > product.price else None,
                 "vendor_name": product.vendor.store_name,
+                "vendor_id": product.vendor.id,
+                "average_rating": product.average_rating,
+                "reviews": ProductReviewSerializer(product.reviews.all(), many=True).data
             }
             return JsonResponse(data, status=200)
         except Product.DoesNotExist:
             return JsonResponse({"error": "Product not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def public_vendor_detail(request, vendor_id):
+    if request.method == "GET":
+        try:
+            vendor = Vendor.objects.get(id=vendor_id)
+            products = Product.objects.filter(vendor=vendor, is_active=True).order_by('-created_at')
+            
+            products_data = []
+            for product in products:
+                image_url = request.build_absolute_uri(product.image.url) if product.image else ""
+                products_data.append({
+                    "id": product.id,
+                    "name": product.name,
+                    "price": float(product.price),
+                    "image": image_url,
+                    "category": product.get_category_display(),
+                })
+            
+            data = {
+                "id": vendor.id,
+                "store_name": vendor.store_name,
+                "owner_name": f"{vendor.user.first_name} {vendor.user.last_name}".strip() or vendor.user.username,
+                "email": vendor.user.email,
+                "phone": vendor.phone,
+                "address": vendor.address,
+                "city": vendor.city,
+                "status": vendor.status,
+                "products": products_data,
+                "products_count": len(products_data)
+            }
+            return JsonResponse(data, status=200)
+        except Vendor.DoesNotExist:
+            return JsonResponse({"error": "Vendor not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
@@ -787,6 +840,10 @@ def vendor_product_detail(request, product_id):
             data = serializer.data
             if product.image:
                 data['image_preview'] = request.build_absolute_uri(product.image.url)
+            if product.image2:
+                data['image2_preview'] = request.build_absolute_uri(product.image2.url)
+            if product.image3:
+                data['image3_preview'] = request.build_absolute_uri(product.image3.url)
             return JsonResponse(data, status=200)
         except Product.DoesNotExist:
             return JsonResponse({"error": "Product not found"}, status=404)
@@ -1146,6 +1203,94 @@ def delete_account(request):
         try:
             user.delete()
             return JsonResponse({"message": "Account deleted successfully"}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def submit_review(request, product_id):
+    if request.method == "POST":
+        user, error_resp = _get_user_from_token(request)
+        if error_resp:
+            return error_resp
+        
+        try:
+            product = Product.objects.get(id=product_id)
+            import json
+            data = json.loads(request.body)
+            rating = data.get('rating')
+            comment = data.get('comment', '')
+
+            if not rating:
+                return JsonResponse({"error": "Rating is required"}, status=400)
+
+            # Check if user has a delivered order for this product
+            # Note: Multiple orders might exist, at least one must be 'delivered'
+            has_delivered_order = Order.objects.filter(
+                customer=user,
+                product=product,
+                status='delivered'
+            ).exists()
+
+            if not has_delivered_order:
+                return JsonResponse({"error": "Only customers who purchased this product and had it delivered can leave a review."}, status=403)
+
+            # Create or update review
+            review, created = ProductReview.objects.update_or_create(
+                customer=user,
+                product=product,
+                defaults={'rating': rating, 'comment': comment}
+            )
+
+            return JsonResponse({
+                "message": "Review submitted successfully",
+                "review": {
+                    "id": review.id,
+                    "rating": review.rating,
+                    "comment": review.comment,
+                    "created_at": review.created_at
+                }
+            }, status=201 if created else 200)
+
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Product not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def check_review_eligibility(request, product_id):
+    if request.method == "GET":
+        user, error_resp = _get_user_from_token(request)
+        if error_resp:
+            return JsonResponse({"can_review": False, "reason": "login_required"}, status=200)
+        
+        try:
+            product = Product.objects.get(id=product_id)
+            
+            has_delivered_order = Order.objects.filter(
+                customer=user,
+                product=product,
+                status='delivered'
+            ).exists()
+
+            existing_review = ProductReview.objects.filter(customer=user, product=product).first()
+            
+            return JsonResponse({
+                "can_review": has_delivered_order,
+                "has_purchased": has_delivered_order,
+                "existing_review": {
+                    "rating": existing_review.rating,
+                    "comment": existing_review.comment
+                } if existing_review else None
+            }, status=200)
+
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Product not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 

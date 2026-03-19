@@ -22,6 +22,7 @@ import AdminReportsPage from "./pages/Admin/AdminReport";
 import AdminSettingsPage from "./pages/Admin/AdminSetting";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
+import VendorProfilePage from "./pages/VendorProfilePage";
 import { CartProvider } from "./context/CartContext";
 import { useEffect, useState } from "react";
 
@@ -54,6 +55,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/product/:productId" element={<ProductDetailsPage />} />
+          <Route path="/vendor/:vendorId" element={<VendorProfilePage />} />
           <Route
             path="/vendor/dashboard"
             element={

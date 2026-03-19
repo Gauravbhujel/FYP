@@ -27,6 +27,7 @@ urlpatterns = [
     path('products/all/', views.public_product_list, name='public_product_list'),
     path('products/search/', views.public_product_search, name='public_product_search'),
     path('products/<int:product_id>/', views.public_product_detail, name='public_product_detail'),
+    path('vendors/<int:vendor_id>/', views.public_vendor_detail, name='public_vendor_detail'),
     path('user/profile/', views.user_profile, name='user_profile'),
     
     # Cart and Wishlist
@@ -39,4 +40,6 @@ urlpatterns = [
     path('user/orders/', views.customer_orders, name='customer_orders'),
     path('user/change-password/', views.change_password, name='change_password'),
     path('user/delete-account/', views.delete_account, name='delete_account'),
+    path('products/<int:product_id>/review/submit/', views.submit_review, name='submit_review'),
+    path('products/<int:product_id>/review/check-eligibility/', views.check_review_eligibility, name='check_review_eligibility'),
 ]

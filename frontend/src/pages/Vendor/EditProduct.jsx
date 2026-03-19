@@ -22,8 +22,8 @@ export function EditProductPage() {
     quantity: "",
   });
 
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([null, null, null]);
+  const [previewUrls, setPreviewUrls] = useState([null, null, null]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -40,9 +40,12 @@ export function EditProductPage() {
           quantity: product.quantity,
         });
         
-        if (product.image_preview) {
-          setPreviewUrl(product.image_preview);
-        }
+        const previews = [
+          product.image_preview || null,
+          product.image2_preview || null,
+          product.image3_preview || null
+        ];
+        setPreviewUrls(previews);
       } catch (err) {
         console.error("Error fetching product details:", err);
         setError("Failed to load product details.");
@@ -62,12 +65,17 @@ export function EditProductPage() {
     });
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, index) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file);
+      const newFiles = [...selectedFiles];
+      newFiles[index] = file;
+      setSelectedFiles(newFiles);
+
       const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      const newPreviews = [...previewUrls];
+      newPreviews[index] = url;
+      setPreviewUrls(newPreviews);
     }
   };
 
@@ -86,9 +94,9 @@ export function EditProductPage() {
         }
       });
       
-      if (selectedFile) {
-        data.append("image", selectedFile);
-      }
+      if (selectedFiles[0]) data.append("image", selectedFiles[0]);
+      if (selectedFiles[1]) data.append("image2", selectedFiles[1]);
+      if (selectedFiles[2]) data.append("image3", selectedFiles[2]);
 
       await api.post(`vendor/products/update/${productId}/`, data, {
         headers: {
@@ -277,51 +285,55 @@ export function EditProductPage() {
               </h2>
               
               <div className="space-y-6">
+                {/* Multi-Image Upload */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Product Image
+                  <label className="block text-sm font-medium text-slate-700 mb-4">
+                    Product Images (Up to 3)
                   </label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-lg hover:border-emerald-400 transition-colors">
-                    <div className="space-y-2 text-center">
-                      {previewUrl ? (
-                        <div className="relative inline-block">
-                          <img 
-                            src={previewUrl} 
-                            alt="Preview" 
-                            className="mx-auto h-48 w-full object-cover rounded-lg shadow-md"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedFile(null);
-                              setPreviewUrl(null);
-                            }}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-lg"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <svg className="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                          <div className="flex text-sm text-slate-600">
-                            <label className="relative cursor-pointer bg-white rounded-md font-medium text-emerald-600 hover:text-emerald-500 focus-within:outline-none">
-                              <span>Change image</span>
-                              <input type="file" name="image" className="sr-only" onChange={handleFileChange} accept="image/*" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} className="relative">
+                        <div className={`aspect-square border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-4 transition-all ${previewUrls[i] ? 'border-emerald-500 bg-emerald-50/10' : 'border-slate-300 hover:border-emerald-400'}`}>
+                          {previewUrls[i] ? (
+                            <div className="relative w-full h-full">
+                              <img 
+                                src={previewUrls[i]} 
+                                alt={`Preview ${i+1}`} 
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newFiles = [...selectedFiles];
+                                  newFiles[i] = null;
+                                  setSelectedFiles(newFiles);
+                                  const newPreviews = [...previewUrls];
+                                  newPreviews[i] = null;
+                                  setPreviewUrls(newPreviews);
+                                }}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-lg z-10"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="cursor-pointer text-center w-full h-full flex flex-col items-center justify-center">
+                              <svg className="mx-auto h-8 w-8 text-slate-400 mb-2" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                              <span className="text-xs font-medium text-slate-600">Upload Image {i+1}</span>
+                              <input type="file" className="sr-only" onChange={(e) => handleFileChange(e, i)} accept="image/*" />
                             </label>
-                            <p className="pl-1 text-slate-500">or drag and drop</p>
-                          </div>
-                          <p className="text-xs text-slate-500">
-                            PNG, JPG, GIF up to 10MB
-                          </p>
-                        </>
-                      )}
-                    </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                  <p className="mt-4 text-xs text-slate-500 text-center italic">
+                    First image is primary. Leave others empty to keep existing or upload new to replace.
+                  </p>
                 </div>
               </div>
             </Card>
