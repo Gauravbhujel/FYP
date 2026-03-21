@@ -109,12 +109,12 @@ export function ManageProductsPage() {
                   key={product.id} 
                   className="group overflow-hidden border border-slate-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-2xl rounded-3xl bg-white flex flex-col"
                 >
-                  <div className="relative aspect-square overflow-hidden bg-slate-100">
+                  <Link to={`/product/${product.id}`} className="relative aspect-square overflow-hidden bg-slate-100 block border-b border-slate-200">
                     {product.image ? (
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-300">
@@ -124,8 +124,8 @@ export function ManageProductsPage() {
                     
                     {/* Status Badge */}
                     <button 
-                      onClick={() => handleToggleStatus(product.id)}
-                      className="absolute top-4 right-4 group-hover:scale-105 transition-transform focus:outline-none"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleStatus(product.id); }}
+                      className="absolute top-4 right-4 hover:scale-105 transition-transform focus:outline-none z-10"
                       title="Click to toggle status"
                     >
                       <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm cursor-pointer ${
@@ -143,7 +143,7 @@ export function ManageProductsPage() {
                          New
                        </span>
                     </div>
-                  </div>
+                  </Link>
 
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center gap-1.5 mb-3">
@@ -154,7 +154,9 @@ export function ManageProductsPage() {
                     </div>
                     
                     <h3 className="text-lg font-bold text-slate-800 line-clamp-1 mb-2 group-hover:text-primary transition-colors">
-                      {product.name}
+                      <Link to={`/product/${product.id}`} className="no-underline text-inherit hover:text-primary transition-colors">
+                        {product.name}
+                      </Link>
                     </h3>
                     
                     <div className="flex items-baseline gap-1 mt-auto mb-6">

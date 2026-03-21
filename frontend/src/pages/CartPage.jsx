@@ -73,15 +73,17 @@ const CartPage = () => {
                                 {cartItems.map((item) => (
                                     <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 border-b last:border-b-0 hover:bg-gray-50/30 transition-colors">
                                         <div className="col-span-2 flex gap-5">
-                                            <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100">
+                                            <Link to={`/product/${item.product.id}`} className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 block hover:border-primary transition-colors">
                                                 <img 
                                                     src={item.product.image || 'https://via.placeholder.com/150'} 
                                                     alt={item.product.name} 
-                                                    className="w-full h-full object-cover"
+                                                    className="w-full h-full object-cover hover:scale-110 transition-transform"
                                                 />
-                                            </div>
+                                            </Link>
                                             <div className="flex flex-col justify-center">
-                                                <h3 className="font-bold text-text-dark text-lg mb-1">{item.product.name}</h3>
+                                                <Link to={`/product/${item.product.id}`} className="no-underline">
+                                                    <h3 className="font-bold text-text-dark text-lg mb-1 hover:text-primary transition-colors">{item.product.name}</h3>
+                                                </Link>
                                                 <p className="text-sm text-gray-500 mb-3">{item.product.category_display}</p>
                                                 <button 
                                                     onClick={() => removeItem(item.id)}

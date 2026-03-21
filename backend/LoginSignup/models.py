@@ -79,6 +79,13 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def average_rating(self):
+        reviews = self.reviews.all()
+        if not reviews:
+            return 0
+        return sum(r.rating for r in reviews) / len(reviews)
+
     def __str__(self):
         return self.name
 

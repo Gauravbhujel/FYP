@@ -74,6 +74,7 @@ MIDDLEWARE = [
 # Allow frontend
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React dev server
+    "http://localhost:3001",  # React dev server (alternative port)
 ]
 
 ROOT_URLCONF = 'backend.urls'

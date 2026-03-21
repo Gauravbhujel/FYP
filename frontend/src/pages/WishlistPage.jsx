@@ -79,25 +79,27 @@ const WishlistPage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {wishlistItems.map((item) => (
                             <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group product-card border border-gray-100 flex flex-col h-full">
-                                <div className="relative h-64 overflow-hidden bg-gray-50">
-                                    <img 
-                                        src={item.product.image || 'https://via.placeholder.com/300'} 
-                                        alt={item.product.name} 
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                    <button 
-                                        onClick={() => removeItem(item.id)}
-                                        className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 shadow-sm border-none cursor-pointer transition-all hover:bg-red-500 hover:text-white"
-                                        title="Remove from Wishlist"
-                                    >
-                                        <FaTrash size={16} />
-                                    </button>
-                                </div>
+                                    <Link to={`/product/${item.product.id}`} className="block relative h-64 overflow-hidden bg-gray-50 border-b border-gray-100">
+                                        <img 
+                                            src={item.product.image || 'https://via.placeholder.com/300'} 
+                                            alt={item.product.name} 
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
+                                        <button 
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeItem(item.id); }}
+                                            className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 shadow-sm border-none cursor-pointer transition-all hover:bg-red-500 hover:text-white z-10"
+                                            title="Remove from Wishlist"
+                                        >
+                                            <FaTrash size={16} />
+                                        </button>
+                                    </Link>
                                 
                                 <div className="p-5 flex flex-col flex-grow">
                                     <div className="mb-2">
                                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{item.product.category_display}</span>
-                                        <h3 className="text-lg font-bold text-text-dark mt-1 line-clamp-2">{item.product.name}</h3>
+                                        <Link to={`/product/${item.product.id}`} className="no-underline">
+                                            <h3 className="text-lg font-bold text-text-dark mt-1 line-clamp-2 hover:text-primary transition-colors">{item.product.name}</h3>
+                                        </Link>
                                     </div>
                                     
                                     <div className="mt-auto pt-4 border-t border-gray-50">

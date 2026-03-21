@@ -18,7 +18,7 @@ export function AdminProductsPage() {
 
   const products = [
     {
-      id: "PRD-001",
+      id: 1,
       name: "Pro Running Shoes",
       vendor: "Nike Sports Co.",
       category: "Running",
@@ -27,7 +27,7 @@ export function AdminProductsPage() {
       status: "active",
     },
     {
-      id: "PRD-002",
+      id: 2,
       name: "Professional Basketball",
       vendor: "Spalding Pro",
       category: "Basketball",
@@ -36,7 +36,7 @@ export function AdminProductsPage() {
       status: "active",
     },
     {
-      id: "PRD-004",
+      id: 3,
       name: "Pro Football",
       vendor: "Adidas Pro",
       category: "Football",

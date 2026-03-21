@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Card } from "../ui/Card";
 
 export function RecentProducts({ products }) {
@@ -53,22 +54,24 @@ export function RecentProducts({ products }) {
                   className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
                 >
                   <td className="py-4">
-                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-slate-200">
+                    <Link to={`/product/${product.id}`} className="block h-10 w-10 rounded-lg overflow-hidden border border-slate-200 hover:border-emerald-500 transition-colors">
                       {product.image ? (
                         <img 
                           src={product.image} 
                           alt={product.name} 
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-cover transition-transform hover:scale-110"
                         />
                       ) : (
                         <div className="h-full w-full bg-slate-100 flex items-center justify-center text-slate-400 text-xs">
                           No Pic
                         </div>
                       )}
-                    </div>
+                    </Link>
                   </td>
                   <td className="py-4 text-sm font-medium text-slate-800">
-                    {product.name}
+                    <Link to={`/product/${product.id}`} className="hover:text-emerald-600 transition-colors no-underline">
+                      {product.name}
+                    </Link>
                   </td>
                   <td className="py-4 text-sm text-slate-700">
                     {product.category}
