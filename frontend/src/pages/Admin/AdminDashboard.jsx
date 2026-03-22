@@ -1,326 +1,263 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   UsersIcon,
   StoreIcon,
   ShoppingBagIcon,
   TrendingUpIcon,
   AlertCircleIcon,
+  BellIcon,
+  ArrowRightIcon,
+  CheckCircle2Icon,
+  XCircleIcon
 } from "lucide-react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { MetricCard } from "../../components/dashboard/MetricCard";
-import { Card } from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
-import { Button } from "../../components/ui/Button";
-
-const RsIcon = ({ className }) => (
-  <span className={`font-bold flex items-center justify-center ${className}`}>Rs</span>
-);
+import api from "../../api";
 
 const AdminDashboard = () => {
-  const [pendingVendors, setPendingVendors] = React.useState([]);
-  const [topVendors, setTopVendors] = React.useState([]);
-  const [stats, setStats] = React.useState({
+  const [pendingVendors, setPendingVendors] = useState([]);
+  const [topVendors, setTopVendors] = useState([]);
+  const [stats, setStats] = useState({
     total_users: 0,
     active_vendors: 0,
     pending_approvals: 0,
     total_revenue: 0,
     total_orders: 0,
   });
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
-    fetchPendingVendors();
-    fetchStats();
-    fetchTopVendors();
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
 
-  const fetchPendingVendors = async () => {
-    const token = localStorage.getItem("token");
+  const fetchDashboardData = async () => {
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/admin/vendors/pending/",
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        },
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setPendingVendors(data);
-      }
+      const [pendingRes, statsRes, topRes] = await Promise.all([
+        api.get("admin/vendors/pending/"),
+        api.get("admin/dashboard/stats/"),
+        api.get("admin/dashboard/top-vendors/")
+      ]);
+      
+      setPendingVendors(pendingRes.data);
+      setStats(statsRes.data);
+      setTopVendors(topRes.data);
     } catch (error) {
-      console.error("Error fetching pending vendors:", error);
-    }
-  };
-
-  const fetchStats = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/admin/dashboard/stats/",
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    }
-  };
-
-  const fetchTopVendors = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/admin/dashboard/top-vendors/",
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setTopVendors(data);
-      }
-    } catch (error) {
-      console.error("Error fetching top vendors:", error);
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleVendorAction = async (vendorId, action) => {
-    const token = localStorage.getItem("token");
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/admin/vendors/update-status/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${token}`,
-          },
-          body: JSON.stringify({ vendor_id: vendorId, action }),
-        },
-      );
-
-      if (response.ok) {
-        alert(`Vendor ${action}d successfully`);
-        fetchPendingVendors(); // Refresh list
-        fetchStats(); // Refresh stats
-      } else {
-        alert("Failed to update status");
-      }
+      await api.post("admin/vendors/update-status/", { 
+        vendor_id: vendorId, 
+        action 
+      });
+      fetchDashboardData();
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("Error updating vendor status:", error);
     }
   };
 
-  const recentActivity = [
-    {
-      type: "vendor",
-      action: "Nike Sports Co. added 5 new products",
-      time: "2 hours ago",
-    },
-    {
-      type: "order",
-      action: "Order #ORD-1240 completed - Rs. 299.99",
-      time: "3 hours ago",
-    },
-    {
-      type: "user",
-      action: "12 new customer registrations",
-      time: "5 hours ago",
-    },
-    {
-      type: "vendor",
-      action: "Adidas Pro updated store information",
-      time: "6 hours ago",
-    },
-    {
-      type: "alert",
-      action: "Low stock alert: 3 products below threshold",
-      time: "8 hours ago",
-    },
-  ];
-
-  /* 
-  Removed hardcoded topVendors as it is now fetched from backend
-  */
+  if (loading) {
+    return (
+      <AdminLayout currentPage="dashboard">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout currentPage="dashboard">
-      <div className="flex-1 overflow-y-auto">
-        <div className="bg-white border-b border-emerald-100 px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-emerald-800">
-                Admin Dashboard
-              </h1>
-              <p className="text-emerald-600 mt-1">
-                Platform overview and management
-              </p>
-            </div>
-            <Badge variant="success" className="text-sm bg-emerald-100 text-emerald-700">
-              System Healthy
-            </Badge>
+      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+        {/* Welcome Block */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight">System Control</h1>
+            <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-[2px] leading-none">GearUp Nepal Global Management Dashboard</p>
+          </div>
+          <div className="flex items-center gap-3">
+             <div className="bg-emerald-50 px-4 py-2 rounded-2xl flex items-center gap-2 border border-emerald-100">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Platform Live</span>
+             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <MetricCard
-              title="Total Revenue"
-              value={stats.total_revenue > 0 ? `Rs. ${stats.total_revenue.toLocaleString()}` : "Rs. 0"}
-              change={0}
-              icon={RsIcon}
-              iconColor="text-green-600"
-              iconBgColor="bg-green-100"
-            />
-            <MetricCard
-              title="Active Vendors"
-              value={String(stats.active_vendors)}
-              change={0}
-              icon={StoreIcon}
-              iconColor="text-blue-600"
-              iconBgColor="bg-blue-100"
-            />
-            <MetricCard
-              title="Total Orders"
-              value={String(stats.total_orders)}
-              change={0}
-              icon={ShoppingBagIcon}
-              iconColor="text-orange-600"
-              iconBgColor="bg-orange-100"
-            />
-            <MetricCard
-              title="Total Users"
-              value={String(stats.total_users)}
-              change={0}
-              icon={UsersIcon}
-              iconColor="text-purple-600"
-              iconBgColor="bg-purple-100"
-            />
-          </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <MetricCard
+            title="Total Revenue"
+            value={`Rs. ${stats.total_revenue.toLocaleString()}`}
+            icon={TrendingUpIcon}
+            iconColor="text-emerald-600"
+            iconBgColor="bg-emerald-50"
+          />
+          <MetricCard
+            title="Partners"
+            value={String(stats.active_vendors)}
+            icon={StoreIcon}
+            iconColor="text-indigo-600"
+            iconBgColor="bg-indigo-50"
+          />
+          <MetricCard
+            title="Global Orders"
+            value={String(stats.total_orders)}
+            icon={ShoppingBagIcon}
+            iconColor="text-amber-600"
+            iconBgColor="bg-amber-50"
+          />
+          <MetricCard
+            title="User Base"
+            value={String(stats.total_users)}
+            icon={UsersIcon}
+            iconColor="text-rose-600"
+            iconBgColor="bg-rose-50"
+          />
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-slate-800">
-                  Platform Health
-                </h3>
-                <TrendingUpIcon className="w-5 h-5 text-green-600" />
-              </div>
-            </Card>
-
-            <Card className="p-6 lg:col-span-2">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-slate-800">
-                  Revenue Breakdown
-                </h3>
-                <select className="px-3 py-1 border-2 border-slate-200 rounded-lg text-sm focus:outline-none focus:border-orange-500">
-                  <option>This Month</option>
-                  <option>Last Month</option>
-                  <option>This Year</option>
-                </select>
-              </div>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <AlertCircleIcon className="w-5 h-5 text-orange-600" />
-                  <h3 className="text-lg font-bold text-slate-800">
-                    Pending Approvals
-                  </h3>
-                </div>
-                <Badge variant="warning">{pendingVendors.length}</Badge>
-              </div>
-              <div className="space-y-4">
-                {pendingVendors.length === 0 ? (
-                  <p className="text-slate-500 text-sm">
-                    No pending approvals.
-                  </p>
-                ) : (
-                  pendingVendors.map((vendor) => (
-                    <div
-                      key={vendor.id}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
-                    >
-                      <div>
-                        <p className="font-semibold text-slate-800">
-                          {vendor.store_name}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {vendor.owner_name}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          onClick={() =>
-                            handleVendorAction(vendor.id, "approve")
-                          }
-                          className="!py-1 !px-3 bg-green-600 hover:bg-green-700"
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            handleVendorAction(vendor.id, "reject")
-                          }
-                          className="!py-1 !px-3 text-red-600 border-red-200 hover:bg-red-50"
-                        >
-                          Reject
-                        </Button>
-                      </div>
+        {/* Main Console Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Approvals Block */}
+            <div className="lg:col-span-8 flex flex-col gap-8">
+                <div className="dashboard-card p-8">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                                <AlertCircleIcon className="w-5 h-5" />
+                            </div>
+                            <h2 className="text-lg font-black text-slate-800 tracking-tight">Pending Approvals</h2>
+                        </div>
+                        <span className="px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-widest">{pendingVendors.length} Awaiting</span>
                     </div>
-                  ))
-                )}
-              </div>
-            </Card>
 
-            <Card className="p-6">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">
-                Recent Activity
-              </h3>
-            </Card>
-          </div>
+                    <div className="space-y-4">
+                        {pendingVendors.length === 0 ? (
+                            <div className="py-12 text-center">
+                                <CheckCircle2Icon className="w-12 h-12 text-emerald-100 mx-auto mb-4" />
+                                <p className="text-sm font-bold text-slate-300 uppercase tracking-widest">Queue is currently empty</p>
+                            </div>
+                        ) : (
+                            pendingVendors.map((vendor) => (
+                                <div key={vendor.id} className="group flex items-center justify-between p-5 bg-slate-50/50 hover:bg-white border border-transparent hover:border-slate-100 rounded-[1.5rem] transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-sm font-black text-slate-400 shadow-sm border border-slate-100">
+                                            {vendor.store_name?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p className="font-black text-slate-800 tracking-tight leading-none">{vendor.store_name}</p>
+                                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">{vendor.owner_name} • Registered just now</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button 
+                                            onClick={() => handleVendorAction(vendor.id, "approve")}
+                                            className="h-10 px-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] rounded-xl transition-all shadow-lg shadow-emerald-500/10 cursor-pointer border-none uppercase tracking-widest"
+                                        >
+                                            Approve
+                                        </button>
+                                        <button 
+                                            onClick={() => handleVendorAction(vendor.id, "reject")}
+                                            className="h-10 px-4 bg-white hover:bg-rose-50 text-rose-500 font-black text-[10px] rounded-xl transition-all cursor-pointer border border-slate-100 hover:border-rose-100 uppercase tracking-widest"
+                                        >
+                                            Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
 
-          <Card className="p-6">
-            <h3 className="text-lg font-bold text-slate-800 mb-4">
-              Top Performing Vendors
-            </h3>
-            <table className="w-full">
-              <tbody>
-                {topVendors.map((vendor, index) => (
-                  <tr key={index}>
-                    <td className="py-4 text-sm font-medium text-slate-800">
-                      {vendor.name}
-                    </td>
-                    <td className="py-4 text-sm font-semibold text-green-600">
-                      Rs. {vendor.revenue.toLocaleString()}
-                    </td>
-                    <td className="py-4 text-sm text-slate-700">
-                      {vendor.orders}
-                    </td>
-                    <td className="py-4 text-sm font-semibold">
-                      {vendor.rating} ★
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Card>
+                {/* Top Vendors Table */}
+                <div className="dashboard-card p-8">
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-lg font-black text-slate-800 tracking-tight text-[14px] uppercase tracking-[2px]">Top Performing Partners</h2>
+                        <button className="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-600 transition-colors border-none bg-transparent cursor-pointer">Analyze Report</button>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
+                                <tr>
+                                    <th className="pb-4 font-black">Partner Store</th>
+                                    <th className="pb-4 font-black">Gross Revenue</th>
+                                    <th className="pb-4 font-black text-center">Volume</th>
+                                    <th className="pb-4 font-black text-right">Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {topVendors.map((vendor, index) => (
+                                    <tr key={index} className="group hover:bg-slate-50/50 transition-colors">
+                                        <td className="py-5">
+                                            <p className="text-sm font-black text-slate-800 tracking-tight leading-none">{vendor.name}</p>
+                                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">Official Verified Merch</p>
+                                        </td>
+                                        <td className="py-5">
+                                            <span className="text-sm font-black text-emerald-600 tracking-tight">Rs. {vendor.revenue.toLocaleString()}</span>
+                                        </td>
+                                        <td className="py-5 text-center">
+                                            <span className="text-xs font-bold text-slate-600 px-3 py-1 bg-slate-100 rounded-lg">{vendor.orders} Orders</span>
+                                        </td>
+                                        <td className="py-5 text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <span className="text-sm font-black text-amber-500">{vendor.rating}</span>
+                                                <span className="text-amber-300">★</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Activity Sidebar */}
+            <div className="lg:col-span-4 flex flex-col gap-8">
+                <div className="dashboard-card p-8">
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                            <BellIcon className="w-5 h-5" />
+                        </div>
+                        <h2 className="text-lg font-black text-slate-800 tracking-tight">Recent Activity</h2>
+                    </div>
+
+                    <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-slate-100">
+                        {[
+                            { type: "vendor", action: "Nike Sports added 5 products", time: "2h ago", color: "bg-indigo-500" },
+                            { type: "order", action: "Order #ORD-1240 completed", time: "3h ago", color: "bg-emerald-500" },
+                            { type: "user", action: "12 new customer registrations", time: "5h ago", color: "bg-amber-500" },
+                            { type: "vendor", action: "Adidas Pro updated info", time: "6h ago", color: "bg-rose-500" },
+                        ].map((act, i) => (
+                            <div key={i} className="relative pl-10">
+                                <div className={`absolute left-0 top-1 w-10 h-10 rounded-xl border-4 border-white ${act.color} flex items-center justify-center text-white scale-75 shadow-sm`}>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                </div>
+                                <p className="text-xs font-black text-slate-700 leading-tight">{act.action}</p>
+                                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{act.time}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    <button className="w-full mt-8 py-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-indigo-600 font-black text-[10px] rounded-xl transition-all border-none cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2">
+                        View Full Logs <ArrowRightIcon className="w-3 h-3" />
+                    </button>
+                </div>
+
+                {/* Efficiency Score */}
+                <div className="dashboard-card p-8 bg-indigo-600 text-white relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150" />
+                     <p className="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">System Health</p>
+                     <h3 className="text-2xl font-black text-white mb-4 tracking-tighter">Operational 99.9%</h3>
+                     <div className="w-full h-1.5 bg-indigo-800 rounded-full overflow-hidden mb-4">
+                        <div className="w-[99%] h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                     </div>
+                     <p className="text-xs font-bold text-indigo-100 leading-relaxed">System performance is optimal. All API endpoints responding within 45ms.</p>
+                </div>
+            </div>
         </div>
       </div>
     </AdminLayout>

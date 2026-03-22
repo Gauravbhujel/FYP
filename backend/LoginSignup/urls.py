@@ -42,4 +42,8 @@ urlpatterns = [
     path('user/delete-account/', views.delete_account, name='delete_account'),
     path('products/<int:product_id>/review/submit/', views.submit_review, name='submit_review'),
     path('products/<int:product_id>/review/check-eligibility/', views.check_review_eligibility, name='check_review_eligibility'),
+    
+    # Admin Product Management
+    path('admin/products/list/', views.admin_products_list, name='admin_products_list'),
+    path('admin/products/delete/<int:product_id>/', views.admin_delete_product, name='admin_delete_product'),
 ]

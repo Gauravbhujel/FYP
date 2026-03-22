@@ -36,8 +36,6 @@ class Vendor(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     zip_code = models.CharField(max_length=20)
-    state = models.CharField(max_length=100)
-    zip_code = models.CharField(max_length=20)
     role = models.CharField(max_length=20, default='vendor')
     
     STATUS_CHOICES = (

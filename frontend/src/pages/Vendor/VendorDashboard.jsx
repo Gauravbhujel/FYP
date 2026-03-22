@@ -4,18 +4,15 @@ import {
   PackageIcon,
   TrendingUpIcon,
   ClockIcon,
+  PlusIcon,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
 import { MetricCard } from "../../components/dashboard/MetricCard";
 import { SalesChart } from "../../components/dashboard/SalesChart";
 import { RecentOrders } from "../../components/dashboard/RecentOrders";
 import { QuickActions } from "../../components/dashboard/QuickActions";
 import { RecentProducts } from "../../components/dashboard/RecentProducts";
-import { Badge } from "../../components/ui/Badge";
-
-const RsIcon = ({ className }) => (
-  <span className={`font-bold flex items-center justify-center ${className}`}>Rs</span>
-);
 
 export const VendorDashboard = () => {
   const [stats, setStats] = useState({
@@ -56,78 +53,86 @@ export const VendorDashboard = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <VendorLayout currentPage="dashboard">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+        </div>
+      </VendorLayout>
+    );
+  }
+
   return (
     <VendorLayout currentPage="dashboard">
-      <div className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <div className="bg-white border-b border-emerald-100 px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-emerald-800">
-                Vendor Dashboard
-              </h1>
-              <p className="text-emerald-600 mt-1">
-                Overview of your store performance
-              </p>
-            </div>
-            <Badge variant="success" className="text-sm bg-emerald-100 text-emerald-700">
-              Store Active
-            </Badge>
+      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
+        {/* Welcome Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Store Overview</h1>
+            <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">Welcome back to your business command center</p>
           </div>
+          <Link to="/vendor/AddProduct">
+            <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 py-3 rounded-2xl flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-95 text-sm uppercase tracking-widest border-none cursor-pointer">
+              <PlusIcon className="w-5 h-5 stroke-[3px]" /> Add New Product
+            </button>
+          </Link>
         </div>
 
-        {/* Content */}
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <MetricCard
-              title="Total Revenue"
-              value={`Rs. ${stats.total_revenue.toLocaleString()}`}
-              change={0}
-              icon={RsIcon}
-              iconColor="text-green-600"
-              iconBgColor="bg-green-100"
-            />
-            <MetricCard
-              title="Total Orders"
-              value={String(stats.total_orders)}
-              change={0}
-              icon={ShoppingBagIcon}
-              iconColor="text-blue-600"
-              iconBgColor="bg-blue-100"
-            />
-            <MetricCard
-              title="Products Listed"
-              value={String(stats.products_listed)}
-              change={0}
-              icon={PackageIcon}
-              iconColor="text-orange-600"
-              iconBgColor="bg-orange-100"
-            />
-            <MetricCard
-              title="Pending Orders"
-              value={String(stats.pending_orders)}
-              change={0}
-              icon={ClockIcon}
-              iconColor="text-purple-600"
-              iconBgColor="bg-purple-100"
-            />
-          </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <MetricCard
+            title="Total Revenue"
+            value={`Rs. ${stats.total_revenue.toLocaleString()}`}
+            change={5.2}
+            icon={TrendingUpIcon}
+            iconColor="text-emerald-600"
+            iconBgColor="bg-emerald-50"
+          />
+          <MetricCard
+            title="Orders"
+            value={String(stats.total_orders)}
+            change={2.1}
+            icon={ShoppingBagIcon}
+            iconColor="text-blue-600"
+            iconBgColor="bg-blue-50"
+          />
+          <MetricCard
+            title="Stock items"
+            value={String(stats.products_listed)}
+            icon={PackageIcon}
+            iconColor="text-orange-600"
+            iconBgColor="bg-orange-50"
+          />
+          <MetricCard
+            title="Pending tasks"
+            value={String(stats.pending_orders)}
+            icon={ClockIcon}
+            iconColor="text-rose-600"
+            iconBgColor="bg-rose-50"
+          />
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div className="lg:col-span-2">
-              <SalesChart data={salesData} />
+        {/* Main Dashboard Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Sales Chart */}
+            <div className="lg:col-span-8">
+                <SalesChart data={salesData} />
             </div>
-            <div className="space-y-6">
-              <QuickActions />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-3 space-y-6">
-              <RecentOrders orders={recentOrders} />
-              <RecentProducts products={recentProducts} />
+            {/* Quick Actions */}
+            <div className="lg:col-span-4">
+                <QuickActions />
             </div>
-          </div>
+
+            {/* Recent Activity Section */}
+            <div className="lg:col-span-7">
+                <RecentOrders orders={recentOrders} />
+            </div>
+
+            <div className="lg:col-span-5">
+                <RecentProducts products={recentProducts} />
+            </div>
         </div>
       </div>
     </VendorLayout>

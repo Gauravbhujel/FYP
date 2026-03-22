@@ -1,94 +1,79 @@
 import React from "react";
-import { Card } from "../ui/Card";
-import { Badge } from "../ui/Badge";
 
 export function RecentOrders({ orders }) {
   const orderList = orders && orders.length > 0 ? orders : [];
 
-  const getStatusVariant = (status) => {
+  const getStatusStyle = (status) => {
     switch (status) {
       case "delivered":
-        return "success";
+        return "bg-emerald-100 text-emerald-700";
       case "shipped":
-        return "info";
+        return "bg-blue-100 text-blue-700";
       case "processing":
-        return "warning";
+        return "bg-amber-100 text-amber-700";
       case "pending":
       default:
-        return "default";
+        return "bg-slate-100 text-slate-700";
     }
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-slate-800">Recent Orders</h3>
+    <div className="dashboard-card p-0 overflow-hidden">
+      <div className="flex items-center justify-between p-6 border-b border-slate-50">
+        <h3 className="text-lg font-black text-slate-800 tracking-tight">Recent Orders</h3>
         <a
           href="/vendor/orders"
-          className="text-sm text-orange-600 hover:text-orange-700 font-semibold"
+          className="text-xs font-bold text-emerald-600 hover:text-emerald-700 uppercase tracking-widest transition-colors"
         >
           View All
         </a>
       </div>
 
-      {orderList.length === 0 ? (
-        <div className="flex items-center justify-center py-12 text-slate-400">
-          <p className="text-sm">No orders yet</p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200">
-                <th className="text-left text-xs font-semibold text-slate-600 pb-3">
-                  Order ID
-                </th>
-                <th className="text-left text-xs font-semibold text-slate-600 pb-3">
-                  Customer
-                </th>
-                <th className="text-left text-xs font-semibold text-slate-600 pb-3">
-                  Product
-                </th>
-                <th className="text-left text-xs font-semibold text-slate-600 pb-3">
-                  Amount
-                </th>
-                <th className="text-left text-xs font-semibold text-slate-600 pb-3">
-                  Status
-                </th>
-                <th className="text-left text-xs font-semibold text-slate-600 pb-3">
-                  Date
-                </th>
-              </tr>
-            </thead>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-slate-50/50">
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Order ID</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Product</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount</th>
+              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+            </tr>
+          </thead>
 
-            <tbody>
-              {orderList.map((order) => (
-                <tr
-                  key={order.id}
-                  className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
-                >
-                  <td className="py-4 text-sm font-medium text-slate-800">
-                    {order.id}
+          <tbody className="divide-y divide-slate-50">
+            {orderList.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="px-6 py-12 text-center text-slate-400 font-medium text-sm">
+                   No orders recorded yet
+                </td>
+              </tr>
+            ) : (
+              orderList.map((order) => (
+                <tr key={order.id} className="hover:bg-slate-50/80 transition-colors group">
+                  <td className="px-6 py-4">
+                    <span className="text-sm font-bold text-slate-800 tracking-tight">{order.id}</span>
                   </td>
-                  <td className="py-4 text-sm text-slate-700">
-                    {order.customer}
+                  <td className="px-6 py-4">
+                    <span className="text-sm font-semibold text-slate-600 tracking-tight">{order.customer}</span>
                   </td>
-                  <td className="py-4 text-sm text-slate-700">{order.product}</td>
-                  <td className="py-4 text-sm font-semibold text-slate-800">
-                    Rs. {order.amount}
+                  <td className="px-6 py-4">
+                    <span className="text-sm text-slate-500 font-medium truncate max-w-[150px] inline-block">{order.product}</span>
                   </td>
-                  <td className="py-4">
-                    <Badge variant={getStatusVariant(order.status)}>
+                  <td className="px-6 py-4">
+                    <span className="text-sm font-black text-slate-900 tracking-tight">Rs. {order.amount.toLocaleString()}</span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-block ${getStatusStyle(order.status)}`}>
                       {order.status}
-                    </Badge>
+                    </span>
                   </td>
-                  <td className="py-4 text-sm text-slate-600">{order.date}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </Card>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

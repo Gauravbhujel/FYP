@@ -7,11 +7,14 @@ import {
   ShieldOffIcon,
   ShieldCheckIcon,
   ClockIcon,
+  UserIcon,
+  UsersIcon,
+  MailIcon,
+  CalendarIcon,
+  ChevronDownIcon
 } from "lucide-react";
-
 import { AdminLayout } from "../../components/admin/AdminLayout";
-import { Card } from "../../components/ui/Card";
-import { Badge } from "../../components/ui/Badge";
+import api from "../../api";
 
 export function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,16 +23,15 @@ export function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const menuRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpenMenuId(null);
       }
     };
@@ -38,310 +40,231 @@ export function AdminUsersPage() {
   }, []);
 
   const fetchUsers = async () => {
-    const token = localStorage.getItem("token");
     setLoading(true);
-    setError(null);
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/admin/users/", {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data);
-      } else {
-        setError("Failed to fetch users");
-      }
+      const response = await api.get("admin/users/");
+      setUsers(response.data);
     } catch (err) {
       console.error("Error fetching users:", err);
-      setError("Network error. Make sure the backend is running.");
+      setError("Failed to synchronize user records with the neural network.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleSuspendAction = async (userId, action) => {
-    const token = localStorage.getItem("token");
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/admin/users/suspend/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${token}`,
-          },
-          body: JSON.stringify({ user_id: userId, action }),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        alert(data.message);
-        fetchUsers(); // Refresh the list
-      } else {
-        alert(data.error || "Failed to update user status");
-      }
+      const response = await api.post("admin/users/suspend/", { user_id: userId, action });
+      fetchUsers();
+      setOpenMenuId(null);
     } catch (err) {
       console.error("Error updating user status:", err);
-      alert("Network error");
     }
-    setOpenMenuId(null);
   };
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
-
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
-
     return matchesSearch && matchesRole;
   });
 
   const getRoleBadge = (role) => {
     switch (role) {
-      case "admin":
-        return "warning";
-      case "vendor":
-        return "info";
-      default:
-        return "default";
+      case "admin": return "bg-rose-50 text-rose-600 border-rose-100";
+      case "vendor": return "bg-indigo-50 text-indigo-600 border-indigo-100";
+      default: return "bg-slate-50 text-slate-600 border-slate-100";
     }
   };
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "suspended":
-        return "bg-red-100 text-red-800";
-      case "inactive":
-        return "bg-slate-100 text-slate-600";
-      default:
-        return "bg-slate-100 text-slate-600";
+      case "active": return "bg-emerald-50 text-emerald-600";
+      case "suspended": return "bg-rose-50 text-rose-600";
+      default: return "bg-slate-50 text-slate-400";
     }
-  };
-
-  const formatSuspendedUntil = (suspendedUntil) => {
-    if (!suspendedUntil) return "";
-    const date = new Date(suspendedUntil);
-    return date.toLocaleString();
   };
 
   return (
     <AdminLayout currentPage="users">
-      <div className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <div className="bg-white border-b border-slate-200 px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-800">
-                Manage Users
-              </h1>
-              <p className="text-slate-600 mt-1">
-                {loading ? "Loading..." : `${filteredUsers.length} users found`}
-              </p>
-            </div>
+      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+        {/* Header Block */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Identity Directory</h1>
+            <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-[2px] leading-none">Management of all authenticated global accounts</p>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className="bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+                <UsersIcon className="w-4 h-4 text-indigo-500" />
+                <span className="text-xs font-black text-slate-700 uppercase tracking-widest">{users.length} Total Registered</span>
+             </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* Filters */}
-          <Card className="p-6 mb-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
-              {/* Search */}
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                  <input
-                    type="text"
+        {/* Filter Toolbar */}
+        <div className="dashboard-card p-4 flex flex-col lg:flex-row items-center gap-4">
+            <div className="flex-1 w-full relative group">
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                <input 
+                    type="text" 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search users by name or email..."
-                    className="w-full pl-10 pr-4 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                  />
-                </div>
-              </div>
-
-              {/* Role Filter */}
-              <div className="flex items-center space-x-2">
-                <FilterIcon className="w-5 h-5 text-slate-400" />
-                <select
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  className="px-4 py-2 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                >
-                  <option value="all">All Roles</option>
-                  <option value="customer">Customer</option>
-                  <option value="vendor">Vendor</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+                    placeholder="Search by identity, email, or system ID..." 
+                    className="w-full h-12 pl-12 pr-4 bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white transition-all shadow-inner"
+                />
             </div>
-          </Card>
+            <div className="flex items-center gap-3 w-full lg:w-auto">
+                <div className="relative flex-1 lg:flex-none min-w-[160px]">
+                    <FilterIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <select 
+                        value={roleFilter}
+                        onChange={(e) => setRoleFilter(e.target.value)}
+                        className="w-full h-12 pl-12 pr-10 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black text-slate-600 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer shadow-sm"
+                    >
+                        <option value="all">All Access</option>
+                        <option value="customer">Customer</option>
+                        <option value="vendor">Partner</option>
+                        <option value="admin">Super Admin</option>
+                    </select>
+                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
+                <button 
+                    onClick={fetchUsers}
+                    className="h-12 w-12 flex items-center justify-center bg-white border border-slate-100 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-indigo-500 transition-all shadow-sm cursor-pointer"
+                >
+                    <Loader2Icon className={`w-5 h-5 ${loading ? "animate-spin text-indigo-500" : ""}`} />
+                </button>
+            </div>
+        </div>
 
-          {/* Error State */}
-          {error && (
-            <Card className="p-6 mb-6 bg-red-50 border border-red-200">
-              <p className="text-red-600 text-sm">{error}</p>
-              <button
-                onClick={fetchUsers}
-                className="mt-2 text-sm text-red-700 underline hover:text-red-800"
-              >
-                Try again
-              </button>
-            </Card>
-          )}
-
-          {/* Loading State */}
-          {loading ? (
-            <Card className="p-12 flex flex-col items-center justify-center">
-              <Loader2Icon className="w-8 h-8 text-emerald-600 animate-spin mb-3" />
-              <p className="text-slate-500">Loading users...</p>
-            </Card>
-          ) : (
-            /* Users Table */
-            <Card className="overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">
-                        User
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">
-                        Role
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">
-                        Status
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase">
-                        Joined Date
-                      </th>
-                      <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-slate-200">
-                    {filteredUsers.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan="5"
-                          className="px-6 py-8 text-center text-slate-500"
-                        >
-                          No users found.
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredUsers.map((user) => (
-                        <tr key={user.id} className="hover:bg-slate-50">
-                          <td className="px-6 py-4">
-                            <p className="text-sm font-medium text-slate-800">
-                              {user.name}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {user.email}
-                            </p>
-                          </td>
-
-                          <td className="px-6 py-4">
-                            <Badge
-                              variant={getRoleBadge(user.role)}
-                              className="capitalize"
-                            >
-                              {user.role}
-                            </Badge>
-                          </td>
-
-                          <td className="px-6 py-4">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyle(user.status)}`}
-                            >
-                              {user.status === "suspended" && (
-                                <ClockIcon className="w-3 h-3 mr-1" />
-                              )}
-                              {user.status}
-                            </span>
-                            {user.status === "suspended" &&
-                              user.suspended_until && (
-                                <p className="text-xs text-red-500 mt-1">
-                                  Until: {formatSuspendedUntil(user.suspended_until)}
-                                </p>
-                              )}
-                          </td>
-
-                          <td className="px-6 py-4 text-sm text-slate-600">
-                            {user.date_joined}
-                          </td>
-
-                          <td className="px-6 py-4 text-right">
-                            <div className="relative inline-block" ref={openMenuId === user.id ? menuRef : null}>
-                              <button
-                                onClick={() =>
-                                  setOpenMenuId(
-                                    openMenuId === user.id ? null : user.id
-                                  )
-                                }
-                                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                              >
-                                <MoreVerticalIcon className="w-4 h-4 text-slate-500" />
-                              </button>
-
-                              {openMenuId === user.id && (
-                                <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
-                                  {user.role !== "admin" && (
-                                    <>
-                                      {user.is_suspended ? (
-                                        <button
-                                          onClick={() =>
-                                            handleSuspendAction(
-                                              user.id,
-                                              "unsuspend"
-                                            )
-                                          }
-                                          className="flex items-center w-full px-4 py-2.5 text-sm text-green-700 hover:bg-green-50 transition-colors"
-                                        >
-                                          <ShieldCheckIcon className="w-4 h-4 mr-2" />
-                                          Unsuspend User
-                                        </button>
-                                      ) : (
-                                        <button
-                                          onClick={() =>
-                                            handleSuspendAction(
-                                              user.id,
-                                              "suspend"
-                                            )
-                                          }
-                                          className="flex items-center w-full px-4 py-2.5 text-sm text-red-700 hover:bg-red-50 transition-colors"
-                                        >
-                                          <ShieldOffIcon className="w-4 h-4 mr-2" />
-                                          Suspend 24 Hours
-                                        </button>
-                                      )}
-                                    </>
-                                  )}
-                                  {user.role === "admin" && (
-                                    <p className="px-4 py-2.5 text-xs text-slate-400">
-                                      No actions available
-                                    </p>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </td>
+        {/* Records Table */}
+        <div className="dashboard-card overflow-hidden">
+            <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                    <thead className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] text-left bg-slate-50/50">
+                        <tr>
+                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Subject Identity</th>
+                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Access Level</th>
+                            <th className="px-8 py-5 font-black border-b border-slate-100/50">State</th>
+                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Registration</th>
+                            <th className="px-8 py-5 font-black border-b border-slate-100/50 text-right">Directives</th>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                        {filteredUsers.length === 0 ? (
+                            <tr>
+                                <td colSpan="5" className="px-8 py-20 text-center">
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
+                                            <SearchIcon className="w-8 h-8 text-slate-200" />
+                                        </div>
+                                        <p className="text-xs font-black text-slate-300 uppercase tracking-widest">No matching records found in database</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredUsers.map((user) => (
+                                <tr key={user.id} className="group hover:bg-indigo-50/30 transition-all duration-200">
+                                    <td className="px-8 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-sm font-black text-indigo-500 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform ring-4 ring-transparent group-hover:ring-indigo-50">
+                                                {user.name?.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="font-black text-slate-800 tracking-tight leading-none text-sm">{user.name}</p>
+                                                <div className="flex items-center gap-2 mt-1.5">
+                                                    <MailIcon className="w-3 h-3 text-slate-300" />
+                                                    <p className="text-[11px] font-bold text-slate-400">{user.email}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className={`px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${getRoleBadge(user.role)}`}>
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]'}`} />
+                                                <span className={`text-[10px] font-black uppercase tracking-widest ${user.status === 'active' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                    {user.status}
+                                                </span>
+                                            </div>
+                                            {user.status === "suspended" && user.suspended_until && (
+                                                <p className="text-[9px] font-bold text-rose-400 mt-1 uppercase tracking-tighter">
+                                                    Released: {new Date(user.suspended_until).toLocaleDateString()}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="flex items-center gap-2">
+                                            <CalendarIcon className="w-3 h-3 text-slate-300" />
+                                            <p className="text-[11px] font-bold text-slate-500">{user.date_joined}</p>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="relative inline-block" ref={openMenuId === user.id ? dropdownRef : null}>
+                                            <button 
+                                                onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
+                                                className="w-10 h-10 flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-100 rounded-xl transition-all shadow-sm cursor-pointer border-none"
+                                            >
+                                                <MoreVerticalIcon className="w-4 h-4 text-slate-400" />
+                                            </button>
+                                            {openMenuId === user.id && (
+                                                <div className="absolute right-0 mt-3 w-56 bg-white border border-slate-100 rounded-[1.5rem] shadow-2xl shadow-indigo-100/50 py-2 z-50 animate-fade-down">
+                                                    <p className="px-5 py-3 text-[9px] font-black text-slate-300 uppercase tracking-[2px] border-b border-slate-50">Identity Directives</p>
+                                                    
+                                                    {user.role !== "admin" ? (
+                                                        <>
+                                                            {user.status === "suspended" ? (
+                                                                <button 
+                                                                    onClick={() => handleSuspendAction(user.id, "unsuspend")}
+                                                                    className="w-full flex items-center px-5 py-3.5 text-xs font-black text-emerald-600 hover:bg-emerald-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                >
+                                                                    <ShieldCheckIcon className="w-4 h-4 mr-3" /> Lift Suspension
+                                                                </button>
+                                                            ) : (
+                                                                <button 
+                                                                    onClick={() => handleSuspendAction(user.id, "suspend")}
+                                                                    className="w-full flex items-center px-5 py-3.5 text-xs font-black text-rose-500 hover:bg-rose-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                >
+                                                                    <ShieldOffIcon className="w-4 h-4 mr-3" /> Suspend (24h)
+                                                                </button>
+                                                            )}
+                                                            <div className="h-px bg-slate-50 my-1 mx-5" />
+                                                            <button className="w-full flex items-center px-5 py-3.5 text-xs font-black text-slate-400 hover:bg-slate-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
+                                                                Detailed Audit
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <div className="px-5 py-4 text-center">
+                                                            <p className="text-[10px] font-bold text-slate-400 italic">No directives available for Super Admins</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
                 </table>
-              </div>
-            </Card>
-          )}
+            </div>
+            
+            {/* Table Footer */}
+            <div className="bg-slate-50/50 px-8 py-4 border-t border-slate-100/50 flex items-center justify-between">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">End of directory records</p>
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Database Sync Active</p>
+                </div>
+            </div>
         </div>
       </div>
     </AdminLayout>

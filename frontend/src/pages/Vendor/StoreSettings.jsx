@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StoreIcon,
   MapPinIcon,
   PhoneIcon,
   MailIcon,
   GlobeIcon,
+  CheckCircle2Icon,
+  AlertCircleIcon,
+  SaveIcon,
+  Building2Icon
 } from "lucide-react";
-
 import { VendorLayout } from "../../components/vendor/VendorLayout";
-import { Button } from "../../components/ui/Button";
-import { Card } from "../../components/ui/Card";
+import api from "../../api";
 
 export function StoreSettingsPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
     storeName: "",
     tagline: "",
@@ -25,254 +30,272 @@ export function StoreSettingsPage() {
     zipCode: "",
   });
 
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await api.get("vendor/profile/");
+        const data = response.data;
+        setFormData({
+          storeName: data.store_name || "",
+          tagline: data.tagline || "",
+          description: data.description || "",
+          email: data.email || "",
+          phone: data.phone_number || "",
+          website: data.website || "",
+          address: data.address || "",
+          city: data.city || "",
+          state: data.state || "",
+          zipCode: data.pincode || "",
+        });
+      } catch (err) {
+        console.error("Error fetching settings:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
     try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/store-settings/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        },
-      );
+      // Map frontend fields to backend expected fields if necessary
+      const payload = {
+          store_name: formData.storeName,
+          tagline: formData.tagline,
+          description: formData.description,
+          phone_number: formData.phone,
+          website: formData.website,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.zipCode
+      };
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Store settings saved successfully!");
-      } else {
-        alert("Error saving store settings");
-        console.log(data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
+      await api.post("vendor/profile/update/", payload);
+      setSuccess("Store profile updated successfully!");
+    } catch (err) {
+      console.error("Error saving settings:", err);
+      setError("Failed to sync store settings. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <VendorLayout currentPage="settings">
-      <div className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <div className="bg-white border-b border-slate-200 px-6 py-6">
-          <h1 className="text-2xl font-bold text-slate-800">Store Settings</h1>
-          <p className="text-slate-600 mt-1">
-            Manage your store information and preferences
-          </p>
+      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-20">
+        <div>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Store Configuration</h1>
+          <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">Manage your brand identity and contact details</p>
         </div>
 
-        {/* Content */}
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Store Information */}
-            <Card className="p-6">
-              <div className="flex items-center space-x-2 mb-6">
-                <StoreIcon className="w-5 h-5 text-orange-600" />
-                <h2 className="text-lg font-bold text-slate-800">
-                  Store Information
-                </h2>
+        {error && (
+          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-center gap-3">
+            <AlertCircleIcon className="w-5 h-5 flex-shrink-0" />
+            <p className="text-sm font-bold">{error}</p>
+          </div>
+        )}
+        {success && (
+          <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center gap-3">
+            <CheckCircle2Icon className="w-5 h-5 flex-shrink-0" />
+            <p className="text-sm font-bold">{success}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 space-y-8">
+            {/* Identity */}
+            <div className="dashboard-card p-8">
+              <div className="flex items-center gap-3 mb-8">
+                 <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                    <StoreIcon className="w-5 h-5" />
+                 </div>
+                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Public Identity</h2>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Store Name *
-                  </label>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Store Display Name</label>
                   <input
                     type="text"
                     name="storeName"
                     value={formData.storeName}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
+                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
                     required
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Tagline
-                  </label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Slogan or Tagline</label>
                   <input
                     type="text"
                     name="tagline"
                     value={formData.tagline}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                    placeholder="Brief description of your store"
+                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-medium text-slate-600 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    placeholder="e.g., Best Gear for Every Athlete"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Store Description
-                  </label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Business Autobiography</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
                     rows="4"
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
+                    className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm font-medium text-slate-600 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none resize-none"
                   />
                 </div>
               </div>
-            </Card>
+            </div>
 
-            {/* Contact Information */}
-            <Card className="p-6">
-              <div className="flex items-center space-x-2 mb-6">
-                <PhoneIcon className="w-5 h-5 text-orange-600" />
-                <h2 className="text-lg font-bold text-slate-800">
-                  Contact Information
-                </h2>
+            {/* Address */}
+            <div className="dashboard-card p-8">
+              <div className="flex items-center gap-3 mb-8">
+                 <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                    <MapPinIcon className="w-5 h-5" />
+                 </div>
+                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Business Address</h2>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Email *
-                    </label>
-
-                    <div className="relative">
-                      <MailIcon className="absolute left-3 top-3 text-slate-400 w-5 h-5" />
-
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Phone *
-                    </label>
-
-                    <div className="relative">
-                      <PhoneIcon className="absolute left-3 top-3 text-slate-400 w-5 h-5" />
-
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                        required
-                      />
-                    </div>
-                  </div>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Street Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    required
+                  />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Website
-                  </label>
-
-                  <div className="relative">
-                    <GlobeIcon className="absolute left-3 top-3 text-slate-400 w-5 h-5" />
-
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">City</label>
                     <input
-                      type="url"
-                      name="website"
-                      value={formData.website}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                      placeholder="https://yourstore.com"
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                        required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Province/State</label>
+                    <input
+                        type="text"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                        className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                        required
+                    />
+                  </div>
+                  <div className="space-y-2 lg:col-span-1 col-span-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ZIP / Postal</label>
+                    <input
+                        type="text"
+                        name="zipCode"
+                        value={formData.zipCode}
+                        onChange={handleChange}
+                        className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                        required
                     />
                   </div>
                 </div>
               </div>
-            </Card>
+            </div>
+          </div>
 
-            {/* Business Address */}
-            <Card className="p-6">
-              <div className="flex items-center space-x-2 mb-6">
-                <MapPinIcon className="w-5 h-5 text-orange-600" />
-                <h2 className="text-lg font-bold text-slate-800">
-                  Business Address
-                </h2>
+          <div className="lg:col-span-4 space-y-8">
+            {/* Contact */}
+            <div className="dashboard-card p-8">
+              <div className="flex items-center gap-3 mb-8">
+                 <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                    <PhoneIcon className="w-5 h-5" />
+                 </div>
+                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Support</h2>
               </div>
 
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="Street Address"
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                  required
-                />
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Public Email</label>
+                  <div className="relative">
+                    <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                    <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full h-12 pl-11 pr-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                        required
+                    />
+                  </div>
+                </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    placeholder="City"
-                    className="px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                    required
-                  />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Line</label>
+                  <div className="relative">
+                    <PhoneIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                    <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full h-12 pl-11 pr-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                        required
+                    />
+                  </div>
+                </div>
 
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    placeholder="State"
-                    className="px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                    required
-                  />
-
-                  <input
-                    type="text"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleChange}
-                    placeholder="ZIP Code"
-                    className="px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-orange-500"
-                    required
-                  />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Official Website</label>
+                  <div className="relative">
+                    <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+                    <input
+                        type="url"
+                        name="website"
+                        value={formData.website}
+                        onChange={handleChange}
+                        className="w-full h-12 pl-11 pr-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                        placeholder="https://"
+                    />
+                  </div>
                 </div>
               </div>
-            </Card>
-
-            <div className="flex justify-end gap-3 mt-8">
-              <Button
-                variant="outline"
-                size="md"
-                type="button"
-                className="px-6 py-2.5 rounded-lg font-semibold border-slate-300 text-slate-700 hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm"
-                onClick={() => window.location.reload()}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                size="md"
-                type="submit"
-                className="bg-primary hover:bg-secondary text-white px-8 py-2.5 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg active:scale-95 border-none"
-              >
-                Save Changes
-              </Button>
             </div>
-          </form>
-        </div>
+
+            {/* Save Block */}
+            <div className="dashboard-card p-2 bg-emerald-500/5 sticky top-24">
+                <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full h-16 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-3xl transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 border-none cursor-pointer uppercase tracking-[2px] text-xs"
+                >
+                    {loading ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                    ) : (
+                        <>
+                            <SaveIcon className="w-5 h-5" />
+                            Synchronize Profile
+                        </>
+                    )}
+                </button>
+            </div>
+          </div>
+        </form>
       </div>
     </VendorLayout>
   );

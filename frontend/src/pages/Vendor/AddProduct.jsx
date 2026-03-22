@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { PackageIcon, DollarSignIcon, ImageIcon, PlusIcon, XIcon, AlertCircleIcon, ChevronLeftIcon } from "lucide-react";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
-import { Button } from "../../components/ui/Button";
-import { Card } from "../../components/ui/Card";
 import api from "../../api";
 
 export function AddProductPage() {
@@ -26,10 +25,7 @@ export function AddProductPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleFileChange = (e, index) => {
@@ -46,6 +42,16 @@ export function AddProductPage() {
     }
   };
 
+  const removeImage = (index) => {
+    const newFiles = [...selectedFiles];
+    newFiles[index] = null;
+    setSelectedFiles(newFiles);
+    
+    const newPreviews = [...previewUrls];
+    newPreviews[index] = null;
+    setPreviewUrls(newPreviews);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -55,314 +61,237 @@ export function AddProductPage() {
     try {
       const data = new FormData();
       Object.keys(formData).forEach(key => {
-        if (formData[key]) {
-          data.append(key, formData[key]);
-        }
+        if (formData[key]) data.append(key, formData[key]);
       });
       
       if (selectedFiles[0]) data.append("image", selectedFiles[0]);
       if (selectedFiles[1]) data.append("image2", selectedFiles[1]);
       if (selectedFiles[2]) data.append("image3", selectedFiles[2]);
 
-      const response = await api.post("vendor/products/add/", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      await api.post("vendor/products/add/", data, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      setSuccess("Product published successfully!");
-      console.log("Product created:", response.data);
       
-      // Clear form
-      setFormData({
-        name: "",
-        description: "",
-        category: "football",
-        size: "free",
-        price: "",
-        compare_price: "",
-        quantity: "",
-      });
-      setSelectedFiles([null, null, null]);
-      setPreviewUrls([null, null, null]);
-
-      // Redirect after a short delay
-      setTimeout(() => {
-        navigate("/vendor/dashboard");
-      }, 2000);
+      setSuccess("Product published successfully!");
+      setTimeout(() => navigate("/vendor/products"), 2000);
     } catch (err) {
       console.error("Error creating product:", err);
-      setError(
-        err.response?.data?.error 
-          ? JSON.stringify(err.response.data.error)
-          : "Failed to publish product. Please try again."
-      );
+      setError(err.response?.data?.error ? JSON.stringify(err.response.data.error) : "Failed to publish product.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <VendorLayout currentPage="add-product">
-      <div className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <div className="bg-white border-b border-slate-200 px-6 py-6">
-          <h1 className="text-2xl font-bold text-slate-800">Add New Product</h1>
-          <p className="text-slate-600 mt-1">
-            Create a new product listing for your store
-          </p>
+    <VendorLayout currentPage="products">
+      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+        {/* Breadcrumb & Header */}
+        <div className="flex flex-col gap-4">
+            <button 
+                onClick={() => navigate("/vendor/products")}
+                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors border-none bg-transparent cursor-pointer group"
+            >
+                <ChevronLeftIcon className="w-3 h-3 transition-transform group-hover:-translate-x-1" /> Back to Catalog
+            </button>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">Add New Product</h1>
+                    <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">List a new item in your digital store</p>
+                </div>
+            </div>
         </div>
 
-        {/* Content */}
-        <div className="max-w-5xl mx-auto px-6 py-8">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="mb-6 p-4 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700">
-              {success}
-            </div>
-          )}
+        {error && (
+          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-center gap-3">
+            <AlertCircleIcon className="w-5 h-5 flex-shrink-0" />
+            <p className="text-sm font-bold">{error}</p>
+          </div>
+        )}
+        {success && (
+          <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center gap-3">
+            <PackageIcon className="w-5 h-5 flex-shrink-0" />
+            <p className="text-sm font-bold">{success}</p>
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Product Information */}
-            <Card className="p-6">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">
-                Product Information
-              </h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Product Name *
-                  </label>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Basic Info */}
+            <div className="dashboard-card p-8">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                    <PackageIcon className="w-5 h-5" />
+                 </div>
+                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Product Information</h2>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Product Title</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                    placeholder="e.g., Pro Running Shoes"
+                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none placeholder:text-slate-300"
+                    placeholder="e.g., Premium Carbon Fiber Tennis Racket"
                     required
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Description
-                  </label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Detailed Description</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    rows={5}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                    placeholder="Detailed product description..."
+                    rows={6}
+                    className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm font-medium text-slate-600 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none resize-none placeholder:text-slate-300"
+                    placeholder="Describe the features, materials, and benefits of your product..."
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Category *
-                    </label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                      required
-                    >
-                      <option value="running">Running</option>
-                      <option value="basketball">Basketball</option>
-                      <option value="football">Football</option>
-                      <option value="tennis">Tennis</option>
-                      <option value="swimming">Swimming</option>
-                      <option value="cycling">Cycling</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Size
-                    </label>
-                    <select
-                      name="size"
-                      value={formData.size}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                    >
-                      <option value="free">Free Size</option>
-                      <option value="s">Small</option>
-                      <option value="m">Medium</option>
-                      <option value="l">Large</option>
-                      <option value="xl">Extra Large</option>
-                    </select>
-                  </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Category</label>
+                        <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none cursor-pointer appearance-none"
+                            required
+                        >
+                            <option value="running">Running</option>
+                            <option value="basketball">Basketball</option>
+                            <option value="football">Football</option>
+                            <option value="tennis">Tennis</option>
+                            <option value="swimming">Swimming</option>
+                            <option value="cycling">Cycling</option>
+                        </select>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Size / Variant</label>
+                        <select
+                            name="size"
+                            value={formData.size}
+                            onChange={handleChange}
+                            className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none cursor-pointer appearance-none"
+                        >
+                            <option value="free">Free Size</option>
+                            <option value="s">Small (S)</option>
+                            <option value="m">Medium (M)</option>
+                            <option value="l">Large (L)</option>
+                            <option value="xl">Extra Large (XL)</option>
+                        </select>
+                    </div>
                 </div>
               </div>
-            </Card>
+            </div>
 
-            {/* Pricing */}
-            <Card className="p-6">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">Pricing & Inventory</h2>
+            {/* Inventory & Pricing */}
+            <div className="dashboard-card p-8">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                    <DollarSignIcon className="w-5 h-5" />
+                 </div>
+                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Pricing & Inventory</h2>
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Selling Price *
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500">
-                      Rs.
-                    </span>
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleChange}
-                      step="0.01"
-                      className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Selling Price (Rs.)</label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-black text-slate-900 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    placeholder="0.00"
+                    required
+                  />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Compare Price <span className="text-xs text-slate-400">(Original)</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500">
-                      Rs.
-                    </span>
-                    <input
-                      type="number"
-                      name="compare_price"
-                      value={formData.compare_price}
-                      onChange={handleChange}
-                      step="0.01"
-                      className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <p className="text-xs text-slate-400 mt-1">Set higher than selling price to show discount</p>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-rose-400">Old Price (Optional)</label>
+                  <input
+                    type="number"
+                    name="compare_price"
+                    value={formData.compare_price}
+                    onChange={handleChange}
+                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-400 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    placeholder="0.00"
+                  />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Stock Quantity *
-                  </label>
+                <div className="space-y-2 lg:col-span-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Available Quantity</label>
                   <input
                     type="number"
                     name="quantity"
                     value={formData.quantity}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
-                    placeholder="0"
+                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    placeholder="e.g. 50"
                     required
                   />
                 </div>
               </div>
-
-              {/* Discount Preview */}
-              {formData.compare_price && formData.price && parseFloat(formData.compare_price) > parseFloat(formData.price) && (
-                <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3">
-                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                    -{Math.round((1 - parseFloat(formData.price) / parseFloat(formData.compare_price)) * 100)}%
-                  </span>
-                  <span className="text-sm text-emerald-800 font-medium">
-                    Customer sees <strong>Rs. {Number(formData.price).toLocaleString()}</strong> instead of <span className="line-through text-slate-400">Rs. {Number(formData.compare_price).toLocaleString()}</span> — This product will appear in Deals page!
-                  </span>
-                </div>
-              )}
-            </Card>
-
-            {/* Media */}
-            <Card className="p-6">
-              <h2 className="text-lg font-bold text-slate-800 mb-4">
-                Media
-              </h2>
-              
-              <div className="space-y-6">
-                {/* Local Image Upload */}
-                {/* Multi-Image Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-4">
-                    Product Images (Up to 3)
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[0, 1, 2].map((i) => (
-                      <div key={i} className="relative">
-                        <div className={`aspect-square border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-4 transition-all ${previewUrls[i] ? 'border-emerald-500 bg-emerald-50/10' : 'border-slate-300 hover:border-emerald-400'}`}>
-                          {previewUrls[i] ? (
-                            <div className="relative w-full h-full">
-                              <img 
-                                src={previewUrls[i]} 
-                                alt={`Preview ${i+1}`} 
-                                className="w-full h-full object-cover rounded-lg"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const newFiles = [...selectedFiles];
-                                  newFiles[i] = null;
-                                  setSelectedFiles(newFiles);
-                                  const newPreviews = [...previewUrls];
-                                  newPreviews[i] = null;
-                                  setPreviewUrls(newPreviews);
-                                }}
-                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-lg z-10"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </button>
-                            </div>
-                          ) : (
-                            <label className="cursor-pointer text-center w-full h-full flex flex-col items-center justify-center">
-                              <svg className="mx-auto h-8 w-8 text-slate-400 mb-2" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                              <span className="text-xs font-medium text-slate-600">Upload Image {i+1}</span>
-                              <input type="file" className="sr-only" onChange={(e) => handleFileChange(e, i)} accept="image/*" />
-                            </label>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-4 text-xs text-slate-500 text-center italic">
-                    First image will be used as the primary display photo.
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            <div className="flex items-center justify-end gap-3 mt-8">
-              <Button 
-                type="button"
-                variant="outline" 
-                size="md" 
-                className="px-6 py-2.5 rounded-lg font-semibold border-slate-300 text-slate-700 hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm"
-                onClick={() => navigate("/vendor/dashboard")}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                variant="primary" 
-                size="md" 
-                className="bg-primary hover:bg-secondary text-white px-8 py-2.5 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg active:scale-95 border-none disabled:opacity-50"
-                disabled={loading}
-              >
-                {loading ? "Publishing..." : "Publish Product"}
-              </Button>
             </div>
-          </form>
-        </div>
+          </div>
+
+          <div className="space-y-8">
+            {/* Visuals */}
+            <div className="dashboard-card p-8">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                    <ImageIcon className="w-5 h-5" />
+                 </div>
+                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Media Assets</h2>
+              </div>
+              
+              <div className="space-y-4">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="group relative aspect-square bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/10 transition-all overflow-hidden">
+                    {previewUrls[i] ? (
+                        <>
+                            <img src={previewUrls[i]} alt={`Preview ${i+1}`} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                            <button 
+                                type="button"
+                                onClick={() => removeImage(i)}
+                                className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-rose-500 shadow-lg border-none cursor-pointer hover:bg-rose-500 hover:text-white transition-all"
+                            >
+                                <XIcon className="w-4 h-4" />
+                            </button>
+                        </>
+                    ) : (
+                        <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-4 text-center">
+                            <PlusIcon className="w-6 h-6 text-slate-300 mb-2 group-hover:text-emerald-500 transition-colors" />
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-600">{i === 0 ? "Main Cover" : `Angle ${i+1}`}</span>
+                            <input type="file" className="sr-only" onChange={(e) => handleFileChange(e, i)} accept="image/*" />
+                        </label>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Block */}
+            <div className="dashboard-card p-8 bg-slate-900/5 backdrop-blur-sm sticky top-24">
+               <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Publish Status</h3>
+               <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-emerald-600">
+                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                         <span className="text-xs font-bold uppercase tracking-widest">Ready to go live</span>
+                    </div>
+                    <button 
+                        type="submit" 
+                        disabled={loading}
+                        className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 text-white font-black rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 border-none cursor-pointer text-sm uppercase tracking-widest"
+                    >
+                        {loading ? "Broadcasting..." : "Publish to Store"}
+                    </button>
+               </div>
+            </div>
+          </div>
+        </form>
       </div>
     </VendorLayout>
   );

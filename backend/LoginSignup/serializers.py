@@ -8,7 +8,7 @@ class VendorSerializer(serializers.ModelSerializer):
         model = Vendor
         fields = [
             'id', 'user', 'store_name', 'phone', 'address', 'city', 
-            'pancard_no', 'pancard_photo', 'status', 'created_at'
+            'status', 'created_at'
         ]
         read_only_fields = ['status', 'created_at']
 

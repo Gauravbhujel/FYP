@@ -2,17 +2,18 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, get_user_model
 from django.utils import timezone
 from datetime import timedelta
-User = get_user_model()
-from .models import Vendor
-
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.db.models import Sum, Count, Q
+from datetime import date
 from rest_framework.authtoken.models import Token
+from .models import CustomUser, Vendor, Product, Order, CartItem, WishlistItem, ProductReview
 from .serializers import (
     ProductSerializer, UserProfileSerializer, VendorSerializer, 
     CartItemSerializer, WishlistItemSerializer, ProductReviewSerializer
 )
-from .models import CustomUser, Vendor, Product, Order, CartItem, WishlistItem, ProductReview
+
+User = get_user_model()
 
 
 
@@ -52,8 +53,6 @@ def signup(request):
             {"message": "User created successfully"},
             status=201
         )
-
-    return JsonResponse({"error": "Invalid request method"}, status=405)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
@@ -446,9 +445,6 @@ def admin_suspend_user(request):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
-from .models import Product, Order
-from django.db.models import Sum, Count, Q
-from datetime import date
 
 
 def _get_vendor_from_token(request):
@@ -1218,7 +1214,6 @@ def submit_review(request, product_id):
         
         try:
             product = Product.objects.get(id=product_id)
-            import json
             data = json.loads(request.body)
             rating = data.get('rating')
             comment = data.get('comment', '')
@@ -1294,4 +1289,75 @@ def check_review_eligibility(request, product_id):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def admin_products_list(request):
+    if request.method == "GET":
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+             return JsonResponse({"error": "Unauthorized"}, status=401)
+        
+        token_key = auth_header.split(' ')[1]
+        try:
+            token = Token.objects.get(key=token_key)
+            user = token.user
+            if not (user.is_superuser or user.is_staff):
+                 return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
+            
+            products = Product.objects.all().select_related('vendor', 'vendor__user').order_by('-created_at')
+
+            products_data = []
+            for p in products:
+                image_url = request.build_absolute_uri(p.image.url) if p.image else ""
+                products_data.append({
+                    "id": p.id,
+                    "name": p.name,
+                    "category": p.get_category_display(),
+                    "category_slug": p.category,
+                    "price": float(p.price),
+                    "quantity": p.quantity,
+                    "is_active": p.is_active,
+                    "sku": p.sku,
+                    "image": image_url,
+                    "vendor": {
+                        "id": p.vendor.id,
+                        "storeName": p.vendor.store_name,
+                        "owner": f"{p.vendor.user.first_name} {p.vendor.user.last_name}".strip() or p.vendor.user.username,
+                    }
+                })
+            
+            return JsonResponse(products_data, safe=False, status=200)
+
+        except Token.DoesNotExist:
+            return JsonResponse({"error": "Invalid token"}, status=401)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def admin_delete_product(request, product_id):
+    if request.method == "DELETE" or request.method == "POST":
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+             return JsonResponse({"error": "Unauthorized"}, status=401)
+        
+        token_key = auth_header.split(' ')[1]
+        try:
+            token = Token.objects.get(key=token_key)
+            user = token.user
+            if not (user.is_superuser or user.is_staff):
+                 return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
+            
+            product = Product.objects.get(id=product_id)
+            product.delete()
+            return JsonResponse({"message": "Product removed from platform catalog"}, status=200)
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Product not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+            
     return JsonResponse({"error": "Invalid request method"}, status=405)

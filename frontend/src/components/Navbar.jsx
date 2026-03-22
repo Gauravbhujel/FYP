@@ -9,6 +9,7 @@ import {
   FaBars,
 } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
+import api from "../api";
 
 const Navbar = () => {
   const { unreadCartCount, unreadWishlistCount } = useCart();
@@ -65,14 +66,9 @@ const Navbar = () => {
   const fetchSearchResults = async (query) => {
     setIsSearching(true);
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/products/search/?q=${query}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setSearchResults(data);
-        setShowSearchResults(true);
-      }
+      const response = await api.get(`products/search/?q=${query}`);
+      setSearchResults(response.data);
+      setShowSearchResults(true);
     } catch (error) {
       console.error("Error fetching search results:", error);
     } finally {
