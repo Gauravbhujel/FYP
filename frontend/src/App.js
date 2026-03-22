@@ -4,6 +4,7 @@ import Signup from "./components/signup";
 
 import HomePage from "./pages/HomePage";
 import ProductListPage from "./pages/ProductListPage";
+import DealsPage from "./pages/DealsPage";
 import CategoryPage from "./pages/CategoryPage";
 import CartPage from "./pages/CartPage";
 import WishlistPage from "./pages/WishlistPage";
@@ -48,6 +49,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductListPage />} />
+          <Route path="/deals" element={<DealsPage />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />

@@ -19,6 +19,7 @@ export function EditProductPage() {
     category: "football",
     size: "free",
     price: "",
+    compare_price: "",
     quantity: "",
   });
 
@@ -37,6 +38,7 @@ export function EditProductPage() {
           category: product.category,
           size: product.size || "free",
           price: product.price,
+          compare_price: product.compare_price || "",
           quantity: product.quantity,
         });
         
@@ -239,10 +241,10 @@ export function EditProductPage() {
             <Card className="p-6">
               <h2 className="text-lg font-bold text-slate-800 mb-4">Pricing & Inventory</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Price *
+                    Selling Price *
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500">
@@ -263,6 +265,27 @@ export function EditProductPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Compare Price <span className="text-xs text-slate-400">(Original)</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500">
+                      Rs.
+                    </span>
+                    <input
+                      type="number"
+                      name="compare_price"
+                      value={formData.compare_price}
+                      onChange={handleChange}
+                      step="0.01"
+                      className="w-full pl-12 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 transition-colors"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">Set higher than selling price to show discount</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Stock Quantity *
                   </label>
                   <input
@@ -276,6 +299,18 @@ export function EditProductPage() {
                   />
                 </div>
               </div>
+
+              {/* Discount Preview */}
+              {formData.compare_price && formData.price && parseFloat(formData.compare_price) > parseFloat(formData.price) && (
+                <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3">
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    -{Math.round((1 - parseFloat(formData.price) / parseFloat(formData.compare_price)) * 100)}%
+                  </span>
+                  <span className="text-sm text-emerald-800 font-medium">
+                    Customer sees <strong>Rs. {Number(formData.price).toLocaleString()}</strong> instead of <span className="line-through text-slate-400">Rs. {Number(formData.compare_price).toLocaleString()}</span> — This product will appear in Deals page!
+                  </span>
+                </div>
+              )}
             </Card>
 
             {/* Media */}

@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import ProductCard from "../components/ProductCard";
 import { categories } from "../data/products";
-import api from "../api";
 import { useNavigate } from "react-router-dom";
 import {
   FaTrophy,
@@ -14,7 +12,6 @@ import {
   FaTag,
   FaChevronLeft,
   FaChevronRight,
-  FaStore,
 } from "react-icons/fa";
 import { CategoryCard } from "../components/CategoryCard";
 
@@ -54,8 +51,6 @@ const heroSlides = [
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [slideIndex, setSlideIndex] = useState(0);
   const slideTimer = useRef(null);
 
@@ -79,22 +74,6 @@ const HomePage = () => {
   const prevSlide = () => goToSlide((slideIndex - 1 + heroSlides.length) % heroSlides.length);
   const nextSlide = () => goToSlide((slideIndex + 1) % heroSlides.length);
 
-  /* Fetch products */
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await api.get("products/all/");
-        setProducts(response.data);
-      } catch (err) {
-        console.error("Error fetching products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-
-  const featuredProducts = products.slice(0, 4);
   const slide = heroSlides[slideIndex];
 
   return (
@@ -107,9 +86,8 @@ const HomePage = () => {
         {heroSlides.map((s, i) => (
           <div
             key={i}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              i === slideIndex ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${i === slideIndex ? "opacity-100" : "opacity-0"
+              }`}
             style={{
               backgroundImage: `url(${s.image})`,
               backgroundSize: "cover",
@@ -168,7 +146,7 @@ const HomePage = () => {
           </div>
 
           {/* Trust badges */}
-          <div className="mt-10 flex items-center gap-6 text-white/70 text-xs font-medium animate-fade-up" style={{animationDelay:"0.6s"}}>
+          <div className="mt-10 flex items-center gap-6 text-white/70 text-xs font-medium animate-fade-up" style={{ animationDelay: "0.6s" }}>
             <span className="flex items-center gap-1.5">✅ Verified Vendors</span>
             <span className="w-px h-4 bg-white/30" />
             <span className="flex items-center gap-1.5">🔒 Secure Checkout</span>
@@ -197,11 +175,10 @@ const HomePage = () => {
             <button
               key={i}
               onClick={() => goToSlide(i)}
-              className={`transition-all duration-300 rounded-full ${
-                i === slideIndex
-                  ? "w-8 h-2.5 bg-[#ff6b00]"
-                  : "w-2.5 h-2.5 bg-white/40 hover:bg-white/70"
-              }`}
+              className={`transition-all duration-300 rounded-full ${i === slideIndex
+                ? "w-8 h-2.5 bg-[#ff6b00]"
+                : "w-2.5 h-2.5 bg-white/40 hover:bg-white/70"
+                }`}
             />
           ))}
         </div>
@@ -253,45 +230,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ─── FEATURED PRODUCTS ──────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 py-12">
-        <div className="flex justify-between items-end mb-10">
-          <div>
-            <p className="text-[#ff6b00] font-semibold text-sm uppercase tracking-widest mb-1">
-              Hand-picked for you
-            </p>
-            <h2 className="section-heading text-3xl font-extrabold text-gray-900">
-              Featured Products
-            </h2>
-          </div>
-          <button
-            onClick={() => navigate("/products")}
-            className="flex items-center gap-2 text-[#0f5132] font-semibold text-sm hover:gap-3 transition-all duration-200 group"
-          >
-            View All
-            <span className="w-7 h-7 rounded-full bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
-              <FaArrowRight className="text-xs" />
-            </span>
-          </button>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {loading
-            ? Array(4).fill(0).map((_, i) => (
-                <div key={i} className="bg-white animate-pulse h-[420px] rounded-2xl border border-gray-100" />
-              ))
-            : featuredProducts.length > 0
-            ? featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            : (
-                <div className="col-span-full py-16 text-center text-gray-400">
-                  <FaStore className="text-5xl mx-auto mb-4 opacity-30" />
-                  <p className="font-medium">No products found.</p>
-                </div>
-              )}
-        </div>
-      </section>
 
       {/* ─── DEALS BANNER ───────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 py-6">
@@ -306,25 +245,19 @@ const HomePage = () => {
               <span className="text-white font-bold text-xs uppercase tracking-wider">Limited Time Deals</span>
             </div>
             <h3 className="text-white font-black text-3xl md:text-4xl leading-tight mb-2">
-              Up to 50% Off
+              Up to 30% Off
             </h3>
             <p className="text-white/85 font-medium text-base">
               Massive savings on premium sports equipment. Don't miss out!
             </p>
           </div>
 
-          <div className="relative z-10 flex flex-col items-center md:items-end gap-4">
-            <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm rounded-2xl px-6 py-3 border border-white/25">
-              <FaTag className="text-white" />
-              <span className="text-white font-bold text-sm">Use code: <span className="text-xl font-black">GEARUP25</span></span>
-            </div>
-            <button
-              onClick={() => navigate("/products")}
-              className="bg-white text-[#ff6b00] font-black px-8 py-3 rounded-full hover:shadow-xl hover:shadow-orange-900/20 hover:-translate-y-px transition-all duration-200 text-base"
-            >
-              Grab the Deal →
-            </button>
-          </div>
+          <button
+            onClick={() => navigate("/deals")}
+            className="bg-white text-[#ff6b00] font-black px-8 py-3 rounded-full hover:shadow-xl hover:shadow-orange-900/20 hover:-translate-y-px transition-all duration-200 text-base"
+          >
+            Grab the Deal →
+          </button>
         </div>
       </section>
 
