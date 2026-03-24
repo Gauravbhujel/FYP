@@ -15,6 +15,7 @@ import {
   MenuIcon,
   XIcon,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export function VendorLayout({ children, currentPage }) {
   const [vendor, setVendor] = useState(null);
@@ -22,6 +23,7 @@ export function VendorLayout({ children, currentPage }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const fetchVendorProfile = async () => {
@@ -69,10 +71,8 @@ export function VendorLayout({ children, currentPage }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("isAuthenticated");
-    navigate("/login");
+    logout();
+    navigate("/");
   };
 
   const navItems = [

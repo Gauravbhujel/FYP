@@ -9,9 +9,11 @@ import {
   FaCog, FaExclamationTriangle, FaSignOutAlt,
   FaRegEdit, FaCheckCircle, FaChevronRight, FaStore
 } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState("profile"); // profile, orders, settings
 
   const [user, setUser] = useState(null);
@@ -184,8 +186,7 @@ const ProfilePage = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    logout();
     navigate("/");
     window.location.reload();
   };

@@ -21,6 +21,7 @@ import {
     FaAward,
     FaChevronRight
 } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetailsPage = () => {
     const { productId } = useParams();
@@ -40,7 +41,7 @@ const ProductDetailsPage = () => {
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const { isAuthenticated, token } = useAuth();
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -77,8 +78,6 @@ const ProductDetailsPage = () => {
     }, [productId, isAuthenticated]);
 
     const handleAction = async (actionType) => {
-        const token = localStorage.getItem("token");
-        
         if (!token) {
             navigate('/login', { state: { from: location.pathname } });
             return;

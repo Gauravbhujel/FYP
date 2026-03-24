@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,9 +28,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("token", data.token); // Save the token!
-        localStorage.setItem("role", data.role); // Save the role!
+        login(data.token, data.role);
 
         // alert("Login successful ✅");
 

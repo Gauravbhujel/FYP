@@ -25,18 +25,43 @@ import ProfilePage from "./pages/ProfilePage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
 import { CartProvider } from "./context/CartContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { useEffect, useState } from "react";
 
 const ProtectedRoute = ({ children, allowedRole }) => {
-  const isAuthenticated = localStorage.getItem("isAuthenticated");
-  const userRole = localStorage.getItem("role");
+  const { isAuthenticated, role: userRole } = useAuth();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (allowedRole && userRole !== allowedRole) {
-    return <Navigate to="/" replace />; // Or unauthorized page
+    if (userRole === "admin") return <Navigate to="/admin/dashboard" replace />;
+    if (userRole === "vendor") return <Navigate to="/vendor/dashboard" replace />;
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+const PublicAuthRoute = ({ children }) => {
+  const { isAuthenticated, role: userRole } = useAuth();
+
+  if (isAuthenticated) {
+    if (userRole === "admin") return <Navigate to="/admin/dashboard" replace />;
+    if (userRole === "vendor") return <Navigate to="/vendor/dashboard" replace />;
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+const CustomerOrPublicRoute = ({ children }) => {
+  const { isAuthenticated, role: userRole } = useAuth();
+
+  if (isAuthenticated) {
+    if (userRole === "admin") return <Navigate to="/admin/dashboard" replace />;
+    if (userRole === "vendor") return <Navigate to="/vendor/dashboard" replace />;
   }
 
   return children;
@@ -45,19 +70,20 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 function App() {
   return (
     <BrowserRouter>
-      <CartProvider>
+      <AuthProvider>
+        <CartProvider>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductListPage />} />
-          <Route path="/deals" element={<DealsPage />} />
-          <Route path="/categories" element={<CategoryPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/product/:productId" element={<ProductDetailsPage />} />
-          <Route path="/vendor/:vendorId" element={<VendorProfilePage />} />
+          <Route path="/" element={<CustomerOrPublicRoute><HomePage /></CustomerOrPublicRoute>} />
+          <Route path="/products" element={<CustomerOrPublicRoute><ProductListPage /></CustomerOrPublicRoute>} />
+          <Route path="/deals" element={<CustomerOrPublicRoute><DealsPage /></CustomerOrPublicRoute>} />
+          <Route path="/categories" element={<CustomerOrPublicRoute><CategoryPage /></CustomerOrPublicRoute>} />
+          <Route path="/cart" element={<CustomerOrPublicRoute><CartPage /></CustomerOrPublicRoute>} />
+          <Route path="/wishlist" element={<CustomerOrPublicRoute><WishlistPage /></CustomerOrPublicRoute>} />
+          <Route path="/login" element={<PublicAuthRoute><Login /></PublicAuthRoute>} />
+          <Route path="/signup" element={<PublicAuthRoute><Signup /></PublicAuthRoute>} />
+          <Route path="/profile" element={<CustomerOrPublicRoute><ProfilePage /></CustomerOrPublicRoute>} />
+          <Route path="/product/:productId" element={<CustomerOrPublicRoute><ProductDetailsPage /></CustomerOrPublicRoute>} />
+          <Route path="/vendor/:vendorId" element={<CustomerOrPublicRoute><VendorProfilePage /></CustomerOrPublicRoute>} />
           <Route
             path="/vendor/dashboard"
             element={
@@ -66,7 +92,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/vendor/signup" element={<VendorSignupPage />} />
+          <Route path="/vendor/signup" element={<PublicAuthRoute><VendorSignupPage /></PublicAuthRoute>} />
           <Route
             path="/vendor/products"
             element={
@@ -157,7 +183,8 @@ function App() {
             }
           />
         </Routes>
-      </CartProvider>
+        </CartProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

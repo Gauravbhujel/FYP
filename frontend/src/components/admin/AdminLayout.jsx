@@ -17,6 +17,7 @@ import {
   XIcon,
   GlobeIcon
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 export function AdminLayout({ children, currentPage }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -25,6 +26,7 @@ export function AdminLayout({ children, currentPage }) {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboardIcon, id: "dashboard" },
@@ -47,10 +49,8 @@ export function AdminLayout({ children, currentPage }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("isAuthenticated");
-    navigate("/login");
+    logout();
+    navigate("/");
   };
 
   return (
