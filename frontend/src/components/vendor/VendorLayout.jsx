@@ -77,7 +77,7 @@ export function VendorLayout({ children, currentPage }) {
 
   const navItems = [
     { icon: LayoutGridIcon, label: "Overview", href: "/vendor/dashboard", id: "dashboard" },
-    { icon: PackageIcon, label: "Catalog", href: "/vendor/products", id: "products" },
+    { icon: PackageIcon, label: "Products", href: "/vendor/products", id: "products" },
     { icon: ShoppingBagIcon, label: "Orders", href: "/vendor/orders", id: "orders" },
     { icon: BarChart3Icon, label: "Analytics", href: "/vendor/dashboard", id: "analytics" },
     { icon: TrendingUpIcon, label: "Earnings", href: "/vendor/dashboard", id: "earnings" },
@@ -155,7 +155,7 @@ export function VendorLayout({ children, currentPage }) {
               <input 
                 type="text" 
                 placeholder="Search resources..." 
-                className="w-full h-11 pl-11 pr-4 bg-gray-50/50 border border-gray-100 rounded-lg text-xs font-bold uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-lg text-xs font-bold uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-400 shadow-sm"
               />
             </div>
           </div>

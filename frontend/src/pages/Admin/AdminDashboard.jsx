@@ -72,17 +72,17 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout currentPage="dashboard">
-      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+      <div className="w-full space-y-8 animate-fade-in pb-12">
         {/* Welcome Block */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight">System Control</h1>
-            <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-[2px] leading-none">GearUp Nepal Global Management Dashboard</p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">System Console</h1>
+            <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-[3px] leading-none">Global Management Dashboard</p>
           </div>
           <div className="flex items-center gap-3">
-             <div className="bg-emerald-50 px-4 py-2 rounded-2xl flex items-center gap-2 border border-emerald-100">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Platform Live</span>
+             <div className="bg-white px-4 py-2 rounded-lg flex items-center gap-3 border border-gray-200 shadow-sm">
+                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Platform Live</span>
              </div>
           </div>
         </div>
@@ -93,29 +93,21 @@ const AdminDashboard = () => {
             title="Total Revenue"
             value={`Rs. ${stats.total_revenue.toLocaleString()}`}
             icon={TrendingUpIcon}
-            iconColor="text-emerald-600"
-            iconBgColor="bg-emerald-50"
           />
           <MetricCard
             title="Partners"
             value={String(stats.active_vendors)}
             icon={StoreIcon}
-            iconColor="text-indigo-600"
-            iconBgColor="bg-indigo-50"
           />
           <MetricCard
             title="Global Orders"
             value={String(stats.total_orders)}
             icon={ShoppingBagIcon}
-            iconColor="text-amber-600"
-            iconBgColor="bg-amber-50"
           />
           <MetricCard
             title="User Base"
             value={String(stats.total_users)}
             icon={UsersIcon}
-            iconColor="text-rose-600"
-            iconBgColor="bg-rose-50"
           />
         </div>
 
@@ -123,45 +115,45 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Approvals Block */}
             <div className="lg:col-span-8 flex flex-col gap-8">
-                <div className="dashboard-card p-8">
+                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
+                            <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center text-gray-400">
                                 <AlertCircleIcon className="w-5 h-5" />
                             </div>
-                            <h2 className="text-lg font-black text-slate-800 tracking-tight">Pending Approvals</h2>
+                            <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Pending Approvals</h2>
                         </div>
-                        <span className="px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-widest">{pendingVendors.length} Awaiting</span>
+                        <span className="px-3 py-1 bg-[#F5F5F5] text-gray-900 text-[10px] font-black rounded uppercase tracking-widest border border-gray-100">{pendingVendors.length} Awaiting</span>
                     </div>
 
                     <div className="space-y-4">
                         {pendingVendors.length === 0 ? (
-                            <div className="py-12 text-center">
-                                <CheckCircle2Icon className="w-12 h-12 text-emerald-100 mx-auto mb-4" />
-                                <p className="text-sm font-bold text-slate-300 uppercase tracking-widest">Queue is currently empty</p>
+                            <div className="py-12 text-center border-2 border-dashed border-gray-50 rounded-lg">
+                                <CheckCircle2Icon className="w-8 h-8 text-gray-200 mx-auto mb-4" />
+                                <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Queue is currently empty</p>
                             </div>
                         ) : (
                             pendingVendors.map((vendor) => (
-                                <div key={vendor.id} className="group flex items-center justify-between p-5 bg-slate-50/50 hover:bg-white border border-transparent hover:border-slate-100 rounded-[1.5rem] transition-all">
+                                <div key={vendor.id} className="group flex items-center justify-between p-5 bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 rounded-lg transition-all">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-sm font-black text-slate-400 shadow-sm border border-slate-100">
+                                        <div className="w-12 h-12 bg-white rounded flex items-center justify-center text-[10px] font-black text-gray-400 shadow-sm border border-gray-100 uppercase">
                                             {vendor.store_name?.charAt(0)}
                                         </div>
                                         <div>
-                                            <p className="font-black text-slate-800 tracking-tight leading-none">{vendor.store_name}</p>
-                                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">{vendor.owner_name} • Registered just now</p>
+                                            <p className="font-black text-gray-900 tracking-tight leading-none uppercase text-xs">{vendor.store_name}</p>
+                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-widest">{vendor.owner_name} • System Registry</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
                                         <button 
                                             onClick={() => handleVendorAction(vendor.id, "approve")}
-                                            className="h-10 px-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] rounded-xl transition-all shadow-lg shadow-emerald-500/10 cursor-pointer border-none uppercase tracking-widest"
+                                            className="h-9 px-4 bg-accent hover:bg-black text-white font-black text-[9px] rounded transition-all cursor-pointer border-none uppercase tracking-widest"
                                         >
                                             Approve
                                         </button>
                                         <button 
                                             onClick={() => handleVendorAction(vendor.id, "reject")}
-                                            className="h-10 px-4 bg-white hover:bg-rose-50 text-rose-500 font-black text-[10px] rounded-xl transition-all cursor-pointer border border-slate-100 hover:border-rose-100 uppercase tracking-widest"
+                                            className="h-9 px-4 bg-white hover:bg-rose-50 text-rose-500 font-black text-[9px] rounded transition-all cursor-pointer border border-gray-100 hover:border-rose-100 uppercase tracking-widest"
                                         >
                                             Reject
                                         </button>
@@ -173,38 +165,38 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Top Vendors Table */}
-                <div className="dashboard-card p-8">
+                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-lg font-black text-slate-800 tracking-tight text-[14px] uppercase tracking-[2px]">Top Performing Partners</h2>
-                        <button className="text-[10px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-600 transition-colors border-none bg-transparent cursor-pointer">Analyze Report</button>
+                        <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Top Performing Partners</h2>
+                        <button className="text-[9px] font-black text-accent uppercase tracking-widest hover:underline transition-colors border-none bg-transparent cursor-pointer">Analyze Full Report</button>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left">
+                            <thead className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-left">
                                 <tr>
-                                    <th className="pb-4 font-black">Partner Store</th>
-                                    <th className="pb-4 font-black">Gross Revenue</th>
-                                    <th className="pb-4 font-black text-center">Volume</th>
-                                    <th className="pb-4 font-black text-right">Performance</th>
+                                    <th className="pb-4 border-b border-gray-50">Partner Store</th>
+                                    <th className="pb-4 border-b border-gray-50">Gross Revenue</th>
+                                    <th className="pb-4 border-b border-gray-50 text-center">Volume</th>
+                                    <th className="pb-4 border-b border-gray-50 text-right">Performance</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-50">
+                            <tbody className="divide-y divide-gray-50">
                                 {topVendors.map((vendor, index) => (
-                                    <tr key={index} className="group hover:bg-slate-50/50 transition-colors">
+                                    <tr key={index} className="group hover:bg-gray-50/50 transition-colors">
                                         <td className="py-5">
-                                            <p className="text-sm font-black text-slate-800 tracking-tight leading-none">{vendor.name}</p>
-                                            <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">Official Verified Merch</p>
+                                            <p className="text-xs font-black text-gray-900 tracking-tight leading-none uppercase">{vendor.name}</p>
+                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-wider">Official Merch</p>
                                         </td>
                                         <td className="py-5">
-                                            <span className="text-sm font-black text-emerald-600 tracking-tight">Rs. {vendor.revenue.toLocaleString()}</span>
+                                            <span className="text-xs font-black text-gray-900 tracking-tight">Rs. {vendor.revenue.toLocaleString()}</span>
                                         </td>
                                         <td className="py-5 text-center">
-                                            <span className="text-xs font-bold text-slate-600 px-3 py-1 bg-slate-100 rounded-lg">{vendor.orders} Orders</span>
+                                            <span className="text-[9px] font-black text-gray-600 px-3 py-1 bg-[#F5F5F5] border border-gray-100 rounded uppercase">{vendor.orders} Orders</span>
                                         </td>
                                         <td className="py-5 text-right">
                                             <div className="flex items-center justify-end gap-1">
-                                                <span className="text-sm font-black text-amber-500">{vendor.rating}</span>
-                                                <span className="text-amber-300">★</span>
+                                                <span className="text-xs font-black text-gray-900">{vendor.rating}</span>
+                                                <span className="text-accent text-xs">★</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -217,45 +209,45 @@ const AdminDashboard = () => {
 
             {/* Right Activity Sidebar */}
             <div className="lg:col-span-4 flex flex-col gap-8">
-                <div className="dashboard-card p-8">
+                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                        <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center text-gray-400">
                             <BellIcon className="w-5 h-5" />
                         </div>
-                        <h2 className="text-lg font-black text-slate-800 tracking-tight">Recent Activity</h2>
+                        <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Recent Activity</h2>
                     </div>
-
-                    <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-slate-100">
+ 
+                    <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-gray-100">
                         {[
-                            { type: "vendor", action: "Nike Sports added 5 products", time: "2h ago", color: "bg-indigo-500" },
-                            { type: "order", action: "Order #ORD-1240 completed", time: "3h ago", color: "bg-emerald-500" },
-                            { type: "user", action: "12 new customer registrations", time: "5h ago", color: "bg-amber-500" },
-                            { type: "vendor", action: "Adidas Pro updated info", time: "6h ago", color: "bg-rose-500" },
+                            { type: "vendor", action: "Nike Sports added 5 products", time: "2h ago", color: "bg-gray-900" },
+                            { type: "order", action: "Order #ORD-1240 completed", time: "3h ago", color: "bg-accent" },
+                            { type: "user", action: "12 new customer registrations", time: "5h ago", color: "bg-gray-400" },
+                            { type: "vendor", action: "Adidas Pro updated info", time: "6h ago", color: "bg-gray-900" },
                         ].map((act, i) => (
                             <div key={i} className="relative pl-10">
-                                <div className={`absolute left-0 top-1 w-10 h-10 rounded-xl border-4 border-white ${act.color} flex items-center justify-center text-white scale-75 shadow-sm`}>
-                                    <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                <div className={`absolute left-0 top-1 w-10 h-10 rounded border-4 border-white ${act.color} flex items-center justify-center text-white scale-75 shadow-sm`}>
+                                    <div className="w-1 h-1 rounded-full bg-white" />
                                 </div>
-                                <p className="text-xs font-black text-slate-700 leading-tight">{act.action}</p>
-                                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{act.time}</p>
+                                <p className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tight">{act.action}</p>
+                                <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-widest">{act.time}</p>
                             </div>
                         ))}
                     </div>
-
-                    <button className="w-full mt-8 py-3 bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-indigo-600 font-black text-[10px] rounded-xl transition-all border-none cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2">
+ 
+                    <button className="w-full mt-8 py-3 bg-[#F5F5F5] hover:bg-gray-100 text-gray-900 font-black text-[9px] rounded transition-all border border-gray-100 cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2">
                         View Full Logs <ArrowRightIcon className="w-3 h-3" />
                     </button>
                 </div>
 
                 {/* Efficiency Score */}
-                <div className="dashboard-card p-8 bg-indigo-600 text-white relative overflow-hidden group">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150" />
-                     <p className="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">System Health</p>
-                     <h3 className="text-2xl font-black text-white mb-4 tracking-tighter">Operational 99.9%</h3>
-                     <div className="w-full h-1.5 bg-indigo-800 rounded-full overflow-hidden mb-4">
-                        <div className="w-[99%] h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-white relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-3xl -mr-16 -mt-16" />
+                     <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">System Health</p>
+                     <h3 className="text-2xl font-black text-white mb-4 tracking-tighter uppercase">Operational 99.9%</h3>
+                     <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden mb-4">
+                        <div className="w-[99%] h-full bg-accent shadow-[0_0_15px_rgba(255,107,0,0.5)]" />
                      </div>
-                     <p className="text-xs font-bold text-indigo-100 leading-relaxed">System performance is optimal. All API endpoints responding within 45ms.</p>
+                     <p className="text-[10px] font-black text-gray-400 leading-relaxed uppercase tracking-widest">Performance Optimal • Low Latency</p>
                 </div>
             </div>
         </div>

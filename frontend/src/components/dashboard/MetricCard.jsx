@@ -11,7 +11,7 @@ export function MetricCard({
   const isNegative = change && change < 0;
 
   return (
-    <div className="bg-white border border-gray-200 p-8 rounded-xl flex items-start justify-between transition-all hover:border-accent/30 group">
+    <div className="bg-white border border-gray-200 p-8 rounded-lg flex items-start justify-between transition-all group shadow-sm">
       <div className="flex-1">
         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">{title}</p>
         <h3 className="text-3xl font-black text-gray-900 tracking-tighter mb-4">{value}</h3>
@@ -30,13 +30,13 @@ export function MetricCard({
               {isPositive && "+"}
               {change}%
             </span>
-            <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Growth</span>
+            <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Growth</span>
           </div>
         )}
       </div>
 
-      <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors group-hover:bg-accent/5">
-        <Icon className={`w-5 h-5 ${iconColor} transition-colors group-hover:text-accent`} />
+      <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center flex-shrink-0">
+        <Icon className="w-5 h-5 text-gray-400" />
       </div>
     </div>
   );

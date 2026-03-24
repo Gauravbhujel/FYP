@@ -60,7 +60,7 @@ export function ManageProductsPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-7xl mx-auto w-full">
             <div>
               <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-2">
-                Product Catalog
+                Product
               </h1>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">
                  Global Inventory Management Control
@@ -69,7 +69,7 @@ export function ManageProductsPage() {
             <Link to="/vendor/AddProduct">
               <button className="bg-accent hover:bg-[#E65A00] text-white px-8 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 flex items-center gap-3 border-none">
                 <PlusIcon size={16} />
-                Create Offering
+                Add Product
               </button>
             </Link>
           </div>

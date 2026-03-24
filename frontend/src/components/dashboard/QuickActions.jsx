@@ -12,34 +12,26 @@ export function QuickActions() {
   const actions = [
     {
       icon: PlusIcon,
-      label: "List Product",
+      label: "Add Product",
       desc: "Ready to sell something new?",
-      color: "text-emerald-500",
-      bgColor: "bg-emerald-50",
       href: "/vendor/AddProduct",
     },
     {
       icon: PackageIcon,
       label: "Ship Orders",
       desc: "Check your pending shipments",
-      color: "text-blue-500",
-      bgColor: "bg-blue-50",
       href: "/vendor/orders",
     },
     {
       icon: BarChart3Icon,
       label: "Analytics",
       desc: "Track your store performance",
-      color: "text-amber-500",
-      bgColor: "bg-amber-50",
       href: "/vendor/dashboard",
     },
     {
       icon: SettingsIcon,
       label: "Settings",
       desc: "Manage your store profile",
-      color: "text-slate-500",
-      bgColor: "bg-slate-50",
       href: "/vendor/settings",
     },
   ];

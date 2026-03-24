@@ -88,71 +88,71 @@ export function AdminUsersPage() {
 
   return (
     <AdminLayout currentPage="users">
-      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+      <div className="w-full space-y-8 animate-fade-in pb-12">
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Identity Directory</h1>
-            <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-[2px] leading-none">Management of all authenticated global accounts</p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">User Directory</h1>
+            <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-[3px] leading-none">Management of all authenticated global accounts</p>
           </div>
           <div className="flex items-center gap-4">
-             <div className="bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
-                <UsersIcon className="w-4 h-4 text-indigo-500" />
-                <span className="text-xs font-black text-slate-700 uppercase tracking-widest">{users.length} Total Registered</span>
+             <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center gap-3">
+                <UsersIcon className="w-4 h-4 text-accent" />
+                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{users.length} Total Registered</span>
              </div>
           </div>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="dashboard-card p-4 flex flex-col lg:flex-row items-center gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
             <div className="flex-1 w-full relative group">
-                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
                 <input 
                     type="text" 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by identity, email, or system ID..." 
-                    className="w-full h-12 pl-12 pr-4 bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white transition-all shadow-inner"
+                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
                 />
             </div>
             <div className="flex items-center gap-3 w-full lg:w-auto">
-                <div className="relative flex-1 lg:flex-none min-w-[160px]">
-                    <FilterIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                <div className="relative flex-1 lg:flex-none min-w-[180px]">
+                    <FilterIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     <select 
                         value={roleFilter}
                         onChange={(e) => setRoleFilter(e.target.value)}
-                        className="w-full h-12 pl-12 pr-10 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black text-slate-600 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer shadow-sm"
+                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer"
                     >
                         <option value="all">All Access</option>
                         <option value="customer">Customer</option>
                         <option value="vendor">Partner</option>
                         <option value="admin">Super Admin</option>
                     </select>
-                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
                 <button 
                     onClick={fetchUsers}
-                    className="h-12 w-12 flex items-center justify-center bg-white border border-slate-100 rounded-xl hover:bg-slate-50 text-slate-400 hover:text-indigo-500 transition-all shadow-sm cursor-pointer"
+                    className="h-11 w-11 flex items-center justify-center bg-white border border-gray-200 rounded hover:bg-gray-50 text-gray-400 hover:text-accent transition-all shadow-sm cursor-pointer"
                 >
-                    <Loader2Icon className={`w-5 h-5 ${loading ? "animate-spin text-indigo-500" : ""}`} />
+                    <Loader2Icon className={`w-4 h-4 ${loading ? "animate-spin text-accent" : ""}`} />
                 </button>
             </div>
         </div>
 
         {/* Records Table */}
-        <div className="dashboard-card overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
-                    <thead className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] text-left bg-slate-50/50">
+                    <thead className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] text-left bg-gray-50/50">
                         <tr>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Subject Identity</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Access Level</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">State</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Registration</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50 text-right">Directives</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Subject Identity</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Access Level</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">State</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Registration</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-gray-50">
                         {filteredUsers.length === 0 ? (
                             <tr>
                                 <td colSpan="5" className="px-8 py-20 text-center">
@@ -166,45 +166,45 @@ export function AdminUsersPage() {
                             </tr>
                         ) : (
                             filteredUsers.map((user) => (
-                                <tr key={user.id} className="group hover:bg-indigo-50/30 transition-all duration-200">
+                                <tr key={user.id} className="group hover:bg-gray-50/50 transition-all duration-200">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-sm font-black text-indigo-500 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform ring-4 ring-transparent group-hover:ring-indigo-50">
+                                            <div className="w-12 h-12 bg-white rounded flex items-center justify-center text-[10px] font-black text-gray-400 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform uppercase">
                                                 {user.name?.charAt(0)}
                                             </div>
                                             <div>
-                                                <p className="font-black text-slate-800 tracking-tight leading-none text-sm">{user.name}</p>
-                                                <div className="flex items-center gap-2 mt-1.5">
-                                                    <MailIcon className="w-3 h-3 text-slate-300" />
-                                                    <p className="text-[11px] font-bold text-slate-400">{user.email}</p>
+                                                <p className="font-black text-gray-900 tracking-tight leading-none text-xs uppercase">{user.name}</p>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <MailIcon className="w-3 h-3 text-gray-300" />
+                                                    <p className="text-[9px] font-black text-gray-400 uppercase">{user.email}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <span className={`px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${getRoleBadge(user.role)}`}>
+                                        <span className={`px-3 py-1 bg-white border text-[9px] font-black uppercase tracking-widest shadow-sm rounded ${getRoleBadge(user.role)}`}>
                                             {user.role}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6">
                                         <div className="flex flex-col">
                                             <div className="flex items-center gap-2">
-                                                <div className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]'}`} />
-                                                <span className={`text-[10px] font-black uppercase tracking-widest ${user.status === 'active' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                <div className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-accent' : 'bg-rose-500'}`} />
+                                                <span className={`text-[10px] font-black uppercase tracking-widest ${user.status === 'active' ? 'text-gray-900' : 'text-rose-600'}`}>
                                                     {user.status}
                                                 </span>
                                             </div>
                                             {user.status === "suspended" && user.suspended_until && (
-                                                <p className="text-[9px] font-bold text-rose-400 mt-1 uppercase tracking-tighter">
+                                                <p className="text-[8px] font-black text-rose-400 mt-1 uppercase tracking-tighter">
                                                     Released: {new Date(user.suspended_until).toLocaleDateString()}
                                                 </p>
                                             )}
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2">
-                                            <CalendarIcon className="w-3 h-3 text-slate-300" />
-                                            <p className="text-[11px] font-bold text-slate-500">{user.date_joined}</p>
+                                        <div className="flex items-center gap-2 text-gray-400">
+                                            <CalendarIcon className="w-3 h-3" />
+                                            <p className="text-[10px] font-black uppercase tracking-tighter">{user.date_joined}</p>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 text-right">
@@ -216,34 +216,34 @@ export function AdminUsersPage() {
                                                 <MoreVerticalIcon className="w-4 h-4 text-slate-400" />
                                             </button>
                                             {openMenuId === user.id && (
-                                                <div className="absolute right-0 mt-3 w-56 bg-white border border-slate-100 rounded-[1.5rem] shadow-2xl shadow-indigo-100/50 py-2 z-50 animate-fade-down">
-                                                    <p className="px-5 py-3 text-[9px] font-black text-slate-300 uppercase tracking-[2px] border-b border-slate-50">Identity Directives</p>
+                                                <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-lg shadow-xl py-2 z-50 animate-fade-down">
+                                                    <p className="px-5 py-3 text-[8px] font-black text-gray-400 uppercase tracking-[2px] border-b border-gray-50">Identity Directives</p>
                                                     
                                                     {user.role !== "admin" ? (
                                                         <>
                                                             {user.status === "suspended" ? (
                                                                 <button 
                                                                     onClick={() => handleSuspendAction(user.id, "unsuspend")}
-                                                                    className="w-full flex items-center px-5 py-3.5 text-xs font-black text-emerald-600 hover:bg-emerald-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                    className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-white bg-accent hover:bg-black transition-all uppercase tracking-widest border-none cursor-pointer"
                                                                 >
                                                                     <ShieldCheckIcon className="w-4 h-4 mr-3" /> Lift Suspension
                                                                 </button>
                                                             ) : (
                                                                 <button 
                                                                     onClick={() => handleSuspendAction(user.id, "suspend")}
-                                                                    className="w-full flex items-center px-5 py-3.5 text-xs font-black text-rose-500 hover:bg-rose-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                    className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-rose-500 hover:bg-rose-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                                 >
                                                                     <ShieldOffIcon className="w-4 h-4 mr-3" /> Suspend (24h)
                                                                 </button>
                                                             )}
-                                                            <div className="h-px bg-slate-50 my-1 mx-5" />
-                                                            <button className="w-full flex items-center px-5 py-3.5 text-xs font-black text-slate-400 hover:bg-slate-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
+                                                            <div className="h-px bg-gray-50 my-1 mx-5" />
+                                                            <button className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-gray-400 hover:bg-gray-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
                                                                 Detailed Audit
                                                             </button>
                                                         </>
                                                     ) : (
                                                         <div className="px-5 py-4 text-center">
-                                                            <p className="text-[10px] font-bold text-slate-400 italic">No directives available for Super Admins</p>
+                                                            <p className="text-[8px] font-black text-gray-400 italic uppercase">Admin Lockdown Active</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -258,11 +258,13 @@ export function AdminUsersPage() {
             </div>
             
             {/* Table Footer */}
-            <div className="bg-slate-50/50 px-8 py-4 border-t border-slate-100/50 flex items-center justify-between">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">End of directory records</p>
-                <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Database Sync Active</p>
+            <div className="bg-gray-50/50 px-8 py-5 border-t border-gray-100 flex items-center justify-between">
+                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Global Identity Vault V1.0</p>
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                        <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest leading-none">Database Sync: Active</p>
+                    </div>
                 </div>
             </div>
         </div>

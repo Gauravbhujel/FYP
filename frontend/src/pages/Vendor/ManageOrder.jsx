@@ -86,7 +86,7 @@ export function ManageOrdersPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-               <button className="h-12 px-8 bg-white border border-gray-200 rounded text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all">
+               <button className="h-12 px-8 bg-white border border-gray-200 rounded text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-accent/5 hover:border-accent/20 hover:text-accent transition-all">
                    Export Data
                </button>
           </div>

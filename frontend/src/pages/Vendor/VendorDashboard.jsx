@@ -56,9 +56,8 @@ export const VendorDashboard = () => {
   if (loading) {
     return (
       <VendorLayout currentPage="dashboard">
-        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-accent"></div>
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Synchronizing Portfolio...</p>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
         </div>
       </VendorLayout>
     );

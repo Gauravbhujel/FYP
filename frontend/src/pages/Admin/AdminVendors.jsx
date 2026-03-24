@@ -2,30 +2,31 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   SearchIcon,
   FilterIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  CheckCircle2Icon,
+  ClockIcon,
+  ShieldCheckIcon,
+  ShieldOffIcon,
+  Trash2Icon,
+  EyeIcon,
   CheckCircleIcon,
   XCircleIcon,
-  EyeIcon,
-  MoreVerticalIcon,
-  Loader2Icon,
-  ShieldOffIcon,
-  ShieldCheckIcon,
-  Trash2Icon,
-  StoreIcon,
-  PackageIcon,
-  TrendingUpIcon,
-  CalendarIcon,
   ChevronDownIcon,
-  CheckCircle2Icon
+  CalendarIcon,
+  MailIcon,
+  PhoneIcon,
+  MapPinIcon
 } from "lucide-react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import api from "../../api";
 
 export function AdminVendorsPage() {
-  const [vendors, setVendors] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [openMenuId, setOpenMenuId] = useState(null);
+  const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -47,8 +48,8 @@ export function AdminVendorsPage() {
     try {
       const response = await api.get("admin/vendors/list/");
       setVendors(response.data);
-    } catch (error) {
-      console.error("Error fetching vendors:", error);
+    } catch (err) {
+      console.error("Error fetching vendors:", err);
     } finally {
       setLoading(false);
     }
@@ -56,155 +57,142 @@ export function AdminVendorsPage() {
 
   const handleVendorAction = async (vendorId, action) => {
     try {
-      await api.post("admin/vendors/update-status/", { 
-        vendor_id: vendorId, 
-        action 
-      });
+      await api.post("admin/vendors/action/", { vendor_id: vendorId, action });
       fetchVendors();
       setOpenMenuId(null);
-    } catch (error) {
-      console.error("Error updating status:", error);
+    } catch (err) {
+      console.error("Error executing vendor action:", err);
     }
   };
 
-  const filteredVendors = vendors.filter((vendor) => {
-    const matchesSearch =
-      vendor.storeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.owner.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || vendor.status === statusFilter;
+  const filteredVendors = vendors.filter((v) => {
+    const matchesSearch = 
+      v.store_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      v.owner_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      v.email?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || v.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case "approved":
-      case "active":
-        return "bg-emerald-50 text-emerald-600 border-emerald-100";
-      case "pending":
-        return "bg-amber-50 text-amber-600 border-amber-100";
-      case "rejected":
-      case "suspended":
-        return "bg-rose-50 text-rose-600 border-rose-100";
-      default:
-        return "bg-slate-50 text-slate-400 border-slate-100";
+      case "active": return "text-emerald-600 bg-emerald-50 border-emerald-100";
+      case "pending": return "text-amber-600 bg-amber-50 border-amber-100";
+      case "suspended": return "text-rose-600 bg-rose-50 border-rose-100";
+      default: return "text-gray-600 bg-gray-50 border-gray-100";
     }
   };
 
   return (
     <AdminLayout currentPage="vendors">
-      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-12">
+      <div className="w-full space-y-8 animate-fade-in pb-12">
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Partner Ecosystem</h1>
-            <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-[2px] leading-none">Management and verification of global retail partners</p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Partner Management</h1>
+            <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-[3px] leading-none">Verification and oversight of the global vendor ecosystem</p>
           </div>
           <div className="flex items-center gap-4">
-             <div className="bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
-                <StoreIcon className="w-4 h-4 text-indigo-500" />
-                <span className="text-xs font-black text-slate-700 uppercase tracking-widest">{vendors.length} Total Partners</span>
+             <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center gap-3">
+                <CheckCircle2Icon className="w-4 h-4 text-accent" />
+                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{vendors.filter(v => v.status === 'active').length} Verified Partners</span>
              </div>
           </div>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="dashboard-card p-4 flex flex-col lg:flex-row items-center gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
             <div className="flex-1 w-full relative group">
-                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
                 <input 
                     type="text" 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by store name, owner, or verify ID..." 
-                    className="w-full h-12 pl-12 pr-4 bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white transition-all shadow-inner"
+                    placeholder="Search by store name, identity, or system ID..." 
+                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
                 />
             </div>
             <div className="flex items-center gap-3 w-full lg:w-auto">
                 <div className="relative flex-1 lg:flex-none min-w-[180px]">
-                    <FilterIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <FilterIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     <select 
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full h-12 pl-12 pr-10 bg-slate-50 border border-slate-100 rounded-xl text-sm font-black text-slate-600 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer shadow-sm"
+                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer"
                     >
-                        <option value="all">Verification Status</option>
-                        <option value="approved">Approved</option>
+                        <option value="all">All States</option>
+                        <option value="active">Verified</option>
                         <option value="pending">Awaiting Sync</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="suspended">Suspended</option>
+                        <option value="suspended">Restricted</option>
                     </select>
-                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
             </div>
         </div>
 
-        {/* Partners Table */}
-        <div className="dashboard-card overflow-hidden">
+        {/* Records Table */}
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
-                    <thead className="text-[10px] font-black text-slate-400 uppercase tracking-[2px] text-left bg-slate-50/50">
+                    <thead className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] text-left bg-gray-50/50">
                         <tr>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Partner Entity</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Catalog Size</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Gross Revenue</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Verification</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50">Onboarding</th>
-                            <th className="px-8 py-5 font-black border-b border-slate-100/50 text-right">Directives</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Partner Entity</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Contact Vector</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Status</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Registration</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
-                        {loading ? (
-                             <tr>
-                                <td colSpan="6" className="px-8 py-20 text-center">
-                                    <Loader2Icon className="w-8 h-8 text-indigo-500 animate-spin mx-auto" />
-                                </td>
-                             </tr>
-                        ) : filteredVendors.length === 0 ? (
+                    <tbody className="divide-y divide-gray-50">
+                        {filteredVendors.length === 0 ? (
                             <tr>
-                                <td colSpan="6" className="px-8 py-20 text-center">
+                                <td colSpan="5" className="px-8 py-20 text-center">
                                     <div className="flex flex-col items-center gap-3">
-                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
-                                            <StoreIcon className="w-8 h-8 text-slate-200" />
+                                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
+                                            <SearchIcon className="w-8 h-8 text-gray-200" />
                                         </div>
-                                        <p className="text-xs font-black text-slate-300 uppercase tracking-widest">No matching partners found in records</p>
+                                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">No matching partners found</p>
                                     </div>
                                 </td>
                             </tr>
                         ) : (
                             filteredVendors.map((vendor) => (
-                                <tr key={vendor.id} className="group hover:bg-slate-50/50 transition-all duration-200">
+                                <tr key={vendor.id} className="group hover:bg-gray-50/50 transition-all duration-200">
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-sm font-black text-slate-400 shadow-sm border border-slate-100 group-hover:scale-110 transition-transform">
-                                                {vendor.storeName?.charAt(0)}
+                                            <div className="w-12 h-12 bg-white rounded flex items-center justify-center text-[10px] font-black text-gray-400 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform uppercase">
+                                                {vendor.store_name?.charAt(0)}
                                             </div>
                                             <div>
-                                                <p className="font-black text-slate-800 tracking-tight leading-none text-sm">{vendor.storeName}</p>
-                                                <p className="text-[11px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">{vendor.owner} • {vendor.email}</p>
+                                                <p className="font-black text-gray-900 tracking-tight leading-none text-xs uppercase">{vendor.store_name}</p>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <MapPinIcon className="w-3 h-3 text-gray-300" />
+                                                    <p className="text-[9px] font-black text-gray-400 uppercase">{vendor.address || "Global HQ"}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2">
-                                            <PackageIcon className="w-3.5 h-3.5 text-slate-300" />
-                                            <span className="text-xs font-black text-slate-600">{vendor.products} SKU's</span>
+                                        <div className="space-y-1.5">
+                                            <div className="flex items-center gap-2">
+                                                <MailIcon className="w-3 h-3 text-gray-400" />
+                                                <span className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">{vendor.email}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <PhoneIcon className="w-3 h-3 text-gray-400" />
+                                                <span className="text-[10px] font-black text-gray-600 tracking-tighter">{vendor.phone || "+977-1-XXXXXX"}</span>
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2">
-                                            <TrendingUpIcon className="w-3.5 h-3.5 text-emerald-500" />
-                                            <span className="text-sm font-black text-emerald-600 tracking-tight">Rs. {vendor.revenue.toLocaleString()}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <span className={`px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-sm ${getStatusBadge(vendor.status)}`}>
+                                        <span className={`px-3 py-1 bg-white border text-[9px] font-black uppercase tracking-widest shadow-sm rounded ${getStatusBadge(vendor.status)}`}>
                                             {vendor.status}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2 text-slate-500">
-                                            <CalendarIcon className="w-3.5 h-3.5 text-slate-300" />
-                                            <span className="text-[11px] font-bold">{vendor.joined}</span>
+                                        <div className="flex items-center gap-2 text-gray-400">
+                                            <CalendarIcon className="w-3.5 h-3.5" />
+                                            <span className="text-[10px] font-black uppercase tracking-tighter">{vendor.joined}</span>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 text-right">
@@ -215,22 +203,21 @@ export function AdminVendorsPage() {
                                             >
                                                 <MoreVerticalIcon className="w-4 h-4 text-slate-400" />
                                             </button>
-                                            
                                             {openMenuId === vendor.id && (
-                                                <div className="absolute right-0 mt-3 w-60 bg-white border border-slate-100 rounded-[1.5rem] shadow-2xl shadow-indigo-100/50 py-2 z-50 animate-fade-down">
-                                                    <p className="px-5 py-3 text-[9px] font-black text-slate-300 uppercase tracking-[2px] border-b border-slate-50">Partner Directives</p>
+                                                <div className="absolute right-0 mt-3 w-60 bg-white border border-gray-100 rounded-lg shadow-xl py-2 z-50 animate-fade-down text-left">
+                                                    <p className="px-5 py-3 text-[8px] font-black text-gray-400 uppercase tracking-[2px] border-b border-gray-50">Partner Directives</p>
                                                     
                                                     {vendor.status === "pending" && (
                                                         <div className="p-2 space-y-1">
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'approve')}
-                                                                className="w-full flex items-center px-4 py-3 text-[10px] font-black text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-white bg-accent hover:bg-black rounded transition-all uppercase tracking-widest border-none cursor-pointer"
                                                             >
                                                                 <CheckCircleIcon className="w-4 h-4 mr-3" /> Execute Approval
                                                             </button>
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'reject')}
-                                                                className="w-full flex items-center px-4 py-3 text-[10px] font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-rose-500 hover:bg-rose-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                             >
                                                                 <XCircleIcon className="w-4 h-4 mr-3" /> Terminate Request
                                                             </button>
@@ -238,31 +225,31 @@ export function AdminVendorsPage() {
                                                     )}
                                                     
                                                     <div className="px-2 space-y-1">
-                                                        <button className="w-full flex items-center px-4 py-3 text-[10px] font-black text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
-                                                            <EyeIcon className="w-4 h-4 mr-3" /> Ecosystem View
+                                                        <button className="w-full flex items-center px-4 py-3 text-[9px] font-black text-gray-900 hover:bg-gray-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
+                                                            <EyeIcon className="w-4 h-4 mr-3 text-gray-400" /> Ecosystem View
                                                         </button>
 
                                                         {vendor.status === "suspended" ? (
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'unsuspend')}
-                                                                className="w-full flex items-center px-4 py-3 text-[10px] font-black text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-gray-900 hover:bg-gray-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                             >
-                                                                <ShieldCheckIcon className="w-4 h-4 mr-3" /> Lift Suspension
+                                                                <ShieldCheckIcon className="w-4 h-4 mr-3 text-accent" /> Lift Suspension
                                                             </button>
                                                         ) : (
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'suspend')}
-                                                                className="w-full flex items-center px-4 py-3 text-[10px] font-black text-amber-600 hover:bg-amber-50 rounded-xl transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-amber-600 hover:bg-amber-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                             >
                                                                 <ShieldOffIcon className="w-4 h-4 mr-3" /> Suspend Operations
                                                             </button>
                                                         )}
 
-                                                        <div className="h-px bg-slate-50 my-1 mx-3" />
+                                                        <div className="h-px bg-gray-50 my-1 mx-3" />
                                                         
                                                         <button 
                                                             onClick={() => handleVendorAction(vendor.id, 'delete')}
-                                                            className="w-full flex items-center px-4 py-3 text-[10px] font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                            className="w-full flex items-center px-4 py-3 text-[9px] font-black text-rose-500 hover:bg-rose-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                         >
                                                             <Trash2Icon className="w-4 h-4 mr-3" /> Purge Entity
                                                         </button>
@@ -277,13 +264,13 @@ export function AdminVendorsPage() {
                     </tbody>
                 </table>
             </div>
-            
+
             {/* Table Footer */}
-            <div className="bg-slate-50/50 px-8 py-4 border-t border-slate-100/50 flex items-center justify-between">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Encrypted Partner Records V3.0</p>
+            <div className="bg-gray-50/50 px-8 py-5 border-t border-gray-100 flex items-center justify-between">
+                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Global Partner Registry V1.0</p>
                 <div className="flex items-center gap-2">
-                    <CheckCircle2Icon className="w-3.5 h-3.5 text-emerald-500" />
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Identity Verified</p>
+                    <CheckCircle2Icon className="w-3.5 h-3.5 text-accent" />
+                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Ecosystem Verified</p>
                 </div>
             </div>
         </div>

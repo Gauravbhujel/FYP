@@ -206,9 +206,11 @@ def admin_pending_vendors(request):
                 vendors_data.append({
                     "id": vendor.id,
                     "store_name": vendor.store_name,
-                    "owner_name": f"{vendor.user.first_name} {vendor.user.last_name}",
+                    "owner_name": f"{vendor.user.first_name} {vendor.user.last_name}".strip() or vendor.user.username,
                     "email": vendor.user.email,
-                    "date": vendor.created_at.strftime("%Y-%m-%d"),
+                    "phone": vendor.phone,
+                    "address": vendor.address,
+                    "joined": vendor.created_at.strftime("%Y-%m-%d"),
                     "status": vendor.status
                 })
             
@@ -1094,9 +1096,11 @@ def admin_vendors_list(request):
             for v in vendors:
                 vendors_data.append({
                     "id": v.id,
-                    "storeName": v.store_name,
-                    "owner": f"{v.user.first_name} {v.user.last_name}".strip() or v.user.username,
+                    "store_name": v.store_name,
+                    "owner_name": f"{v.user.first_name} {v.user.last_name}".strip() or v.user.username,
                     "email": v.user.email,
+                    "phone": v.phone,
+                    "address": v.address,
                     "products": v.product_count or 0,
                     "revenue": float(v.total_revenue or 0),
                     "status": v.status,
