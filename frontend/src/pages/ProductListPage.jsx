@@ -120,9 +120,9 @@ const ProductListPage = () => {
     }, [products, searchQuery, selectedCategory, priceRange, selectedSizes, sortBy]);
 
     const getPageTitle = () => {
-        if (selectedCategory === 'all') return "Explore Selection";
+        if (selectedCategory === 'all') return "All Products";
         const cat = categories.find(c => c.id === selectedCategory);
-        return cat ? cat.label : "Shop";
+        return cat ? cat.label : "Products";
     };
 
     const clearFilters = () => {
@@ -139,15 +139,11 @@ const ProductListPage = () => {
                              (selectedSizes.length > 0 ? 1 : 0);
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#F9FBFA] font-sans">
+        <div className="min-h-screen flex flex-col bg-white font-sans">
             <Navbar />
             
-            {/* ─── PREMIUM HEADER ─── */}
-            <div className="bg-white border-b border-gray-100 overflow-hidden relative">
-                {/* Decorative Pattern */}
-                <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
-                
-                <div className="max-w-[1440px] mx-auto py-12 px-6 lg:px-10">
+            <div className="bg-white py-12 border-b border-gray-100">
+                <div className="max-w-7xl mx-auto px-6">
                     <nav className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">
                         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                         <span>/</span>
@@ -155,14 +151,11 @@ const ProductListPage = () => {
                     </nav>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none mb-4 uppercase">
+                            <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-2 uppercase">
                                 {getPageTitle()}
-                                <span className="ml-4 text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full align-middle normal-case tracking-normal">
-                                    {filteredAndSortedProducts.length} Items
-                                </span>
                             </h1>
-                            <p className="text-gray-500 max-w-xl font-medium text-sm md:text-base">
-                                Premium {getPageTitle().toLowerCase()} equipment curated for dedicated athletes in Nepal.
+                            <p className="text-gray-500 max-w-2xl font-medium">
+                                Showing {filteredAndSortedProducts.length} results
                             </p>
                         </div>
                     </div>
@@ -179,7 +172,7 @@ const ProductListPage = () => {
                         className="w-full flex justify-between items-center bg-white border border-gray-200 p-4 rounded-2xl shadow-lg ring-1 ring-black/5"
                     >
                         <div className="flex items-center gap-3">
-                            <span className="bg-primary text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-md shadow-primary/20">
+                            <span className="bg-gray-100 text-primary w-10 h-10 rounded flex items-center justify-center shadow-sm">
                                 <FaFilter size={14} />
                             </span>
                             <span className="font-black text-gray-900 text-sm uppercase tracking-wider">Filters & Refine</span>
@@ -195,24 +188,24 @@ const ProductListPage = () => {
                     {/* Backdrop for mobile */}
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileFiltersOpen(false)}></div>
                     
-                    <div className="absolute bottom-0 left-0 right-0 h-[90vh] lg:h-auto lg:relative lg:bottom-auto bg-white rounded-t-[2.5rem] lg:rounded-none lg:bg-transparent overflow-y-auto lg:overflow-visible flex flex-col p-8 lg:p-0">
+                    <div className="absolute bottom-0 left-0 right-0 h-[90vh] lg:h-auto lg:relative lg:bottom-auto bg-white lg:bg-transparent overflow-y-auto lg:overflow-visible flex flex-col p-8 lg:p-0">
                         {/* Mobile Header */}
                         <div className="flex justify-between items-center mb-8 lg:hidden">
                             <h2 className="text-2xl font-black text-gray-900 border-l-4 border-primary pl-4">FILTERS</h2>
                             <button onClick={() => setIsMobileFiltersOpen(false)} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center"><FaTimes /></button>
                         </div>
 
-                        <div className="lg:sticky lg:top-32 space-y-6">
+                        <div className="lg:sticky lg:top-32 space-y-10">
                             {/* Global Search inside Sidebar */}
-                            <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm shadow-gray-200/50">
-                                <h3 className="font-black text-gray-900 mb-4 uppercase tracking-widest text-xs flex items-center gap-2">
+                            <div className="mb-10 border-b border-gray-100 pb-8">
+                                <h3 className="font-black text-gray-900 mb-4 uppercase tracking-widest text-[10px] flex items-center gap-2">
                                     <FaSearch size={10} className="text-primary" /> Search Gear
                                 </h3>
                                 <div className="relative group">
                                     <input 
                                         type="text" 
                                         placeholder="Keywords..." 
-                                        className="w-full pl-5 pr-10 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:outline-none focus:border-primary/30 focus:bg-white transition-all text-sm font-bold"
+                                        className="w-full py-2 bg-transparent border-b border-gray-200 focus:outline-none focus:border-primary transition-all text-sm font-bold"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
@@ -221,12 +214,12 @@ const ProductListPage = () => {
                             </div>
 
                             {/* Section: Categories */}
-                            <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm shadow-gray-200/50">
+                             <div className="mb-8">
                                 <button 
                                     onClick={() => toggleSection('categories')}
-                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-xs mb-4"
+                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-4"
                                 >
-                                    Experience
+                                    Category
                                     {openSections.categories ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
                                 </button>
                                 {openSections.categories && (
@@ -235,10 +228,10 @@ const ProductListPage = () => {
                                             <button
                                                 key={cat.id}
                                                 onClick={() => setSelectedCategory(cat.id)}
-                                                className={`w-full text-left px-4 py-2.5 rounded-xl transition-all flex items-center justify-between text-xs font-bold ${
+                                                className={`w-full text-left py-2 transition-all flex items-center justify-between text-xs font-bold ${
                                                     selectedCategory === cat.id 
-                                                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                                                    ? 'text-primary' 
+                                                    : 'text-gray-500 hover:text-gray-900'
                                                 }`}
                                             >
                                                 {cat.label}
@@ -250,12 +243,12 @@ const ProductListPage = () => {
                             </div>
 
                             {/* Section: Price Range */}
-                            <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm shadow-gray-200/50">
+                            <div className="mb-8">
                                 <button 
                                     onClick={() => toggleSection('price')}
-                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-xs mb-4"
+                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-4"
                                 >
-                                    Budget (Rs.)
+                                    Price Range
                                     {openSections.price ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
                                 </button>
                                 {openSections.price && (
@@ -283,12 +276,12 @@ const ProductListPage = () => {
                             </div>
 
                             {/* Section: Sizes */}
-                            <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm shadow-gray-200/50">
+                            <div className="mb-8">
                                 <button 
                                     onClick={() => toggleSection('size')}
-                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-xs mb-4"
+                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-4"
                                 >
-                                    Athletic Size
+                                    Size
                                     {openSections.size ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
                                 </button>
                                 {openSections.size && (
@@ -297,10 +290,10 @@ const ProductListPage = () => {
                                             <button 
                                                 key={size.id}
                                                 onClick={() => handleSizeToggle(size.id)}
-                                                className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border-2 ${
+                                                className={`px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all border ${
                                                     selectedSizes.includes(size.id)
-                                                    ? 'bg-gray-900 text-white border-gray-900 shadow-md'
-                                                    : 'bg-white text-gray-400 border-gray-100 hover:border-gray-200'
+                                                    ? 'bg-primary text-white border-primary'
+                                                    : 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'
                                                 }`}
                                             >
                                                 {size.id}
@@ -313,7 +306,7 @@ const ProductListPage = () => {
                             {/* Mobile CTA */}
                             <button 
                                 onClick={() => setIsMobileFiltersOpen(false)}
-                                className="w-full lg:hidden bg-primary text-white py-4 rounded-2xl font-black text-sm shadow-xl shadow-primary/25 mt-6"
+                                className="w-full lg:hidden bg-accent text-white py-4 rounded font-black text-sm shadow-sm mt-6 hover:bg-opacity-90 transition-all"
                             >
                                 SHOW {filteredAndSortedProducts.length} RESULTS
                             </button>
@@ -333,25 +326,22 @@ const ProductListPage = () => {
                 {/* ─── PRODUCT DISCOVERY GRID ─── */}
                 <main className="flex-1 w-full">
                     {/* Top Bar / Sort Utility */}
-                    <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm shadow-gray-200/50 flex flex-col sm:flex-row justify-between items-center gap-4 mb-10 overflow-hidden relative">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-primary">
-                                <FaSortAmountDown size={14} />
-                            </div>
-                            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">
-                                Validating <span className="text-gray-900">{filteredAndSortedProducts.length}</span> Premium Match{filteredAndSortedProducts.length !== 1 ? 'es' : ''}
+                    <div className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-gray-100 pb-6">
+                        <div className="flex items-center gap-2">
+                            <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em]">
+                                Showing <span className="text-gray-900">{filteredAndSortedProducts.length}</span> Results
                             </p>
                         </div>
-                        <div className="flex items-center gap-3 bg-gray-50 p-1.5 rounded-2xl border border-gray-100 w-full sm:w-auto">
-                            <span className="pl-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sort:</span>
+                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sort by:</span>
                             <select 
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="bg-white border-none text-gray-900 py-2.5 px-4 rounded-xl focus:outline-none focus:ring-0 cursor-pointer font-black text-xs min-w-[160px] shadow-sm"
+                                className="bg-transparent border-none text-gray-900 py-2 pl-2 pr-8 rounded-none focus:outline-none focus:ring-0 cursor-pointer font-black text-[10px] uppercase tracking-widest"
                             >
-                                <option value="newest">Fresh Arrivals</option>
-                                <option value="price-asc">Price: Minimal First</option>
-                                <option value="price-desc">Price: Luxury First</option>
+                                <option value="newest">Newest First</option>
+                                <option value="price-asc">Price: Low to High</option>
+                                <option value="price-desc">Price: High to Low</option>
                             </select>
                         </div>
                     </div>
@@ -384,7 +374,7 @@ const ProductListPage = () => {
                                 </p>
                                 <button 
                                     onClick={clearFilters}
-                                    className="px-10 py-4 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all font-black text-xs uppercase tracking-widest shadow-xl shadow-gray-200 flex items-center gap-3"
+                                    className="px-10 py-4 bg-primary text-white rounded hover:bg-opacity-90 transition-all font-black text-xs uppercase tracking-widest shadow-sm flex items-center gap-3"
                                 >
                                     <FaSlidersH /> Reset Discovery
                                 </button>

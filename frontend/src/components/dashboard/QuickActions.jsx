@@ -45,42 +45,41 @@ export function QuickActions() {
   ];
 
   return (
-    <div className="dashboard-card p-8">
-      <div className="flex items-center justify-between mb-8">
-          <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Operation Hub</h3>
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+    <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-50">
+          <h3 className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Operation Hub</h3>
+          <span className="w-1.5 h-1.5 rounded-full bg-accent" />
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-2">
         {actions.map((action, index) => {
           const Icon = action.icon;
           return (
             <Link
               key={index}
               to={action.href}
-              className="flex items-center gap-4 p-4 rounded-3xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100"
+              className="flex items-center gap-5 p-4 rounded-lg hover:bg-gray-50 transition-all group border border-transparent hover:border-gray-100"
             >
-              <div className={`w-12 h-12 rounded-2xl ${action.bgColor} flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3`}>
-                <Icon className={`w-6 h-6 ${action.color} stroke-[2.5px]`} />
+              <div className="w-10 h-10 rounded bg-gray-50 flex items-center justify-center transition-colors group-hover:bg-accent/5 group-hover:text-accent">
+                <Icon className="w-4 h-4 text-gray-400 group-hover:text-accent transition-colors" />
               </div>
 
               <div className="flex-1">
-                <p className="text-sm font-black text-slate-800 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">{action.label}</p>
-                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">{action.desc}</p>
+                <p className="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none group-hover:text-accent transition-colors">{action.label}</p>
+                <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-[0.2em]">{action.desc}</p>
               </div>
 
-              <ChevronRightIcon className="w-4 h-4 text-slate-200 group-hover:text-slate-400 group-hover:translate-x-1 transition-all" />
+              <ChevronRightIcon className="w-3 h-3 text-gray-200 group-hover:text-gray-900 group-hover:translate-x-1 transition-all" />
             </Link>
           );
         })}
       </div>
 
-      <div className="mt-8 pt-8 border-t border-slate-50">
-           <div className="bg-slate-900 rounded-3xl p-6 text-white text-center relative overflow-hidden group cursor-pointer shadow-xl shadow-slate-900/20">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150" />
-                <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Premium Benefit</p>
-                <p className="text-xs font-bold leading-relaxed mb-4">Your store is currently operating at <span className="text-emerald-400">Peak Performance</span></p>
-                <button className="w-full h-10 bg-white/10 hover:bg-white/20 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border-none cursor-pointer">View Upgrade Options</button>
+      <div className="mt-8 pt-6 border-t border-gray-100">
+           <div className="bg-gray-900 rounded-lg p-6 text-white text-center relative overflow-hidden group cursor-pointer">
+                <p className="text-[8px] font-black text-accent uppercase tracking-[0.2em] mb-2">Service Status</p>
+                <p className="text-[10px] font-black leading-relaxed uppercase tracking-widest mb-4">Store integrity is <span className="text-accent underline decoration-2 underline-offset-4">Optimal</span></p>
+                <button className="w-full py-3 bg-white/5 hover:bg-white/10 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded border border-white/10 transition-all">Support Desk</button>
            </div>
       </div>
     </div>

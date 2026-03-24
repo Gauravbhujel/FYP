@@ -25,7 +25,7 @@ const heroSlides = [
     badge: "🏆 Nepal's #1 Sports Store",
     image:
       "https://images.unsplash.com/photo-1517649763962-0c623066013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-    gradient: "from-[#0a3622]/95 via-[#0f5132]/85 to-[#166534]/70",
+    gradient: "from-black/80 to-transparent",
   },
   {
     title: "Run Faster. Jump Higher.",
@@ -35,7 +35,7 @@ const heroSlides = [
     badge: "⚡ New Arrivals",
     image:
       "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-    gradient: "from-[#1e1b4b]/95 via-[#312e81]/80 to-[#4338ca]/60",
+    gradient: "from-black/80 to-transparent",
   },
   {
     title: "Train Like a Champion",
@@ -45,7 +45,7 @@ const heroSlides = [
     badge: "🔥 Hot Deals",
     image:
       "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80",
-    gradient: "from-[#431407]/95 via-[#7c2d12]/80 to-[#c2410c]/60",
+    gradient: "from-black/80 to-transparent",
   },
 ];
 
@@ -94,25 +94,20 @@ const HomePage = () => {
               backgroundPosition: "center",
             }}
           >
-            <div className={`absolute inset-0 bg-gradient-to-br ${s.gradient}`} />
+            {/* Improved Dark Overlay for readability (~50% opacity) */}
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
           </div>
         ))}
 
         {/* Hero Content */}
-        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto">
-          {/* Badge */}
-          <div
-            key={`badge-${slideIndex}`}
-            className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-full px-5 py-2 mb-6 text-white text-sm font-semibold animate-fade-up"
-          >
-            <span>{slide.badge}</span>
-          </div>
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6 max-w-4xl mx-auto pt-10">
 
           {/* Heading */}
           <h1
             key={`title-${slideIndex}`}
-            className="text-white font-black mb-5 leading-[1.1] animate-fade-up animate-fade-up-delay-1"
-            style={{ fontSize: "clamp(2.2rem, 6vw, 4.5rem)" }}
+            className="text-white font-black mb-6 leading-[1.1] animate-fade-up animate-fade-up-delay-1 drop-shadow-sm"
+            style={{ fontSize: "clamp(2.5rem, 7vw, 5rem)" }}
           >
             {slide.title}
           </h1>
@@ -120,110 +115,88 @@ const HomePage = () => {
           {/* Subtitle */}
           <p
             key={`sub-${slideIndex}`}
-            className="text-white/85 mb-8 max-w-xl mx-auto font-normal leading-relaxed animate-fade-up animate-fade-up-delay-2"
-            style={{ fontSize: "clamp(0.95rem, 2vw, 1.15rem)" }}
+            className="text-white/90 mb-10 max-w-2xl mx-auto font-medium leading-relaxed animate-fade-up animate-fade-up-delay-2 drop-shadow-sm"
+            style={{ fontSize: "clamp(1rem, 2.2vw, 1.25rem)" }}
           >
             {slide.subtitle}
           </p>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons - Single strong action for a cleaner look */}
           <div
             key={`cta-${slideIndex}`}
-            className="flex items-center gap-4 flex-wrap justify-center animate-fade-up animate-fade-up-delay-3"
+            className="flex items-center gap-5 flex-wrap justify-center animate-fade-up animate-fade-up-delay-3"
           >
             <button
               onClick={() => navigate("/products")}
-              className="bg-gradient-to-r from-[#ff6b00] to-[#ff9d3d] text-white font-bold px-8 py-3.5 rounded-full transition-all duration-200 hover:from-[#cc5200] hover:to-[#ff6b00] hover:shadow-2xl hover:shadow-orange-500/40 hover:-translate-y-px flex items-center gap-2 text-base pulse-glow"
+              className="bg-accent text-white font-semibold px-10 py-4 rounded-lg shadow-lg shadow-accent/20 transition-all duration-300 hover:bg-opacity-90 hover:scale-[1.03] active:scale-95 flex items-center gap-3 text-base"
             >
-              {slide.cta} <FaArrowRight className="text-sm" />
-            </button>
-            <button
-              onClick={() => navigate("/categories")}
-              className="bg-white/15 backdrop-blur-md border border-white/30 text-white font-semibold px-8 py-3.5 rounded-full transition-all duration-200 hover:bg-white/25 hover:-translate-y-px text-base"
-            >
-              Browse Categories
+              Get Started <FaArrowRight className="text-sm" />
             </button>
           </div>
 
-          {/* Trust badges */}
-          <div className="mt-10 flex items-center gap-6 text-white/70 text-xs font-medium animate-fade-up" style={{ animationDelay: "0.6s" }}>
-            <span className="flex items-center gap-1.5">✅ Verified Vendors</span>
-            <span className="w-px h-4 bg-white/30" />
-            <span className="flex items-center gap-1.5">🔒 Secure Checkout</span>
-            <span className="w-px h-4 bg-white/30" />
-            <span className="flex items-center gap-1.5">🚀 Fast Delivery</span>
-          </div>
+
         </div>
 
         {/* Slider Controls */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-white/30 transition-all duration-200"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white/25 transition-all duration-200"
         >
           <FaChevronLeft className="text-sm" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white flex items-center justify-center hover:bg-white/30 transition-all duration-200"
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white/25 transition-all duration-200"
         >
           <FaChevronRight className="text-sm" />
         </button>
 
         {/* Slide Dots */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
           {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => goToSlide(i)}
-              className={`transition-all duration-300 rounded-full ${i === slideIndex
-                ? "w-8 h-2.5 bg-[#ff6b00]"
-                : "w-2.5 h-2.5 bg-white/40 hover:bg-white/70"
+              className={`transition-all duration-500 rounded-full h-1.5 ${i === slideIndex
+                ? "w-10 bg-accent"
+                : "w-4 bg-white/40 hover:bg-white/60"
                 }`}
             />
           ))}
         </div>
 
         {/* Bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
+        <div className="absolute bottom-0 left-0 right-0 z-10 pointer-events-none">
           <svg viewBox="0 0 1440 80" className="w-full" style={{ display: "block" }}>
-            <path d="M0,60 C360,0 1080,120 1440,60 L1440,80 L0,80 Z" fill="#f9fafb" />
+            <path d="M0,60 C360,0 1080,120 1440,60 L1440,80 L0,80 Z" fill="#ffffff" />
           </svg>
         </div>
       </section>
 
       {/* ─── BENEFITS STRIP ─────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 -mt-2 pb-16 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <section className="max-w-6xl mx-auto px-5 py-20 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
           {[
             {
-              icon: <FaTrophy className="text-2xl" />,
               title: "Premium Quality",
-              desc: "Curated selection from verified vendors",
-              color: "from-amber-500 to-yellow-400",
+              desc: "Curated selection from verified vendors worldwide",
             },
             {
-              icon: <FaShieldAlt className="text-2xl" />,
               title: "Secure Shopping",
-              desc: "Protected payments and buyer guarantee",
-              color: "from-[#0f5132] to-[#198754]",
+              desc: "Encrypted payments and full buyer protection",
             },
             {
-              icon: <FaShippingFast className="text-2xl" />,
               title: "Fast Shipping",
-              desc: "Quick delivery from vendors near you",
-              color: "from-blue-600 to-blue-400",
+              desc: "Doorstep delivery across all provinces of Nepal",
             },
-          ].map(({ icon, title, desc, color }) => (
+          ].map(({ title, desc }) => (
             <div
               key={title}
-              className="flex items-center gap-4 p-5 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-gray-100 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.10)] transition-all duration-300"
+              className="flex flex-col items-center text-center gap-2 group"
             >
-              <div className={`bg-gradient-to-br ${color} text-white w-14 h-14 flex items-center justify-center rounded-xl shadow-md flex-shrink-0`}>
-                {icon}
-              </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-base mb-0.5">{title}</h3>
-                <p className="text-sm text-gray-500 leading-snug">{desc}</p>
+                <h3 className="font-black text-gray-900 text-lg mb-1 uppercase tracking-tighter">{title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed max-w-[240px]">{desc}</p>
               </div>
             </div>
           ))}
@@ -233,30 +206,22 @@ const HomePage = () => {
 
 
       {/* ─── DEALS BANNER ───────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 py-6">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#ff6b00] via-[#ff8c38] to-[#ffb347] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-orange-500/25">
-          {/* Background decoration */}
-          <div className="absolute -top-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="relative z-10 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 mb-3">
-              <FaFire className="text-white text-sm" />
-              <span className="text-white font-bold text-xs uppercase tracking-wider">Limited Time Deals</span>
-            </div>
-            <h3 className="text-white font-black text-3xl md:text-4xl leading-tight mb-2">
+      <section className="max-w-6xl mx-auto px-5 py-12">
+        <div className="bg-white p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-gray-100 rounded-xl border-l-[6px] border-l-accent shadow-sm">
+          <div className="text-center md:text-left pl-2">
+            <h3 className="text-gray-900 font-black text-2xl md:text-3xl tracking-tight mb-2 uppercase">
               Up to 30% Off
             </h3>
-            <p className="text-white/85 font-medium text-base">
-              Massive savings on premium sports equipment. Don't miss out!
+            <p className="text-gray-500 font-medium text-sm md:text-base">
+              Massive savings on premium sports equipment. Elevate your performance for less.
             </p>
           </div>
 
           <button
             onClick={() => navigate("/deals")}
-            className="bg-white text-[#ff6b00] font-black px-8 py-3 rounded-full hover:shadow-xl hover:shadow-orange-900/20 hover:-translate-y-px transition-all duration-200 text-base"
+            className="bg-accent text-white font-bold px-10 py-4 rounded-lg border-none shadow-lg shadow-accent/20 hover:bg-opacity-90 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-sm md:text-base uppercase tracking-wider"
           >
-            Grab the Deal →
+            Grab the Deal
           </button>
         </div>
       </section>
@@ -265,21 +230,18 @@ const HomePage = () => {
       <section className="max-w-6xl mx-auto px-5 py-12">
         <div className="flex justify-between items-end mb-10">
           <div>
-            <p className="text-[#ff6b00] font-semibold text-sm uppercase tracking-widest mb-1">
+            <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-1">
               Find your sport
             </p>
-            <h2 className="section-heading text-3xl font-extrabold text-gray-900">
+            <h2 className="text-3xl font-extrabold text-primary">
               Shop by Category
             </h2>
           </div>
           <button
             onClick={() => navigate("/categories")}
-            className="flex items-center gap-2 text-[#0f5132] font-semibold text-sm hover:gap-3 transition-all duration-200 group"
+            className="flex items-center gap-2 text-primary font-semibold text-sm border-b border-primary pb-0.5 hover:gap-3 transition-all duration-200 group"
           >
-            All Categories
-            <span className="w-7 h-7 rounded-full bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
-              <FaArrowRight className="text-xs" />
-            </span>
+            All Categories <FaArrowRight className="text-xs" />
           </button>
         </div>
 

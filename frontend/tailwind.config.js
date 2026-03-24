@@ -4,15 +4,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#0f5132",
-        "primary-light": "#198754",
-        secondary: "#198754",
+        primary: "#111111",
+        "primary-light": "#333333",
+        secondary: "#4b5563",
         accent: "#ff6b00",
-        "accent-light": "#ff9d3d",
-        "text-dark": "#111827",
+        "accent-light": "#ff8533",
+        "text-dark": "#111111",
         "text-mid": "#374151",
         "text-light": "#6b7280",
-        "bg-light": "#f9fafb",
+        "bg-light": "#f5f5f5",
       },
       fontFamily: {
         sans: ["Inter", "Poppins", "sans-serif"],

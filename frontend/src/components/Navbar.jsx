@@ -95,9 +95,9 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-[1000] w-full">
       {/* Announcement Bar */}
-      <div className="bg-gradient-to-r from-[#0a3622] via-[#0f5132] to-[#0a3622] text-white text-xs py-2 text-center font-medium tracking-wide">
+      <div className="bg-primary text-white text-xs py-2 text-center font-medium tracking-wide">
         🚚 Free delivery on orders above{" "}
-        <span className="font-bold text-[#ff8c38]">Rs. 999</span>
+        <span className="font-bold text-accent-light">Rs. 999</span>
         &nbsp;&nbsp;|&nbsp;&nbsp;✨ Trusted by 10,000+ athletes across Nepal
       </div>
 
@@ -105,8 +105,8 @@ const Navbar = () => {
       <nav
         className={`flex justify-between items-center px-6 md:px-10 py-3.5 transition-all duration-300 ${
           scrolled
-            ? "bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg shadow-black/5"
-            : "bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm"
+            ? "bg-white border-b border-gray-100 shadow-sm"
+            : "bg-white border-b border-gray-100 shadow-none"
         }`}
       >
         {/* Logo */}
@@ -114,14 +114,14 @@ const Navbar = () => {
           to="/"
           className="flex items-center gap-2.5 no-underline select-none"
         >
-          <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-[#0f5132] to-[#198754] rounded-lg shadow-md">
+          <div className="flex items-center justify-center w-9 h-9 bg-primary rounded-lg shadow-sm">
             <span className="text-white font-black text-base leading-none">G</span>
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-[#0f5132] font-extrabold text-lg tracking-tight leading-tight">
+            <span className="text-primary font-extrabold text-lg tracking-tight leading-tight">
               GearUp
             </span>
-            <span className="text-[#ff6b00] font-bold text-xs tracking-widest uppercase leading-tight">
+            <span className="text-accent font-bold text-xs tracking-widest uppercase leading-tight">
               Nepal
             </span>
           </div>
@@ -137,10 +137,10 @@ const Navbar = () => {
             <li key={to}>
               <Link
                 to={to}
-                className="no-underline text-[#374151] font-medium text-sm transition-all duration-200 hover:text-[#0f5132] relative group"
+                className="no-underline text-text-mid font-medium text-sm transition-all duration-200 hover:text-primary relative group"
               >
                 {label}
-                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#ff6b00] rounded transition-all duration-300 group-hover:w-full" />
+                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300 group-hover:w-full" />
               </Link>
             </li>
           ))}
@@ -151,12 +151,12 @@ const Navbar = () => {
           <div
             className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 w-[320px] lg:w-[380px] ${
               showSearchResults || searchQuery
-                ? "border-[#0f5132] bg-white shadow-md shadow-green-900/10 ring-2 ring-[#0f5132]/10"
+                ? "border-primary bg-white shadow-sm ring-1 ring-primary/10"
                 : "border-gray-200 bg-gray-50 hover:border-gray-300"
             }`}
           >
             {isSearching ? (
-              <div className="w-4 h-4 border-2 border-[#0f5132] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin flex-shrink-0" />
             ) : (
               <FaSearch className="text-gray-400 text-sm flex-shrink-0" />
             )}
@@ -195,7 +195,7 @@ const Navbar = () => {
                     <div
                       key={product.id}
                       onClick={() => handleSearchResultClick(product.id)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
                     >
                       <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
                         {product.image ? (
@@ -218,7 +218,7 @@ const Navbar = () => {
                           {product.category}
                         </div>
                       </div>
-                      <div className="text-sm font-bold text-[#0f5132] flex-shrink-0">
+                      <div className="text-sm font-bold text-primary flex-shrink-0">
                         Rs. {product.price}
                       </div>
                     </div>
@@ -226,7 +226,7 @@ const Navbar = () => {
                   <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
                     <Link
                       to={`/products?search=${searchQuery}`}
-                      className="text-xs font-bold text-[#0f5132] hover:text-[#198754] transition-colors"
+                      className="text-xs font-bold text-primary hover:text-primary-light transition-colors"
                       onClick={() => setShowSearchResults(false)}
                     >
                       View all results →
@@ -247,7 +247,7 @@ const Navbar = () => {
           {/* Wishlist */}
           <Link
             to="/wishlist"
-            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-[#0f5132] hover:bg-green-50 transition-all duration-200"
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-primary hover:bg-gray-100 transition-all duration-200"
             title="Wishlist"
           >
             <FaHeart className="text-lg" />
@@ -261,7 +261,7 @@ const Navbar = () => {
           {/* Cart */}
           <Link
             to="/cart"
-            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-[#0f5132] hover:bg-green-50 transition-all duration-200"
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-primary hover:bg-gray-100 transition-all duration-200"
             title="Cart"
           >
             <FaShoppingCart className="text-lg" />
@@ -277,26 +277,26 @@ const Navbar = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-[#0f5132] to-[#198754] text-white shadow-md hover:shadow-lg hover:shadow-green-900/20 transition-all duration-200"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white shadow-sm hover:shadow-md transition-all duration-200"
                 title="Profile"
               >
                 <FaUser className="text-sm" />
               </button>
               {showDropdown && (
-                <div className="absolute top-full right-0 mt-2 w-[200px] bg-white shadow-2xl rounded-2xl py-2 z-[1001] border border-gray-100">
+                <div className="absolute top-full right-0 mt-2 w-[200px] bg-white shadow-md rounded-2xl py-2 z-[1001] border border-gray-100">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-xs text-gray-400 font-medium">Signed in</p>
                   </div>
                   <Link
                     to="/vendor/signup"
-                    className="flex items-center px-4 py-3 no-underline text-[#374151] text-sm transition-colors hover:bg-green-50 hover:text-[#0f5132]"
+                    className="flex items-center px-4 py-3 no-underline text-text-mid text-sm transition-colors hover:bg-gray-50 hover:text-primary"
                     onClick={() => setShowDropdown(false)}
                   >
                     🏪 Become a Vendor
                   </Link>
                   <Link
                     to="/profile"
-                    className="flex items-center px-4 py-3 no-underline text-[#374151] text-sm transition-colors hover:bg-green-50 hover:text-[#0f5132] border-t border-gray-50"
+                    className="flex items-center px-4 py-3 no-underline text-text-mid text-sm transition-colors hover:bg-gray-50 hover:text-primary border-t border-gray-50"
                     onClick={() => setShowDropdown(false)}
                   >
                     👤 View Profile
@@ -313,7 +313,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="bg-gradient-to-r from-[#0f5132] to-[#198754] text-white px-5 py-2.5 rounded-full no-underline font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:shadow-green-900/25 hover:-translate-y-px"
+              className="bg-accent text-white px-5 py-2.5 rounded-full no-underline font-semibold text-sm transition-all duration-200 hover:shadow-md hover:-translate-y-px"
             >
               Sign In
             </Link>
@@ -350,7 +350,7 @@ const Navbar = () => {
             <Link
               key={to}
               to={to}
-              className="no-underline text-[#374151] font-medium text-sm py-2 border-b border-gray-50 hover:text-[#0f5132] transition-colors"
+              className="no-underline text-text-mid font-medium text-sm py-2 border-b border-gray-50 hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               {label}

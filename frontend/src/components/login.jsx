@@ -54,73 +54,78 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f4f5f7]">
-      <div className="max-w-[600px] w-[90%] bg-white p-10 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] text-center">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          {/* <span className="text-[22px]">🏪</span> */}
-          <h2 className="m-0">GearUp Nepal</h2>
+    <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-6 font-sans">
+      <div className="max-w-[480px] w-full bg-white rounded-xl shadow-xl shadow-black/5 overflow-hidden">
+        <div className="p-10 md:p-14">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <Link to="/" className="inline-block text-2xl font-black uppercase tracking-tighter mb-4">
+              GearUp <span className="text-accent underline decoration-2 underline-offset-4">Nepal</span>
+            </Link>
+            <h2 className="text-3xl font-black text-gray-900 tracking-tighter uppercase mb-2">Welcome Back</h2>
+            <p className="text-gray-500 font-medium">Clear values, clear goals. Access your gear.</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Email Address</label>
+              <div className="relative group">
+                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors" />
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium placeholder:text-gray-300"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-end">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Password</label>
+                <Link to="#" className="text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Forgot?</Link>
+              </div>
+              <div className="relative group">
+                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors" />
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium placeholder:text-gray-300"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input 
+                type="checkbox" 
+                id="remember"
+                className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent accent-accent cursor-pointer"
+              />
+              <label htmlFor="remember" className="text-xs font-bold text-gray-500 cursor-pointer">Stay signed in for 30 days</label>
+            </div>
+
+            <button
+              className="w-full py-4 bg-accent text-white rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-accent/20 hover:bg-[#E65A00] hover:scale-[0.99] active:scale-95 transition-all duration-300"
+              type="submit"
+            >
+              Sign In to GearUp
+            </button>
+          </form>
+
+          <div className="mt-12 pt-10 border-t border-gray-100 text-center">
+            <p className="text-gray-500 font-medium text-sm">
+              Don’t have an account?{" "}
+              <Link to="/signup" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2 hover:underline">
+                Create Account
+              </Link>
+            </p>
+          </div>
         </div>
-
-        <h3 className="mt-2.5">Welcome Back</h3>
-        <p className="text-[#6b7280] text-sm mb-5">Sign in to your account</p>
-
-        <form onSubmit={handleLogin}>
-          <div className="text-left mb-4">
-            <label className="text-sm font-medium">Email</label>
-            <div className="flex items-center bg-white p-2.5 rounded-md border border-[#ced4da] mt-1.5 transition-all duration-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10">
-              <FaEnvelope className="text-lg text-[#6c757d]" />
-              <input
-                type="email"
-                placeholder="your.email@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="border-none outline-none bg-transparent w-full ml-2"
-              />
-            </div>
-          </div>
-
-          <div className="text-left mb-4">
-            <label className="text-sm font-medium">Password</label>
-            <div className="flex items-center bg-white p-2.5 rounded-md border border-[#ced4da] mt-1.5 transition-all duration-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10">
-              <FaLock className="text-lg text-[#6c757d]" />
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="border-none outline-none bg-transparent w-full ml-2"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center text-[13px] mb-5">
-            <label className="">
-              <input type="checkbox" />
-              Remember me
-            </label>
-            <span className="no-underline text-[#2563eb]">
-              Forgot password?
-            </span>
-          </div>
-
-          <button
-            className="w-full p-3 border-none bg-secondary text-white rounded-lg text-[15px] cursor-pointer font-semibold hover:bg-[#157347]"
-            type="submit"
-          >
-            Sign In
-          </button>
-        </form>
-
-        <div className="h-px bg-[#e5e7eb] my-5"></div>
-
-        <p className="text-sm">
-          Don’t have an account?{" "}
-          <Link to="/signup" className="text-primary no-underline font-medium">
-            Sign up
-          </Link>
-        </p>
       </div>
     </div>
   );

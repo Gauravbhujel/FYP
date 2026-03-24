@@ -9,6 +9,7 @@ import {
   StoreIcon,
   MapPinIcon,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 
@@ -82,325 +83,239 @@ export function VendorSignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center transform -rotate-12">
-              <span className="text-white font-bold text-2xl transform rotate-12">
-                G
-              </span>
-            </div>
-            <span className="text-3xl font-bold text-slate-800">
-              GearUp Nepal
-            </span>
+    <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-6 lg:p-12 font-sans">
+      <div className="max-w-[800px] w-full bg-white rounded-xl shadow-xl shadow-black/5 overflow-hidden">
+        <div className="p-8 md:p-14">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <Link to="/" className="inline-block text-2xl font-black uppercase tracking-tighter mb-4">
+              GearUp <span className="text-accent underline decoration-2 underline-offset-4">Nepal</span>
+            </Link>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase mb-2">Vendor Registration</h2>
+            <p className="text-gray-500 font-medium">Join Nepal's elite sports marketplace as a trusted partner</p>
           </div>
-          <h2 className="text-2xl font-bold text-slate-800">Become a Vendor</h2>
-          <p className="text-slate-600 mt-2">
-            Start selling sports equipment to athletes worldwide
-          </p>
-        </div>
 
-        <Card className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Personal Information */}
-            <div>
-              <h3 className="text-lg font-bold text-slate-800 mb-4">
-                Personal Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* First Name */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    First Name
-                  </label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+          <form onSubmit={handleSubmit} className="space-y-10">
+            {/* Section: Personal Info */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="h-px bg-gray-100 flex-1"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Personal Information</span>
+                <div className="h-px bg-gray-100 flex-1"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">First Name</label>
+                  <div className="relative group">
+                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
                     <input
                       type="text"
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
-                      placeholder=""
-                      className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:border-secondary transition-colors ${errors.firstName ? "border-red-500" : "border-slate-200"
-                        }`}
+                      placeholder="e.g. Ram"
+                      className={`w-full pl-11 pr-4 py-3.5 bg-white border rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium ${
+                        errors.firstName ? "border-red-500" : "border-gray-200"
+                      }`}
                     />
                   </div>
-                  {errors.firstName && (
-                    <p className="mt-1 text-xs text-red-600">
-                      {errors.firstName}
-                    </p>
-                  )}
                 </div>
-
-                {/* Last Name */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    placeholder=""
-                    className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-secondary transition-colors ${errors.lastName ? "border-red-500" : "border-slate-200"
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Last Name</label>
+                  <div className="relative group">
+                    <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="e.g. Sharma"
+                      className={`w-full pl-11 pr-4 py-3.5 bg-white border rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium ${
+                        errors.lastName ? "border-red-500" : "border-gray-200"
                       }`}
-                  />
-                  {errors.lastName && (
-                    <p className="mt-1 text-xs text-red-600">
-                      {errors.lastName}
-                    </p>
-                  )}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Email & Phone */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <MailIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Email Address</label>
+                  <div className="relative group">
+                    <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="you@example.com"
-                      className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:border-secondary transition-colors ${errors.email ? "border-red-500" : "border-slate-200"
-                        }`}
+                      placeholder="business@example.com"
+                      required
+                      className={`w-full pl-11 pr-4 py-3.5 bg-white border rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium ${
+                        errors.email ? "border-red-500" : "border-gray-200"
+                      }`}
                     />
                   </div>
-                  {errors.email && (
-                    <p className="mt-1 text-xs text-red-600">{errors.email}</p>
-                  )}
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Phone Number</label>
+                  <div className="relative group">
+                    <PhoneIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="9800000000"
-                      className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-secondary transition-colors"
+                      placeholder="+977"
+                      className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Business Info & Address */}
-            <div className="pt-6 border-t border-slate-200">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">
-                Business Information
-              </h3>
-              <div className="space-y-4">
-                {/* Store Name */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Store Name
-                  </label>
-                  <div className="relative">
-                    <StoreIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+            {/* Section: Business Info */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="h-px bg-gray-100 flex-1"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Business Information</span>
+                <div className="h-px bg-gray-100 flex-1"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Store Name</label>
+                  <div className="relative group">
+                    <StoreIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
                     <input
                       type="text"
                       name="storeName"
                       value={formData.storeName}
                       onChange={handleChange}
-                      placeholder="Your Sports Store"
-                      className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:border-secondary transition-colors ${errors.storeName ? "border-red-500" : "border-slate-200"
-                        }`}
+                      placeholder="Your Business Name"
+                      className={`w-full pl-11 pr-4 py-3.5 bg-white border rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium ${
+                        errors.storeName ? "border-red-500" : "border-gray-200"
+                      }`}
                     />
                   </div>
-                  {errors.storeName && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.storeName}
-                    </p>
-                  )}
                 </div>
-
-                {/* Business Type */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Business Type
-                  </label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Business Type</label>
                   <select
                     name="businessType"
                     value={formData.businessType}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-secondary transition-colors"
+                    className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium text-gray-500"
                   >
-                    <option value="">Select business type</option>
+                    <option value="">Select type</option>
                     <option value="manufacturer">Manufacturer</option>
                     <option value="distributor">Distributor</option>
                     <option value="retailer">Retailer</option>
                     <option value="individual">Individual Seller</option>
                   </select>
                 </div>
+              </div>
 
-                {/* Address */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Business Address
-                  </label>
-                  <div className="relative">
-                    <MapPinIcon className="absolute left-3 top-3 text-slate-400 w-5 h-5" />
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      placeholder="123 Main Street"
-                      className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-secondary transition-colors"
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Business Address</label>
+                <div className="relative group">
+                  <MapPinIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Physical location or main hub"
+                    className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Password */}
-            <div className="pt-6 border-t border-slate-200">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">
-                Account Security
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Password */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+            {/* Section: Security */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="h-px bg-gray-100 flex-1"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Account Security</span>
+                <div className="h-px bg-gray-100 flex-1"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Create Password</label>
+                  <div className="relative group">
+                    <LockIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
                     <input
                       type={showPassword ? "text" : "password"}
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`w-full pl-10 pr-12 py-3 border-2 rounded-lg focus:outline-none focus:border-secondary transition-colors ${errors.password ? "border-red-500" : "border-slate-200"
-                        }`}
+                      className={`w-full pl-11 pr-12 py-3.5 bg-white border rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium ${
+                        errors.password ? "border-red-500" : "border-gray-200"
+                      }`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-accent"
                     >
-                      {showPassword ? (
-                        <EyeOffIcon className="w-5 h-5" />
-                      ) : (
-                        <EyeIcon className="w-5 h-5" />
-                      )}
+                      {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.password}
-                    </p>
-                  )}
                 </div>
-
-                {/* Confirm Password */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Confirm Password</label>
+                  <div className="relative group">
+                    <LockIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors w-4 h-4" />
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="••••••••"
-                      className={`w-full pl-10 pr-12 py-3 border-2 rounded-lg focus:outline-none focus:border-secondary transition-colors ${errors.confirmPassword
-                          ? "border-red-500"
-                          : "border-slate-200"
-                        }`}
+                      className={`w-full pl-11 pr-12 py-3.5 bg-white border rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium ${
+                        errors.confirmPassword ? "border-red-500" : "border-gray-200"
+                      }`}
                     />
                     <button
                       type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-accent"
                     >
-                      {showConfirmPassword ? (
-                        <EyeOffIcon className="w-5 h-5" />
-                      ) : (
-                        <EyeIcon className="w-5 h-5" />
-                      )}
+                      {showConfirmPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                     </button>
                   </div>
-                  {errors.confirmPassword && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors.confirmPassword}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
 
-            {/* Terms */}
-            <div className="flex items-start">
-              <input
-                type="checkbox"
-                className="w-4 h-4 mt-1 text-primary rounded focus:ring-secondary"
-                required
-              />
-              <label className="ml-2 text-sm text-slate-600">
-                I agree to the{" "}
-                <a
-                  href="/vendor-terms"
-                  className="text-primary hover:text-secondary font-medium"
-                >
-                  Vendor Terms
-                </a>
-                ,{" "}
-                <a
-                  href="/terms-of-service"
-                  className="text-primary hover:text-secondary font-medium"
-                >
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a
-                  href="/privacy-policy"
-                  className="text-primary hover:text-secondary font-medium"
-                >
-                  Privacy Policy
-                </a>
+            <div className="pt-4">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" required className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent accent-accent cursor-pointer" />
+                <span className="text-xs font-bold text-gray-500 group-hover:text-gray-700 transition-colors">
+                  I agree to the <span className="text-accent underline">Vendor Terms</span> and <span className="text-accent underline">Privacy Policy</span>
+                </span>
               </label>
             </div>
 
-            <Button
+            <button
+              className="w-full py-4 bg-accent text-white rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-accent/20 hover:bg-[#E65A00] hover:scale-[0.99] active:scale-95 transition-all duration-300"
               type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full !bg-secondary !hover:bg-[#157347]"
             >
-              Create Vendor Account
-            </Button>
+              Verify & Launch My Store
+            </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-600">
-            Already have an account?{" "}
-            <a
-              href="/login"
-              className="text-primary hover:text-secondary font-semibold"
-            >
-              Sign in
-            </a>
-          </p>
-        </Card>
+          <div className="mt-12 pt-10 border-t border-gray-100 text-center">
+            <p className="text-gray-500 font-medium text-sm">
+              Already representative of a store?{" "}
+              <a href="/login" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2 hover:underline">
+                Sign In
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

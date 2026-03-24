@@ -82,7 +82,7 @@ const CartPage = () => {
                                             </Link>
                                             <div className="flex flex-col justify-center">
                                                 <Link to={`/product/${item.product.id}`} className="no-underline">
-                                                    <h3 className="font-bold text-text-dark text-lg mb-1 hover:text-primary transition-colors">{item.product.name}</h3>
+                                                    <h3 className="font-bold text-primary text-lg mb-1 hover:text-gray-700 transition-colors">{item.product.name}</h3>
                                                 </Link>
                                                 <p className="text-sm text-gray-500 mb-3">{item.product.category_display}</p>
                                                 <button 
@@ -130,7 +130,7 @@ const CartPage = () => {
                                         <span className="text-primary">Rs. {calculateTotal()}</span>
                                     </div>
                                 </div>
-                                <button className="w-full bg-primary text-white py-4 rounded-xl font-bold transition-all hover:bg-secondary hover:-translate-y-1 shadow-lg shadow-primary/20 border-none cursor-pointer text-lg mb-4">
+                                <button className="w-full bg-accent text-white py-4 rounded font-bold transition-all hover:bg-opacity-90 hover:-translate-y-px shadow-sm text-lg mb-4">
                                     Proceed to Checkout
                                 </button>
                                 <div className="flex items-center justify-center gap-3 text-gray-400">
@@ -143,13 +143,13 @@ const CartPage = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-dashed border-gray-200">
-                        <div className="bg-primary/5 w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8">
-                            <FaShoppingCart size={40} className="text-primary/30" />
+                    <div className="text-center py-24 bg-white rounded-xl shadow-sm border border-dashed border-gray-200">
+                        <div className="bg-gray-100 w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8">
+                            <FaShoppingCart size={40} className="text-gray-300" />
                         </div>
-                        <h2 className="text-3xl font-extrabold text-text-dark mb-4">Your cart is empty</h2>
+                        <h2 className="text-3xl font-extrabold text-primary mb-4">Your cart is empty</h2>
                         <p className="text-gray-500 mb-10 max-w-sm mx-auto leading-relaxed text-lg">Looks like you haven't added any gear to your cart yet. Time to gear up!</p>
-                        <Link to="/products" className="inline-block bg-primary text-white px-12 py-5 rounded-2xl font-bold transition-all hover:bg-secondary hover:-translate-y-1 shadow-xl shadow-primary/25 no-underline text-lg">
+                        <Link to="/products" className="inline-block bg-primary text-white px-12 py-5 rounded font-bold transition-all hover:bg-opacity-90 hover:-translate-y-px shadow-sm no-underline text-lg">
                             Explore Products
                         </Link>
                     </div>

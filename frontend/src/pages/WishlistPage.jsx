@@ -78,16 +78,16 @@ const WishlistPage = () => {
                 {wishlistItems.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {wishlistItems.map((item) => (
-                            <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group product-card border border-gray-100 flex flex-col h-full">
+                            <div key={item.id} className="bg-white rounded overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group product-card border border-gray-100 flex flex-col h-full">
                                     <Link to={`/product/${item.product.id}`} className="block relative h-64 overflow-hidden bg-gray-50 border-b border-gray-100">
                                         <img 
                                             src={item.product.image || 'https://via.placeholder.com/300'} 
                                             alt={item.product.name} 
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                         />
                                         <button 
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeItem(item.id); }}
-                                            className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-red-500 shadow-sm border-none cursor-pointer transition-all hover:bg-red-500 hover:text-white z-10"
+                                            className="absolute top-4 right-4 w-10 h-10 bg-white rounded flex items-center justify-center text-gray-400 shadow-sm border-none cursor-pointer transition-colors hover:text-red-500 z-10"
                                             title="Remove from Wishlist"
                                         >
                                             <FaTrash size={16} />
@@ -98,7 +98,7 @@ const WishlistPage = () => {
                                     <div className="mb-2">
                                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{item.product.category_display}</span>
                                         <Link to={`/product/${item.product.id}`} className="no-underline">
-                                            <h3 className="text-lg font-bold text-text-dark mt-1 line-clamp-2 hover:text-primary transition-colors">{item.product.name}</h3>
+                                            <h3 className="text-lg font-bold text-primary mt-1 line-clamp-2 hover:text-gray-700 transition-colors">{item.product.name}</h3>
                                         </Link>
                                     </div>
                                     
@@ -107,7 +107,7 @@ const WishlistPage = () => {
                                             <span className="text-xl font-black text-primary">Rs. {Number(item.product.price).toLocaleString()}</span>
                                             <button 
                                                 onClick={() => addToCart(item.product)}
-                                                className="bg-accent text-white p-3 rounded-xl flex items-center justify-center transition-all hover:bg-secondary border-none cursor-pointer shadow-lg shadow-accent/20"
+                                                className="bg-accent text-white p-3 rounded flex items-center justify-center transition-colors hover:bg-opacity-90 border-none cursor-pointer shadow-sm"
                                                 title="Add to Cart"
                                             >
                                                 <FaShoppingCart />
@@ -119,13 +119,13 @@ const WishlistPage = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-dashed border-gray-200">
-                        <div className="bg-red-50 w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8">
-                            <FaHeart size={40} className="text-red-200" />
+                    <div className="text-center py-24 bg-white rounded-xl shadow-sm border border-dashed border-gray-200">
+                        <div className="bg-gray-100 w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8">
+                            <FaHeart size={40} className="text-gray-300" />
                         </div>
-                        <h2 className="text-3xl font-extrabold text-text-dark mb-4">Your wishlist is empty</h2>
+                        <h2 className="text-3xl font-extrabold text-primary mb-4">Your wishlist is empty</h2>
                         <p className="text-gray-500 mb-10 max-w-sm mx-auto leading-relaxed text-lg">See something you like? Add it to your wishlist so you can find it later!</p>
-                        <Link to="/products" className="inline-block bg-primary text-white px-12 py-5 rounded-2xl font-bold transition-all hover:bg-secondary hover:-translate-y-1 shadow-xl shadow-primary/25 no-underline text-lg">
+                        <Link to="/products" className="inline-block bg-primary text-white px-12 py-5 rounded font-bold transition-all hover:bg-opacity-90 hover:-translate-y-px shadow-sm no-underline text-lg">
                             Browse Best Gear
                         </Link>
                     </div>

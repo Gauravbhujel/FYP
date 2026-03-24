@@ -5,41 +5,38 @@ export function MetricCard({
   value,
   change,
   icon: Icon,
-  iconColor = "text-emerald-600",
-  iconBgColor = "bg-emerald-50",
+  iconColor = "text-gray-900",
 }) {
   const isPositive = change && change > 0;
   const isNegative = change && change < 0;
 
   return (
-    <div className="dashboard-card p-6 flex items-start justify-between">
+    <div className="bg-white border border-gray-200 p-8 rounded-xl flex items-start justify-between transition-all hover:border-accent/30 group">
       <div className="flex-1">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{title}</p>
-        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">{value}</h3>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">{title}</p>
+        <h3 className="text-3xl font-black text-gray-900 tracking-tighter mb-4">{value}</h3>
 
         {change !== undefined && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <span
-              className={`text-xs font-bold px-1.5 py-0.5 rounded-md ${
+              className={`text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest ${
                 isPositive
-                  ? "bg-emerald-100 text-emerald-700"
+                  ? "bg-green-50 text-green-600"
                   : isNegative
-                    ? "bg-rose-100 text-rose-700"
-                    : "bg-slate-100 text-slate-600"
+                    ? "bg-red-50 text-red-600"
+                    : "bg-gray-50 text-gray-500"
               }`}
             >
               {isPositive && "+"}
               {change}%
             </span>
-            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">vs last month</span>
+            <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Growth</span>
           </div>
         )}
       </div>
 
-      <div
-        className={`w-12 h-12 rounded-2xl ${iconBgColor} flex items-center justify-center flex-shrink-0 shadow-inner`}
-      >
-        <Icon className={`w-6 h-6 ${iconColor}`} />
+      <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors group-hover:bg-accent/5">
+        <Icon className={`w-5 h-5 ${iconColor} transition-colors group-hover:text-accent`} />
       </div>
     </div>
   );

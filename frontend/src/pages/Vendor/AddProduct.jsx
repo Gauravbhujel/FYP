@@ -84,81 +84,78 @@ export function AddProductPage() {
 
   return (
     <VendorLayout currentPage="products">
-      <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+      <div className="max-w-4xl mx-auto space-y-10 animate-fade-in pb-20">
         {/* Breadcrumb & Header */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
             <button 
                 onClick={() => navigate("/vendor/products")}
-                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors border-none bg-transparent cursor-pointer group"
+                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-accent transition-all border-none bg-transparent cursor-pointer group w-fit"
             >
-                <ChevronLeftIcon className="w-3 h-3 transition-transform group-hover:-translate-x-1" /> Back to Catalog
+                <ChevronLeftIcon className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" /> Back to Catalog
             </button>
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-800 tracking-tight">Add New Product</h1>
-                    <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">List a new item in your digital store</p>
+                    <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-2">Create Listing</h1>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Initialize new asset in the global store</p>
                 </div>
             </div>
         </div>
 
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-center gap-3">
-            <AlertCircleIcon className="w-5 h-5 flex-shrink-0" />
-            <p className="text-sm font-bold">{error}</p>
+          <div className="p-6 bg-red-50 border border-red-100 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
+            <AlertCircleIcon size={16} />
+            <p>{error}</p>
           </div>
         )}
         {success && (
-          <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-2xl flex items-center gap-3">
-            <PackageIcon className="w-5 h-5 flex-shrink-0" />
-            <p className="text-sm font-bold">{success}</p>
+          <div className="p-6 bg-gray-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
+            <PackageIcon size={16} className="text-accent" />
+            <p>{success}</p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
-          <div className="lg:col-span-2 space-y-8">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2 space-y-10">
             {/* Basic Info */}
-            <div className="dashboard-card p-8">
-              <div className="flex items-center gap-3 mb-6">
-                 <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                    <PackageIcon className="w-5 h-5" />
-                 </div>
-                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Product Information</h2>
+            <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+              <div className="flex items-center gap-4 mb-10 pb-4 border-b border-gray-50">
+                  <h2 className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Product Core Details</h2>
               </div>
               
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Product Title</label>
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Asset Identity</label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none placeholder:text-slate-300"
-                    placeholder="e.g., Premium Carbon Fiber Tennis Racket"
+                    className="w-full h-14 px-5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    placeholder="e.g., PHANTOM ELITE V2"
                     required
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Detailed Description</label>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Composition & Narrative</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    rows={6}
-                    className="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm font-medium text-slate-600 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none resize-none placeholder:text-slate-300"
-                    placeholder="Describe the features, materials, and benefits of your product..."
+                    rows={8}
+                    className="w-full p-5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-500 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none resize-none placeholder:text-gray-300 leading-relaxed"
+                    placeholder="Describe technical specifications and engineering..."
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Category</label>
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Global Category</label>
                         <select
                             name="category"
                             value={formData.category}
                             onChange={handleChange}
-                            className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none cursor-pointer appearance-none"
+                            className="w-full h-14 px-5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
                             required
                         >
                             <option value="running">Running</option>
@@ -169,19 +166,19 @@ export function AddProductPage() {
                             <option value="cycling">Cycling</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Size / Variant</label>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Operational Variance</label>
                         <select
                             name="size"
                             value={formData.size}
                             onChange={handleChange}
-                            className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none cursor-pointer appearance-none"
+                            className="w-full h-14 px-5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
                         >
-                            <option value="free">Free Size</option>
+                            <option value="free">Standard (Free)</option>
                             <option value="s">Small (S)</option>
                             <option value="m">Medium (M)</option>
                             <option value="l">Large (L)</option>
-                            <option value="xl">Extra Large (XL)</option>
+                            <option value="xl">Extra (XL)</option>
                         </select>
                     </div>
                 </div>
@@ -189,46 +186,43 @@ export function AddProductPage() {
             </div>
 
             {/* Inventory & Pricing */}
-            <div className="dashboard-card p-8">
-              <div className="flex items-center gap-3 mb-6">
-                 <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
-                    <DollarSignIcon className="w-5 h-5" />
-                 </div>
-                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Pricing & Inventory</h2>
+            <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+              <div className="flex items-center gap-4 mb-10 pb-4 border-b border-gray-50">
+                  <h2 className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Financials & Inventory</h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Selling Price (Rs.)</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Unit Valuation (Rs.)</label>
                   <input
                     type="number"
                     name="price"
                     value={formData.price}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-black text-slate-900 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    className="w-full h-14 px-5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black text-accent uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                     placeholder="0.00"
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 text-rose-400">Old Price (Optional)</label>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Legacy Valuation</label>
                   <input
                     type="number"
                     name="compare_price"
                     value={formData.compare_price}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-400 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    className="w-full h-14 px-5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black text-gray-300 uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                     placeholder="0.00"
                   />
                 </div>
-                <div className="space-y-2 lg:col-span-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Available Quantity</label>
+                <div className="space-y-3 lg:col-span-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Available Resource Units</label>
                   <input
                     type="number"
                     name="quantity"
                     value={formData.quantity}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-slate-50 border-none rounded-2xl text-sm font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+                    className="w-full h-14 px-5 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-black text-gray-900 uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                     placeholder="e.g. 50"
                     required
                   />
@@ -237,34 +231,31 @@ export function AddProductPage() {
             </div>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-10">
             {/* Visuals */}
-            <div className="dashboard-card p-8">
-              <div className="flex items-center gap-3 mb-6">
-                 <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                    <ImageIcon className="w-5 h-5" />
-                 </div>
-                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Media Assets</h2>
+            <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+              <div className="flex items-center gap-4 mb-10 pb-4 border-b border-gray-50">
+                  <h2 className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Media Matrix</h2>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="group relative aspect-square bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/10 transition-all overflow-hidden">
+                  <div key={i} className="group relative aspect-square bg-gray-50 rounded border border-gray-100 hover:border-accent transition-all overflow-hidden grayscale group-hover:grayscale-0">
                     {previewUrls[i] ? (
                         <>
-                            <img src={previewUrls[i]} alt={`Preview ${i+1}`} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                            <img src={previewUrls[i]} alt={`Preview ${i+1}`} className="w-full h-full object-cover grayscale active:grayscale-0 hover:grayscale-0 transition-all" />
                             <button 
                                 type="button"
                                 onClick={() => removeImage(i)}
-                                className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-rose-500 shadow-lg border-none cursor-pointer hover:bg-rose-500 hover:text-white transition-all"
+                                className="absolute top-4 right-4 w-10 h-10 bg-gray-900/90 backdrop-blur text-white rounded flex items-center justify-center border-none cursor-pointer hover:bg-accent transition-all"
                             >
-                                <XIcon className="w-4 h-4" />
+                                <XIcon size={16} />
                             </button>
                         </>
                     ) : (
-                        <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-4 text-center">
-                            <PlusIcon className="w-6 h-6 text-slate-300 mb-2 group-hover:text-emerald-500 transition-colors" />
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-600">{i === 0 ? "Main Cover" : `Angle ${i+1}`}</span>
+                        <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-6 text-center">
+                            <PlusIcon size={20} className="text-gray-300 mb-3 group-hover:text-accent transition-colors" />
+                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-accent">{i === 0 ? "Main Perspective" : `Angle 0${i+1}`}</span>
                             <input type="file" className="sr-only" onChange={(e) => handleFileChange(e, i)} accept="image/*" />
                         </label>
                     )}
@@ -274,19 +265,26 @@ export function AddProductPage() {
             </div>
 
             {/* Submit Block */}
-            <div className="dashboard-card p-8 bg-slate-900/5 backdrop-blur-sm sticky top-24">
-               <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Publish Status</h3>
-               <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-emerald-600">
-                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                         <span className="text-xs font-bold uppercase tracking-widest">Ready to go live</span>
+            <div className="bg-gray-900 rounded-xl p-8 sticky top-24">
+               <h3 className="text-[10px] font-black text-accent uppercase tracking-[0.2em] mb-6">Store Integration</h3>
+               <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                         <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                         <span className="text-[9px] font-black text-white uppercase tracking-[0.2em]">Integrity Verified</span>
                     </div>
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 text-white font-black rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95 border-none cursor-pointer text-sm uppercase tracking-widest"
+                        className="w-full py-5 bg-accent hover:bg-[#E65A00] disabled:bg-gray-800 text-white font-black rounded-lg transition-all active:scale-95 border-none cursor-pointer text-[10px] uppercase tracking-[0.2em]"
                     >
-                        {loading ? "Broadcasting..." : "Publish to Store"}
+                        {loading ? "Initializing..." : "Publish Offering"}
+                    </button>
+                    <button 
+                        type="button" 
+                        onClick={() => navigate("/vendor/products")}
+                        className="w-full py-4 bg-white/5 hover:bg-white/10 text-gray-400 font-black rounded-lg transition-all border border-white/10 cursor-pointer text-[10px] uppercase tracking-[0.2em]"
+                    >
+                        Cancel Cycle
                     </button>
                </div>
             </div>

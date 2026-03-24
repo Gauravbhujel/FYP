@@ -56,8 +56,9 @@ export const VendorDashboard = () => {
   if (loading) {
     return (
       <VendorLayout currentPage="dashboard">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-accent"></div>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Synchronizing Portfolio...</p>
         </div>
       </VendorLayout>
     );
@@ -65,16 +66,16 @@ export const VendorDashboard = () => {
 
   return (
     <VendorLayout currentPage="dashboard">
-      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
+      <div className="max-w-7xl mx-auto space-y-12 animate-fade-in">
         {/* Welcome Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
           <div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Store Overview</h1>
-            <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">Welcome back to your business command center</p>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-3">Store Overview</h1>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Business Performance Control Center</p>
           </div>
           <Link to="/vendor/AddProduct">
-            <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-6 py-3 rounded-2xl flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-95 text-sm uppercase tracking-widest border-none cursor-pointer">
-              <PlusIcon className="w-5 h-5 stroke-[3px]" /> Add New Product
+            <button className="bg-accent hover:bg-[#E65A00] text-white font-black px-8 py-4 rounded-lg flex items-center gap-3 transition-all active:scale-95 text-[10px] uppercase tracking-[0.2em] border-none cursor-pointer">
+              <PlusIcon size={16} /> Add New Product
             </button>
           </Link>
         </div>
@@ -86,30 +87,22 @@ export const VendorDashboard = () => {
             value={`Rs. ${stats.total_revenue.toLocaleString()}`}
             change={5.2}
             icon={TrendingUpIcon}
-            iconColor="text-emerald-600"
-            iconBgColor="bg-emerald-50"
           />
           <MetricCard
-            title="Orders"
+            title="Total Orders"
             value={String(stats.total_orders)}
             change={2.1}
             icon={ShoppingBagIcon}
-            iconColor="text-blue-600"
-            iconBgColor="bg-blue-50"
           />
           <MetricCard
-            title="Stock items"
+            title="Listed Products"
             value={String(stats.products_listed)}
             icon={PackageIcon}
-            iconColor="text-orange-600"
-            iconBgColor="bg-orange-50"
           />
           <MetricCard
-            title="Pending tasks"
+            title="Pending Actions"
             value={String(stats.pending_orders)}
             icon={ClockIcon}
-            iconColor="text-rose-600"
-            iconBgColor="bg-rose-50"
           />
         </div>
 

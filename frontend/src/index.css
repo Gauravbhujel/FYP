@@ -8,43 +8,43 @@
 /* ─── Design Tokens ─────────────────────────────────────────────── */
 :root {
   /* Brand Colors */
-  --primary:        #0f5132;
-  --primary-light:  #198754;
-  --primary-dark:   #0a3622;
+  --primary:        #111111;
+  --primary-light:  #333333;
+  --primary-dark:   #000000;
   --accent:         #ff6b00;
-  --accent-light:   #ff8c38;
+  --accent-light:   #ff8533;
   --accent-dark:    #cc5200;
 
   /* Neutrals */
-  --text-dark:      #111827;
+  --text-dark:      #111111;
   --text-mid:       #374151;
   --text-light:     #6b7280;
   --text-muted:     #9ca3af;
-  --bg-light:       #f9fafb;
+  --bg-light:       #f5f5f5;
   --bg-card:        #ffffff;
   --border:         #e5e7eb;
 
   /* Gradients */
-  --grad-hero:      linear-gradient(135deg, rgba(10,54,34,0.95) 0%, rgba(15,81,50,0.85) 50%, rgba(25,135,84,0.75) 100%);
-  --grad-accent:    linear-gradient(135deg, #ff6b00 0%, #ff9d3d 100%);
-  --grad-dark:      linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+  --grad-hero:      linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
+  --grad-accent:    linear-gradient(135deg, #ff6b00 0%, #ff8533 100%);
+  --grad-dark:      linear-gradient(135deg, #111111 0%, #333333 100%);
 
   /* Shadows */
-  --shadow-sm:      0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-  --shadow-md:      0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
-  --shadow-lg:      0 10px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-accent:  0 8px 32px rgba(255,107,0,0.30);
-  --shadow-green:   0 8px 32px rgba(15,81,50,0.25);
+  --shadow-sm:      0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:      0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:      0 8px 24px rgba(0,0,0,0.08);
+  --shadow-accent:  0 4px 12px rgba(255,107,0,0.20);
+  --shadow-green:   0 4px 12px rgba(17,17,17,0.1);
 
   /* Transitions */
   --t-fast:  all 0.2s cubic-bezier(0.4,0,0.2,1);
   --t-base:  all 0.3s cubic-bezier(0.4,0,0.2,1);
   --t-slow:  all 0.5s cubic-bezier(0.4,0,0.2,1);
 
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  /* Glassmorphism - Fallback */
+  --glass-bg: #ffffff;
+  --glass-border: var(--border);
+  --glass-shadow: var(--shadow-sm);
 }
 
 /* ─── Base ───────────────────────────────────────────────────────── */
@@ -118,11 +118,9 @@ body {
 }
 
 .glass-nav {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .dashboard-card {
@@ -136,7 +134,7 @@ body {
 .dashboard-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  border-color: var(--primary-light);
+  border-color: #e5e7eb;
 }
 
 /* Section heading underline */

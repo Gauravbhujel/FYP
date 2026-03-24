@@ -173,7 +173,7 @@ const ProductDetailsPage = () => {
                     </div>
                     <h2 className="text-3xl font-black text-gray-900 mb-3">Product Not Found</h2>
                     <p className="text-gray-500 mb-8 max-w-md">The product you are looking for might have been moved or is currently out of stock.</p>
-                    <Link to="/products" className="bg-gradient-to-r from-primary to-primary-light text-white px-8 py-4 rounded-2xl font-bold no-underline shadow-lg shadow-primary/25 hover:-translate-y-1 transition-all">
+                    <Link to="/products" className="bg-primary text-white px-8 py-4 rounded font-bold no-underline shadow-sm hover:bg-opacity-90 hover:-translate-y-px transition-all">
                         Explore Catalog
                     </Link>
                 </div>
@@ -206,16 +206,16 @@ const ProductDetailsPage = () => {
                     
                     {/* ─── LEFT: IMAGE GALLERY ─── */}
                     <div className="w-full lg:w-[48%] xl:w-[50%] lg:sticky lg:top-28">
-                        <div className="relative bg-white rounded-3xl overflow-hidden shadow-xl shadow-gray-200/60 border border-gray-100 group">
+                        <div className="relative bg-white rounded overflow-hidden group">
                             {/* Badges */}
                             <div className="absolute top-5 left-5 z-10 flex flex-col gap-2.5">
                                 {product.is_new && (
-                                    <span className="bg-gradient-to-r from-orange-500 to-amber-400 text-white px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-500/30 flex items-center gap-1.5">
+                                    <span className="bg-accent text-white px-4 py-1.5 rounded font-black text-[10px] uppercase tracking-widest shadow-sm flex items-center gap-1.5">
                                         <FaBolt className="text-[8px]" /> New Arrival
                                     </span>
                                 )}
                                 {discountPct > 0 && (
-                                    <span className="bg-gradient-to-r from-red-500 to-rose-500 text-white px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-500/30">
+                                    <span className="bg-primary text-white px-4 py-1.5 rounded font-black text-[10px] uppercase tracking-widest shadow-sm">
                                         Save {discountPct}%
                                     </span>
                                 )}
@@ -234,19 +234,12 @@ const ProductDetailsPage = () => {
                             </button>
 
                             {/* Main Image */}
-                            <div className="aspect-[4/4] sm:aspect-[5/4] overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+                            <div className="aspect-[4/4] sm:aspect-[5/4] overflow-hidden bg-gray-50">
                                 <img 
                                     src={mainImage || 'https://via.placeholder.com/800'} 
                                     alt={product.name} 
                                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                 />
-                            </div>
-
-                            {/* Quality badge on hover */}
-                            <div className="absolute bottom-5 left-5 right-5 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
-                                <span className="bg-white/90 backdrop-blur-xl px-4 py-2.5 rounded-xl text-[10px] font-black text-gray-700 border border-white/50 shadow-lg flex items-center gap-2 uppercase tracking-wider">
-                                    <FaCheckCircle className="text-emerald-500" /> Authenticity Verified
-                                </span>
                             </div>
                         </div>
 
@@ -257,9 +250,9 @@ const ProductDetailsPage = () => {
                                     <button 
                                         key={idx}
                                         onClick={() => setMainImage(img)}
-                                        className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex-shrink-0 overflow-hidden border-2 transition-all duration-300 ${
+                                        className={`w-20 h-20 sm:w-24 sm:h-24 rounded flex-shrink-0 overflow-hidden border-2 transition-all duration-300 ${
                                             mainImage === img 
-                                                ? 'border-primary shadow-lg shadow-primary/20 ring-4 ring-primary/10 scale-105' 
+                                                ? 'border-primary shadow-sm scale-105' 
                                                 : 'border-gray-200 hover:border-gray-300 opacity-60 hover:opacity-100'
                                         }`}
                                     >
@@ -274,16 +267,11 @@ const ProductDetailsPage = () => {
                     <div className="w-full lg:w-[52%] xl:w-[50%] flex flex-col gap-6">
                         
                         {/* Product Details Card */}
-                        <div className="bg-white p-7 sm:p-9 rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100">
+                        <div className="bg-white py-2">
                             
                             {/* Category & Badges */}
                             <div className="flex items-center flex-wrap gap-2 mb-4">
-                                <span className="bg-primary/8 text-primary font-black uppercase tracking-[0.15em] text-[10px] px-3.5 py-1.5 rounded-lg border border-primary/15">{product.category}</span>
-                                {product.is_featured && (
-                                    <span className="flex items-center gap-1 text-amber-600 bg-amber-50 font-black text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg border border-amber-100">
-                                        <FaGem className="text-[8px]" /> Editor's Choice
-                                    </span>
-                                )}
+                                <span className="text-accent font-bold uppercase tracking-[0.1em] text-xs px-1">{product.category}</span>
                             </div>
 
                             {/* Product Name */}
@@ -308,7 +296,7 @@ const ProductDetailsPage = () => {
                             </div>
 
                             {/* ─── PRICING SECTION ─── */}
-                            <div className={`rounded-2xl p-5 mb-6 ${discountPct > 0 ? 'bg-gradient-to-r from-red-50 to-orange-50 border border-red-100' : 'bg-gray-50 border border-gray-100'}`}>
+                            <div className="mb-6">
                                 <div className="flex items-end gap-3 flex-wrap">
                                     <span className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-none">
                                         Rs. {Number(product.price).toLocaleString()}
@@ -319,13 +307,13 @@ const ProductDetailsPage = () => {
                                         </span>
                                     )}
                                     {discountPct > 0 && (
-                                        <span className="bg-red-500 text-white text-xs font-black px-2.5 py-1 rounded-lg ml-auto">
+                                        <span className="bg-primary text-white text-xs font-black px-2.5 py-1 rounded ml-auto">
                                             -{discountPct}% OFF
                                         </span>
                                     )}
                                 </div>
                                 {discountPct > 0 && (
-                                    <p className="text-red-600 text-sm font-bold mt-2 flex items-center gap-1.5">
+                                    <p className="text-gray-900 text-sm font-bold mt-2 flex items-center gap-1.5">
                                         🎉 You save Rs. {(product.compare_price - product.price).toLocaleString()}
                                     </p>
                                 )}
@@ -340,7 +328,7 @@ const ProductDetailsPage = () => {
                             <div className="space-y-4 mb-7">
                                 <div className="flex items-center gap-4">
                                     {/* Quantity selector */}
-                                    <div className="flex items-center bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden">
+                                    <div className="flex items-center border-b border-gray-200 overflow-hidden">
                                         <button 
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                             className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 transition-all text-lg font-bold text-gray-500 hover:text-gray-900"
@@ -355,10 +343,10 @@ const ProductDetailsPage = () => {
                                     {/* Add to Cart */}
                                     <button 
                                         onClick={() => handleAction('cart')}
-                                        className={`flex-grow h-12 rounded-2xl font-bold text-sm shadow-lg transition-all duration-300 flex items-center justify-center gap-2.5 ${
+                                        className={`flex-grow h-12 rounded font-bold text-sm shadow-sm transition-all duration-300 flex items-center justify-center gap-2.5 ${
                                             addedToCart 
-                                                ? 'bg-emerald-500 text-white shadow-emerald-500/25' 
-                                                : 'bg-gradient-to-r from-primary to-emerald-600 text-white shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0'
+                                                ? 'bg-green-500 text-white' 
+                                                : 'bg-accent text-white hover:bg-opacity-90 hover:-translate-y-0.5'
                                         }`}
                                     >
                                         {addedToCart ? (
@@ -372,37 +360,21 @@ const ProductDetailsPage = () => {
                                 {/* Buy Now */}
                                 <button 
                                     onClick={() => alert("Redirecting to checkout...")}
-                                    className="w-full h-12 bg-gray-900 text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all flex items-center justify-center gap-2 group"
+                                    className="w-full h-12 bg-primary text-white rounded font-bold text-sm hover:bg-opacity-90 transition-all flex items-center justify-center gap-2 group"
                                 >
-                                    <FaBolt className="text-amber-400 group-hover:scale-110 transition-transform" />
+                                    <FaBolt className="text-white group-hover:scale-110 transition-transform" />
                                     Buy It Now
                                 </button>
                             </div>
 
-                            {/* ─── TRUST BADGES ─── */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                {[
-                                    { icon: <FaTruck />, label: 'Fast Delivery', sub: 'Nationwide', iconClass: 'bg-emerald-50 text-emerald-600' },
-                                    { icon: <FaShieldAlt />, label: 'Genuine', sub: 'Brand Direct', iconClass: 'bg-blue-50 text-blue-600' },
-                                    { icon: <FaSyncAlt />, label: 'Easy Returns', sub: '7 Day Policy', iconClass: 'bg-purple-50 text-purple-600' },
-                                    { icon: <FaAward />, label: 'Top Quality', sub: 'Inspected', iconClass: 'bg-amber-50 text-amber-600' },
-                                ].map((badge, i) => (
-                                    <div key={i} className="flex flex-col items-center text-center p-3 rounded-xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all hover:-translate-y-0.5 group">
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs mb-2 group-hover:scale-110 transition-transform ${badge.iconClass}`}>
-                                            {badge.icon}
-                                        </div>
-                                        <span className="block font-bold text-[10px] text-gray-800 leading-tight">{badge.label}</span>
-                                        <span className="block text-[9px] text-gray-400 mt-0.5">{badge.sub}</span>
-                                    </div>
-                                ))}
-                            </div>
+
                         </div>
 
                         {/* ─── VENDOR CARD ─── */}
-                        <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-lg shadow-gray-200/40">
+                        <div className="pt-4 border-t border-gray-100">
                             <div className="flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 bg-gradient-to-br from-primary via-emerald-500 to-teal-400 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-primary/20 border-2 border-white">
+                                    <div className="w-14 h-14 bg-gray-100 rounded flex items-center justify-center text-primary font-black text-xl border border-gray-200">
                                         {product.vendor_name?.charAt(0)}
                                     </div>
                                     <div>
@@ -505,8 +477,8 @@ const ProductDetailsPage = () => {
                                                 <div key={num} className="flex items-center gap-3">
                                                     <span className="text-sm font-bold text-gray-400 w-4">{num}</span>
                                                     <FaStar className="text-amber-400 text-xs" />
-                                                    <div className="flex-grow h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                                        <div className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full transition-all duration-1000" style={{ width: `${pct}%` }}></div>
+                                                    <div className="flex-grow h-2.5 bg-gray-100 rounded overflow-hidden">
+                                                        <div className="h-full bg-accent rounded transition-all duration-1000" style={{ width: `${pct}%` }}></div>
                                                     </div>
                                                     <span className="text-sm font-bold text-gray-300 w-8 text-right">{count}</span>
                                                 </div>
@@ -523,7 +495,7 @@ const ProductDetailsPage = () => {
                                                 <div className="flex justify-between items-start mb-3">
                                                     <div>
                                                         <div className="flex items-center gap-3 mb-1.5">
-                                                            <div className="w-9 h-9 bg-gradient-to-br from-primary to-teal-400 rounded-xl flex items-center justify-center text-white font-bold text-xs">
+                                                            <div className="w-9 h-9 bg-gray-100 rounded flex items-center justify-center text-primary font-bold text-xs border border-gray-200">
                                                                 {review.customer_name?.charAt(0)}
                                                             </div>
                                                             <div>
@@ -550,10 +522,7 @@ const ProductDetailsPage = () => {
                                 </div>
 
                                 {/* Review Form */}
-                                <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-8 sm:p-10 rounded-3xl shadow-2xl relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-                                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
-                                    
+                                <div className="bg-primary text-white p-8 sm:p-10 rounded-xl shadow-sm relative overflow-hidden">
                                     <div className="relative z-10">
                                         <h3 className="text-2xl font-black mb-1">Write a Review</h3>
                                         <p className="text-gray-400 mb-8 text-sm">Your feedback helps the community choose the best gear.</p>
@@ -577,7 +546,7 @@ const ProductDetailsPage = () => {
                                                     <button 
                                                         type="submit"
                                                         disabled={isSubmittingReview}
-                                                        className="w-full h-14 bg-gradient-to-r from-primary to-emerald-500 text-white rounded-2xl font-bold text-sm uppercase tracking-wider hover:shadow-lg hover:shadow-primary/30 transition-all disabled:opacity-50"
+                                                        className="w-full h-14 bg-accent text-white rounded font-bold text-sm uppercase tracking-wider hover:opacity-90 hover:shadow-sm transition-all disabled:opacity-50"
                                                     >
                                                         {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
                                                     </button>

@@ -12,7 +12,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#0d1117] text-white mt-auto">
+    <footer className="bg-primary text-white mt-auto">
       {/* Main Footer */}
       <div className="max-w-6xl mx-auto px-6 pt-14 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
@@ -20,12 +20,12 @@ const Footer = () => {
           {/* Brand Column */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex items-center justify-center w-9 h-9 bg-gradient-to-br from-[#0f5132] to-[#198754] rounded-lg shadow-md">
-                <span className="text-white font-black text-base leading-none">G</span>
+              <div className="flex items-center justify-center w-9 h-9 bg-white rounded-lg shadow-sm">
+                <span className="text-primary font-black text-base leading-none">G</span>
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-white font-extrabold text-lg tracking-tight">GearUp</span>
-                <span className="text-[#ff6b00] font-bold text-xs tracking-widest uppercase">Nepal</span>
+                <span className="text-accent font-bold text-xs tracking-widest uppercase">Nepal</span>
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-5">
@@ -39,7 +39,7 @@ const Footer = () => {
                 { icon: <FaEnvelope />, text: "support@gearupnepal.com" },
               ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-2.5 text-gray-400 text-sm">
-                  <span className="text-[#ff6b00] text-xs flex-shrink-0">{icon}</span>
+                  <span className="text-accent text-xs flex-shrink-0">{icon}</span>
                   {text}
                 </div>
               ))}
@@ -48,7 +48,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#ff6b00] after:rounded">
+            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-accent after:rounded">
               Quick Links
             </h4>
             <ul className="list-none flex flex-col gap-3">
@@ -61,9 +61,9 @@ const Footer = () => {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="text-gray-400 no-underline text-sm transition-all duration-200 hover:text-[#ff6b00] hover:pl-1 flex items-center gap-1.5 group"
+                    className="text-gray-400 no-underline text-sm transition-all duration-200 hover:text-accent hover:pl-1 flex items-center gap-1.5 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-[#ff6b00] transition-colors flex-shrink-0" />
+                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-accent transition-colors flex-shrink-0" />
                     {label}
                   </Link>
                 </li>
@@ -73,15 +73,15 @@ const Footer = () => {
 
           {/* Customer Care */}
           <div>
-            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#ff6b00] after:rounded">
+            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-accent after:rounded">
               Customer Care
             </h4>
             <ul className="list-none flex flex-col gap-3">
               {['Contact Us', 'Track My Order', 'Shipping Policy', 'Returns & Exchanges', 'FAQs'].map(
                 (item) => (
                   <li key={item}>
-                    <span className="text-gray-400 text-sm transition-all duration-200 hover:text-[#ff6b00] hover:pl-1 cursor-pointer flex items-center gap-1.5 group">
-                      <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-[#ff6b00] transition-colors flex-shrink-0" />
+                    <span className="text-gray-400 text-sm transition-all duration-200 hover:text-accent hover:pl-1 cursor-pointer flex items-center gap-1.5 group">
+                      <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-accent transition-colors flex-shrink-0" />
                       {item}
                     </span>
                   </li>
@@ -92,7 +92,7 @@ const Footer = () => {
 
           {/* Social + Payment */}
           <div>
-            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-[#ff6b00] after:rounded">
+            <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-accent after:rounded">
               Follow Us
             </h4>
             <div className="flex gap-3 mb-8">

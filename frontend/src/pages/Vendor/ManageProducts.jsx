@@ -54,139 +54,119 @@ export function ManageProductsPage() {
 
   return (
     <VendorLayout currentPage="products">
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* Header */}
-        <div className="bg-white border-b border-emerald-100 px-8 py-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto w-full">
+        <div className="bg-white border-b border-gray-100 px-8 py-10 lg:px-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-7xl mx-auto w-full">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-                My Products
+              <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-2">
+                Product Catalog
               </h1>
-              <p className="text-slate-500 mt-1.5 font-medium">
-                Manage and monitor your store inventory
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">
+                 Global Inventory Management Control
               </p>
             </div>
             <Link to="/vendor/AddProduct">
-              <Button className="bg-primary hover:bg-secondary text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl active:scale-95 flex items-center gap-2 border-none">
-                <PlusIcon className="w-5 h-5 stroke-[3px]" />
-                Add Product
-              </Button>
+              <button className="bg-accent hover:bg-[#E65A00] text-white px-8 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 flex items-center gap-3 border-none">
+                <PlusIcon size={16} />
+                Create Offering
+              </button>
             </Link>
           </div>
         </div>
 
         {/* Content */}
-        <div className="max-w-7xl mx-auto px-8 py-10">
+        <div className="max-w-7xl mx-auto px-8 py-12 lg:px-12 w-full">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg">
-              {error}
+            <div className="mb-8 p-6 bg-red-50 border border-red-100 text-red-700 rounded-lg text-xs font-black uppercase tracking-widest">
+              Error Profile: {error}
             </div>
           )}
 
           {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+            <div className="flex justify-center py-20 grayscale opacity-20">
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-accent"></div>
             </div>
           ) : products.length === 0 ? (
-            <div className="bg-white rounded-2xl border-2 border-dashed border-slate-200 p-16 text-center shadow-sm">
-              <div className="bg-emerald-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                 <PlusIcon className="w-10 h-10 text-emerald-500" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">No products yet</h3>
-              <p className="text-slate-500 mb-8 max-w-md mx-auto">
-                Start adding products to your store to begin selling on GearUpNepal.
+            <div className="bg-white rounded-xl border border-gray-200 p-20 text-center shadow-sm">
+              <h3 className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em] mb-4">No Inventory Detected</h3>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-10 max-w-xs mx-auto leading-relaxed">
+                Begin populating your store catalog to initialize revenue streams
               </p>
               <Link to="/vendor/AddProduct">
-                <Button className="bg-primary hover:bg-secondary text-white px-8 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl active:scale-95 border-none" size="lg">
-                  Add Your First Product
-                </Button>
+                <button className="bg-accent hover:bg-[#E65A00] text-white px-10 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all border-none cursor-pointer">
+                  Initialize First Asset
+                </button>
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {products.map((product) => (
-                <Card 
-                  key={product.id} 
-                  className="group overflow-hidden border border-slate-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-2xl rounded-3xl bg-white flex flex-col"
-                >
-                  <Link to={`/product/${product.id}`} className="relative aspect-square overflow-hidden bg-slate-100 block border-b border-slate-200">
-                    {product.image ? (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-300">
-                        <PackageIcon className="w-16 h-16 opacity-20" />
-                      </div>
-                    )}
-                    
-                    {/* Status Badge */}
-                    <button 
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleToggleStatus(product.id); }}
-                      className="absolute top-4 right-4 hover:scale-105 transition-transform focus:outline-none z-10"
-                      title="Click to toggle status"
-                    >
-                      <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm cursor-pointer ${
-                        product.is_active 
-                        ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" 
-                        : "bg-red-100 text-red-700 hover:bg-red-200"
-                      }`}>
-                        {product.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </button>
-
-                    {/* Quick Tags Label from Image */}
-                    <div className="absolute bottom-4 left-4">
-                       <span className="bg-white/90 backdrop-blur-sm text-slate-600 px-2 py-1 rounded text-[10px] font-bold shadow-sm">
-                         New
-                       </span>
-                    </div>
-                  </Link>
-
-                  <div className="p-6 flex flex-col flex-1">
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <TagIcon className="w-3 h-3 text-primary" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.1em] text-primary/80">
-                        {product.category}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-lg font-bold text-slate-800 line-clamp-1 mb-2 group-hover:text-primary transition-colors">
-                      <Link to={`/product/${product.id}`} className="no-underline text-inherit hover:text-primary transition-colors">
-                        {product.name}
-                      </Link>
-                    </h3>
-                    
-                    <div className="flex items-baseline gap-1 mt-auto mb-6">
-                      <span className="text-slate-500 text-sm font-bold">Rs.</span>
-                      <span className="text-2xl font-black text-slate-900 leading-none">
-                        {product.price}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button
-                        variant="ghost"
-                        className="bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-slate-100 transition-all active:scale-95"
-                        onClick={() => navigate(`/vendor/edit-product/${product.id}`)}
-                      >
-                        <Edit2Icon className="w-3.5 h-3.5" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        className="bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-700 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-slate-100 transition-all active:scale-95"
-                        onClick={() => handleDelete(product.id)}
-                      >
-                        <Trash2Icon className="w-3.5 h-3.5" />
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-gray-50/50 border-b border-gray-100">
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] w-24">Item</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Properties</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Pricing</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">State</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Control</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {products.map((product) => (
+                    <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
+                      <td className="px-8 py-6">
+                        <div className="h-12 w-12 rounded border border-gray-100 overflow-hidden grayscale group-hover:grayscale-0 transition-all">
+                          {product.image ? (
+                            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-gray-50 flex items-center justify-center text-[8px] font-black text-gray-300">N/A</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{product.name}</span>
+                          <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">{product.category}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-black text-accent uppercase tracking-widest">Rs. {product.price.toLocaleString()}</span>
+                          <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">Stock: {product.quantity}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <button 
+                          onClick={() => handleToggleStatus(product.id)}
+                          className={`px-3 py-1.5 rounded text-[8px] font-black uppercase tracking-widest transition-all ${
+                            product.is_active 
+                            ? "bg-green-50 text-green-600 hover:bg-green-100" 
+                            : "bg-red-50 text-red-600 hover:bg-red-100"
+                          }`}
+                        >
+                          {product.is_active ? "Operational" : "Offline"}
+                        </button>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <div className="flex items-center justify-end gap-3">
+                          <button
+                            onClick={() => navigate(`/vendor/edit-product/${product.id}`)}
+                            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white rounded transition-colors"
+                          >
+                            <Edit2Icon size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <Trash2Icon size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

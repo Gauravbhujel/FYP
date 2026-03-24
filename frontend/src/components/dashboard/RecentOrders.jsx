@@ -18,53 +18,49 @@ export function RecentOrders({ orders }) {
   };
 
   return (
-    <div className="dashboard-card p-0 overflow-hidden">
-      <div className="flex items-center justify-between p-6 border-b border-slate-50">
-        <h3 className="text-lg font-black text-slate-800 tracking-tight">Recent Orders</h3>
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="flex items-center justify-between p-8 border-b border-gray-100">
+        <h3 className="text-sm font-black text-gray-900 tracking-tighter uppercase">Recent Orders</h3>
         <a
           href="/vendor/orders"
-          className="text-xs font-bold text-emerald-600 hover:text-emerald-700 uppercase tracking-widest transition-colors"
+          className="text-[10px] font-black text-accent hover:underline uppercase tracking-widest transition-all"
         >
-          View All
+          View All History
         </a>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-slate-50/50">
-              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Order ID</th>
-              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer</th>
-              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Product</th>
-              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount</th>
-              <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+            <tr className="bg-gray-50/50">
+              <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transaction ID</th>
+              <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Customer</th>
+              <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Amount</th>
+              <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">Status</th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-slate-50">
+          <tbody className="divide-y divide-gray-100">
             {orderList.length === 0 ? (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center text-slate-400 font-medium text-sm">
-                   No orders recorded yet
+                <td colSpan="4" className="px-8 py-16 text-center text-gray-400 font-bold text-[10px] uppercase tracking-widest">
+                   No pending transactions
                 </td>
               </tr>
             ) : (
               orderList.map((order) => (
-                <tr key={order.id} className="hover:bg-slate-50/80 transition-colors group">
-                  <td className="px-6 py-4">
-                    <span className="text-sm font-bold text-slate-800 tracking-tight">{order.id}</span>
+                <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
+                  <td className="px-8 py-6">
+                    <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">#{order.id}</span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm font-semibold text-slate-600 tracking-tight">{order.customer}</span>
+                  <td className="px-8 py-6">
+                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{order.customer}</span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-500 font-medium truncate max-w-[150px] inline-block">{order.product}</span>
+                  <td className="px-8 py-6">
+                    <span className="text-[10px] font-black text-accent uppercase tracking-widest">Rs. {order.amount.toLocaleString()}</span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm font-black text-slate-900 tracking-tight">Rs. {order.amount.toLocaleString()}</span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest inline-block ${getStatusStyle(order.status)}`}>
+                  <td className="px-8 py-6 text-center">
+                    <span className={`px-3 py-1.5 rounded text-[8px] font-black uppercase tracking-widest inline-block ${getStatusStyle(order.status)}`}>
                       {order.status}
                     </span>
                   </td>
