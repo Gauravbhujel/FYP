@@ -140,7 +140,7 @@ const Navbar = () => {
                 className="no-underline text-text-mid font-medium text-sm transition-all duration-200 relative group"
               >
                 {label}
-                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300" />
+                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300 group-hover:w-full" />
               </Link>
             </li>
           ))}
@@ -247,7 +247,7 @@ const Navbar = () => {
           {/* Wishlist */}
           <Link
             to="/wishlist"
-            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-all duration-200"
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-accent hover:bg-accent/10 transition-all duration-200"
             title="Wishlist"
           >
             <FaHeart className="text-lg" />
@@ -261,7 +261,7 @@ const Navbar = () => {
           {/* Cart */}
           <Link
             to="/cart"
-            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-all duration-200"
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-accent hover:bg-accent/10 transition-all duration-200"
             title="Cart"
           >
             <FaShoppingCart className="text-lg" />

@@ -197,45 +197,47 @@ const ProductListPage = () => {
 
                         <div className="lg:sticky lg:top-32 space-y-10">
                             {/* Global Search inside Sidebar */}
-                            <div className="mb-10 border-b border-gray-200 pb-8">
-                                <h3 className="font-black text-gray-900 mb-4 uppercase tracking-widest text-[10px] flex items-center gap-2">
-                                    <FaSearch size={10} className="text-primary" /> Search Gear
+                            <div className="mb-10 pb-8 border-b-2 border-primary/5">
+                                <h3 className="font-black text-gray-900 mb-6 uppercase tracking-widest text-[10px] flex items-center gap-2">
+                                    <div className="w-6 h-6 bg-primary text-white rounded flex items-center justify-center">
+                                        <FaSearch size={8} />
+                                    </div>
+                                    Search Gear
                                 </h3>
                                 <div className="relative group">
                                     <input 
                                         type="text" 
                                         placeholder="Keywords..." 
-                                        className="w-full py-2 bg-transparent border-b border-gray-200 focus:outline-none focus:border-primary transition-all text-sm font-bold"
+                                        className="w-full py-4 px-4 bg-gray-50/50 border-2 border-transparent focus:border-primary/10 rounded-xl transition-all text-xs font-black placeholder:text-gray-400 focus:outline-none focus:bg-white"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
-                                    <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors" />
+                                    <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors cursor-text" />
                                 </div>
                             </div>
-
-                            {/* Section: Categories */}
-                             <div className="mb-8">
+                                        {/* Section: Categories */}
+                             <div className="mb-8 font-sans">
                                 <button 
                                     onClick={() => toggleSection('categories')}
-                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-4"
+                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-6"
                                 >
                                     Category
                                     {openSections.categories ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
                                 </button>
                                 {openSections.categories && (
-                                    <div className="space-y-1.5 animate-fade-in">
+                                    <div className="space-y-3 animate-fade-in pl-1">
                                         {categories.map(cat => (
                                             <button
                                                 key={cat.id}
                                                 onClick={() => setSelectedCategory(cat.id)}
-                                                className={`w-full text-left py-2 transition-all flex items-center justify-between text-xs font-bold ${
+                                                className={`w-full text-left py-3 px-4 transition-all flex items-center justify-between text-[11px] font-black uppercase tracking-widest rounded-sm ${
                                                     selectedCategory === cat.id 
-                                                    ? 'text-primary' 
-                                                    : 'text-gray-500'
+                                                    ? 'text-primary border-2 border-primary bg-gray-50' 
+                                                    : 'text-gray-400 hover:text-gray-600 border border-transparent hover:border-gray-200'
                                                 }`}
                                             >
                                                 {cat.label}
-                                                {selectedCategory === cat.id && <FaArrowRight size={8} />}
+                                                {selectedCategory === cat.id && <FaArrowRight size={10} className="ml-2" />}
                                             </button>
                                         ))}
                                     </div>
@@ -364,8 +366,8 @@ const ProductListPage = () => {
                                 <ProductCard key={product.id} product={product} />
                             ))
                         ) : (
-                            <div className="col-span-full py-24 bg-white rounded-[3rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-center px-6 animate-fade-up">
-                                <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-sm">
+                            <div className="col-span-full py-24 bg-[#FDFFF5]/50 rounded-[3rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-center px-6 animate-fade-up">
+                                <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center mb-6 shadow-sm border border-gray-100">
                                     <FaRegSadTear className="text-4xl text-gray-200" />
                                 </div>
                                 <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight mb-3">No Gear Detected</h3>
@@ -374,7 +376,7 @@ const ProductListPage = () => {
                                 </p>
                                 <button 
                                     onClick={clearFilters}
-                                    className="px-10 py-4 bg-accent text-white rounded transition-all font-black text-xs uppercase tracking-widest shadow-sm flex items-center gap-3 hover:scale-[1.02] active:scale-95"
+                                    className="px-10 py-4 bg-accent text-white rounded transition-all font-black text-xs uppercase tracking-widest shadow-sm flex items-center gap-3 hover:scale-[1.05] active:scale-95 transition-all duration-300"
                                 >
                                     <FaSlidersH /> Reset Discovery
                                 </button>

@@ -4,9 +4,6 @@ import Footer from "../components/Footer";
 import { categories } from "../data/products";
 import { useNavigate } from "react-router-dom";
 import {
-  FaTrophy,
-  FaShieldAlt,
-  FaShippingFast,
   FaArrowRight,
   FaFire,
   FaChevronLeft,
@@ -174,35 +171,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ─── BENEFITS STRIP ─────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-5 py-20 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
-          {[
-            {
-              title: "Premium Quality",
-              desc: "Curated selection from verified vendors worldwide",
-            },
-            {
-              title: "Secure Shopping",
-              desc: "Encrypted payments and full buyer protection",
-            },
-            {
-              title: "Fast Shipping",
-              desc: "Doorstep delivery across all provinces of Nepal",
-            },
-          ].map(({ title, desc }) => (
-            <div
-              key={title}
-              className="flex flex-col items-center text-center gap-2 group"
-            >
-              <div>
-                <h3 className="font-black text-gray-900 text-lg mb-1 uppercase tracking-tighter">{title}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed max-w-[240px]">{desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
 
 

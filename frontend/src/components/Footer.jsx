@@ -61,10 +61,13 @@ const Footer = () => {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="text-gray-400 no-underline text-sm transition-all duration-200 flex items-center gap-1.5 group"
+                    className="text-gray-400 no-underline text-sm transition-all duration-300 flex items-center gap-1.5 group hover:text-accent hover:translate-x-1"
                   >
-                    <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0" />
-                    {label}
+                    <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0 group-hover:bg-accent" />
+                    <span className="relative">
+                      {label}
+                      <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300 group-hover:w-full" />
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -80,9 +83,12 @@ const Footer = () => {
               {['Contact Us', 'Track My Order', 'Shipping Policy', 'Returns & Exchanges', 'FAQs'].map(
                 (item) => (
                   <li key={item}>
-                    <span className="text-gray-400 text-sm transition-all duration-200 cursor-pointer flex items-center gap-1.5 group">
-                      <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0" />
-                      {item}
+                    <span className="text-gray-400 text-sm transition-all duration-300 cursor-pointer flex items-center gap-1.5 group hover:text-accent hover:translate-x-1">
+                      <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0 group-hover:bg-accent" />
+                      <span className="relative">
+                        {item}
+                        <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300 group-hover:w-full" />
+                      </span>
                     </span>
                   </li>
                 )
@@ -97,10 +103,10 @@ const Footer = () => {
             </h4>
             <div className="flex gap-3 mb-8">
               {[
-                { icon: <FaFacebookF />, label: 'Facebook', color: '' },
-                { icon: <FaInstagram />, label: 'Instagram', color: '' },
-                { icon: <FaTwitter />, label: 'Twitter', color: '' },
-                { icon: <FaYoutube />, label: 'YouTube', color: '' },
+                { icon: <FaFacebookF />, label: 'Facebook', color: 'hover:bg-[#1877F2] hover:border-[#1877F2] hover:text-white' },
+                { icon: <FaInstagram />, label: 'Instagram', color: 'hover:bg-[#E4405F] hover:border-[#E4405F] hover:text-white' },
+                { icon: <FaTwitter />, label: 'Twitter', color: 'hover:bg-[#1DA1F2] hover:border-[#1DA1F2] hover:text-white' },
+                { icon: <FaYoutube />, label: 'YouTube', color: 'hover:bg-[#FF0000] hover:border-[#FF0000] hover:text-white' },
               ].map(({ icon, label, color }) => (
                 <button
                   key={label}
