@@ -142,10 +142,10 @@ const ProductListPage = () => {
         <div className="min-h-screen flex flex-col bg-white font-sans">
             <Navbar />
             
-            <div className="bg-white py-12 border-b border-gray-100">
+            <div className="bg-white py-12 border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-6">
                     <nav className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-4">
-                        <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                        <Link to="/" className="transition-colors">Home</Link>
                         <span>/</span>
                         <span className="text-gray-900">Products</span>
                     </nav>
@@ -197,7 +197,7 @@ const ProductListPage = () => {
 
                         <div className="lg:sticky lg:top-32 space-y-10">
                             {/* Global Search inside Sidebar */}
-                            <div className="mb-10 border-b border-gray-100 pb-8">
+                            <div className="mb-10 border-b border-gray-200 pb-8">
                                 <h3 className="font-black text-gray-900 mb-4 uppercase tracking-widest text-[10px] flex items-center gap-2">
                                     <FaSearch size={10} className="text-primary" /> Search Gear
                                 </h3>
@@ -231,7 +231,7 @@ const ProductListPage = () => {
                                                 className={`w-full text-left py-2 transition-all flex items-center justify-between text-xs font-bold ${
                                                     selectedCategory === cat.id 
                                                     ? 'text-primary' 
-                                                    : 'text-gray-500 hover:text-gray-900'
+                                                    : 'text-gray-500'
                                                 }`}
                                             >
                                                 {cat.label}
@@ -257,7 +257,7 @@ const ProductListPage = () => {
                                             <input 
                                                 type="number" 
                                                 placeholder="MIN"
-                                                className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:outline-none focus:border-primary/20 text-xs font-black placeholder:text-gray-300"
+                                                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary/20 text-xs font-black placeholder:text-gray-400"
                                                 value={priceRange.min}
                                                 onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
                                             />
@@ -266,7 +266,7 @@ const ProductListPage = () => {
                                             <input 
                                                 type="number" 
                                                 placeholder="MAX"
-                                                className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:outline-none focus:border-primary/20 text-xs font-black placeholder:text-gray-300"
+                                                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary/20 text-xs font-black placeholder:text-gray-400"
                                                 value={priceRange.max}
                                                 onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
                                             />
@@ -292,8 +292,8 @@ const ProductListPage = () => {
                                                 onClick={() => handleSizeToggle(size.id)}
                                                 className={`px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all border ${
                                                     selectedSizes.includes(size.id)
-                                                    ? 'bg-primary text-white border-primary'
-                                                    : 'bg-white text-gray-400 border-gray-200 hover:border-gray-900 hover:text-gray-900'
+                                                    ? 'bg-primary text-white border-primary border-2'
+                                                    : 'bg-white text-gray-400 border-gray-300'
                                                 }`}
                                             >
                                                 {size.id}
@@ -306,7 +306,7 @@ const ProductListPage = () => {
                             {/* Mobile CTA */}
                             <button 
                                 onClick={() => setIsMobileFiltersOpen(false)}
-                                className="w-full lg:hidden bg-accent text-white py-4 rounded font-black text-sm shadow-sm mt-6 hover:bg-opacity-90 transition-all"
+                                className="w-full lg:hidden bg-accent text-white py-4 rounded font-black text-sm shadow-sm mt-6 transition-all"
                             >
                                 SHOW {filteredAndSortedProducts.length} RESULTS
                             </button>
@@ -314,9 +314,9 @@ const ProductListPage = () => {
                             {activeFiltersCount > 0 && (
                                 <button 
                                     onClick={clearFilters}
-                                    className="w-full py-3 text-gray-400 hover:text-red-500 font-bold text-[10px] uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 group"
+                                    className="w-full py-3 text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2 group"
                                 >
-                                    <FaTimes className="group-hover:rotate-90 transition-transform" /> Reset Discovery
+                                    <FaTimes className="transition-transform" /> Reset Discovery
                                 </button>
                             )}
                         </div>
@@ -326,7 +326,7 @@ const ProductListPage = () => {
                 {/* ─── PRODUCT DISCOVERY GRID ─── */}
                 <main className="flex-1 w-full">
                     {/* Top Bar / Sort Utility */}
-                    <div className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-gray-100 pb-6">
+                    <div className="mb-10 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-gray-200 pb-6">
                         <div className="flex items-center gap-2">
                             <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em]">
                                 Showing <span className="text-gray-900">{filteredAndSortedProducts.length}</span> Results
@@ -364,7 +364,7 @@ const ProductListPage = () => {
                                 <ProductCard key={product.id} product={product} />
                             ))
                         ) : (
-                            <div className="col-span-full py-24 bg-white rounded-[3rem] border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-center px-6 animate-fade-up">
+                            <div className="col-span-full py-24 bg-white rounded-[3rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-center px-6 animate-fade-up">
                                 <div className="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-sm">
                                     <FaRegSadTear className="text-4xl text-gray-200" />
                                 </div>
@@ -374,7 +374,7 @@ const ProductListPage = () => {
                                 </p>
                                 <button 
                                     onClick={clearFilters}
-                                    className="px-10 py-4 bg-primary text-white rounded hover:bg-opacity-90 transition-all font-black text-xs uppercase tracking-widest shadow-sm flex items-center gap-3"
+                                    className="px-10 py-4 bg-accent text-white rounded transition-all font-black text-xs uppercase tracking-widest shadow-sm flex items-center gap-3 hover:scale-[1.02] active:scale-95"
                                 >
                                     <FaSlidersH /> Reset Discovery
                                 </button>
@@ -385,8 +385,8 @@ const ProductListPage = () => {
                     {/* Pagination Placeholder */}
                     {filteredAndSortedProducts.length > 8 && (
                         <div className="flex justify-center mt-20">
-                            <button className=" group flex items-center gap-4 px-8 py-4 bg-white border border-gray-100 rounded-2xl font-black text-xs uppercase tracking-widest hover:border-primary/50 transition-all shadow-sm">
-                                <span className="text-gray-400 group-hover:text-primary transition-colors">Mounting more results</span>
+                            <button className=" group flex items-center gap-4 px-8 py-4 bg-white border border-gray-200 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-sm">
+                                <span className="text-gray-400 transition-colors">Mounting more results</span>
                                 <div className="flex gap-1">
                                     <div className="w-1 h-1 bg-primary rounded-full animate-bounce"></div>
                                     <div className="w-1 h-1 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>

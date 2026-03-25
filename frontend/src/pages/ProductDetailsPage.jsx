@@ -139,7 +139,7 @@ const ProductDetailsPage = () => {
                         type="button"
                         disabled={!interactive}
                         onClick={() => interactive && setUserReview(prev => ({ ...prev, rating: star }))}
-                        className={`${interactive ? 'hover:scale-125 transition-transform focus:outline-none cursor-pointer' : ''}`}
+                        className={`${interactive ? 'focus:outline-none cursor-pointer' : ''}`}
                     >
                         {star <= (interactive ? userReview.rating : rating) ? <FaStar /> : <FaRegStar className="text-gray-300" />}
                     </button>
@@ -192,11 +192,11 @@ const ProductDetailsPage = () => {
             <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-10 w-full flex-grow">
                 {/* ─── BREADCRUMBS ─── */}
                 <nav className="flex items-center gap-2 mb-8 text-xs font-bold text-gray-400 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
-                    <Link to="/" className="hover:text-primary transition-colors">Home</Link>
+                    <Link to="/" className="transition-colors">Home</Link>
                     <FaChevronRight className="text-[8px] text-gray-300" />
-                    <Link to="/products" className="hover:text-primary transition-colors">Products</Link>
+                    <Link to="/products" className="transition-colors">Products</Link>
                     <FaChevronRight className="text-[8px] text-gray-300" />
-                    <Link to={`/products?category=${product.category}`} className="hover:text-primary transition-colors uppercase tracking-wider">{product.category}</Link>
+                    <Link to={`/products?category=${product.category}`} className="transition-colors uppercase tracking-wider">{product.category}</Link>
                     <FaChevronRight className="text-[8px] text-gray-300" />
                     <span className="text-gray-700 truncate">{product.name}</span>
                 </nav>
@@ -227,10 +227,10 @@ const ProductDetailsPage = () => {
                                 className={`absolute top-5 right-5 z-10 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-lg backdrop-blur-md ${
                                     isWishlisted 
                                         ? 'bg-red-500 text-white shadow-red-500/30' 
-                                        : 'bg-white/80 text-gray-400 hover:text-red-500 hover:bg-white shadow-black/5'
+                                        : 'bg-white/80 text-gray-400 shadow-black/5'
                                 }`}
                             >
-                                <FaHeart className={`transition-transform ${isWishlisted ? 'scale-110' : 'hover:scale-110'}`} />
+                                <FaHeart className={`transition-transform ${isWishlisted ? 'scale-110' : ''}`} />
                             </button>
 
                             {/* Main Image */}
@@ -238,7 +238,7 @@ const ProductDetailsPage = () => {
                                 <img 
                                     src={mainImage || 'https://via.placeholder.com/800'} 
                                     alt={product.name} 
-                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 ease-out"
                                 />
                             </div>
                         </div>
@@ -250,10 +250,10 @@ const ProductDetailsPage = () => {
                                     <button 
                                         key={idx}
                                         onClick={() => setMainImage(img)}
-                                        className={`w-20 h-20 sm:w-24 sm:h-24 rounded flex-shrink-0 overflow-hidden border-2 transition-all duration-300 ${
+                                        className={`w-20 h-20 sm:w-24 sm:h-24 rounded flex-shrink-0 overflow-hidden border-2 transition-all duration-300 hover:border-primary/50 hover:opacity-100 ${
                                             mainImage === img 
                                                 ? 'border-primary shadow-sm scale-105' 
-                                                : 'border-gray-200 hover:border-gray-300 opacity-60 hover:opacity-100'
+                                                : 'border-gray-200 opacity-60'
                                         }`}
                                     >
                                         <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
@@ -285,7 +285,7 @@ const ProductDetailsPage = () => {
                                     </div>
                                     <span className="text-amber-800 font-black text-xs">{product.average_rating?.toFixed(1) || '4.8'}</span>
                                 </div>
-                                <span className="text-gray-400 font-semibold text-xs hover:text-primary transition-colors cursor-pointer underline decoration-dashed underline-offset-4">{reviews.length || '128'} Reviews</span>
+                                <span className="text-gray-400 font-semibold text-xs transition-colors cursor-pointer underline decoration-dashed underline-offset-4">{reviews.length || '128'} Reviews</span>
                                 <div className="flex items-center gap-1.5">
                                     <span className="relative flex h-2 w-2">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -331,12 +331,12 @@ const ProductDetailsPage = () => {
                                     <div className="flex items-center border-b border-gray-200 overflow-hidden">
                                         <button 
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 transition-all text-lg font-bold text-gray-500 hover:text-gray-900"
+                                            className="w-12 h-12 flex items-center justify-center transition-all text-lg font-bold text-gray-500"
                                         >−</button>
                                         <span className="w-12 text-center font-black text-base text-gray-900 select-none">{quantity}</span>
                                         <button 
                                             onClick={() => setQuantity(quantity + 1)}
-                                            className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 transition-all text-lg font-bold text-gray-500 hover:text-gray-900"
+                                            className="w-12 h-12 flex items-center justify-center transition-all text-lg font-bold text-gray-500"
                                         >+</button>
                                     </div>
 
@@ -344,7 +344,7 @@ const ProductDetailsPage = () => {
                                     <Button 
                                         variant="primary"
                                         onClick={() => handleAction('cart')}
-                                        className={`flex-grow h-12 shadow-sm gap-2.5 ${addedToCart ? '!bg-green-500 !hover:bg-green-600' : ''}`}
+                                        className={`flex-grow h-12 shadow-sm gap-2.5 ${addedToCart ? '!bg-green-500' : ''}`}
                                     >
                                         {addedToCart ? (
                                             <><FaCheckCircle /> Added!</>
@@ -358,9 +358,9 @@ const ProductDetailsPage = () => {
                                 <Button 
                                     variant="secondary"
                                     onClick={() => alert("Redirecting to checkout...")}
-                                    className="w-full h-12 gap-2 group border-none shadow-none bg-black !text-white hover:!bg-black/90"
+                                    className="w-full h-12 gap-2 group border-none shadow-none bg-black !text-white"
                                 >
-                                    <FaBolt className="text-white group-hover:scale-110 transition-transform" />
+                                    <FaBolt className="text-white transition-transform" />
                                     Buy It Now
                                 </Button>
                             </div>
@@ -369,7 +369,7 @@ const ProductDetailsPage = () => {
                         </div>
 
                         {/* ─── VENDOR CARD ─── */}
-                        <div className="pt-4 border-t border-gray-100">
+                        <div className="pt-4 border-t border-gray-200">
                             <div className="flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className="w-14 h-14 bg-gray-100 rounded flex items-center justify-center text-primary font-black text-xl border border-gray-200">
@@ -386,7 +386,7 @@ const ProductDetailsPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <Link to={`/vendor/${product.vendor_id || ''}`} className="bg-gray-50 border border-gray-200 text-gray-700 font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center gap-2 no-underline">
+                                <Link to={`/vendor/${product.vendor_id || ''}`} className="bg-gray-50 border border-gray-200 text-gray-700 font-bold text-xs px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 no-underline hover:bg-gray-100 hover:border-gray-300">
                                     <FaStore /> Visit
                                 </Link>
                             </div>
@@ -409,7 +409,7 @@ const ProductDetailsPage = () => {
                                 className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${
                                     activeTab === tab.id 
                                         ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                        : 'bg-white text-gray-400 hover:text-gray-600 hover:bg-gray-50 border border-gray-100'
+                                        : 'bg-white text-gray-400 border border-gray-200 hover:bg-gray-50 hover:text-gray-600'
                                 }`}
                             >
                                 <span className="text-xs">{tab.icon}</span>
@@ -420,7 +420,7 @@ const ProductDetailsPage = () => {
 
                     <div className="max-w-4xl mx-auto">
                         {activeTab === 'description' && (
-                            <div className="animate-fade-up bg-white p-8 sm:p-10 rounded-3xl border border-gray-100 shadow-sm">
+                            <div className="animate-fade-up bg-white p-8 sm:p-10 rounded-3xl border border-gray-200 shadow-sm">
                                 <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
                                     <span className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary text-sm"><FaBoxOpen /></span>
                                     Product Details
@@ -434,7 +434,7 @@ const ProductDetailsPage = () => {
                         )}
                         
                         {activeTab === 'specifications' && (
-                            <div className="animate-fade-up bg-white p-8 sm:p-10 rounded-3xl border border-gray-100 shadow-sm">
+                            <div className="animate-fade-up bg-white p-8 sm:p-10 rounded-3xl border border-gray-200 shadow-sm">
                                 <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
                                     <span className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 text-sm"><FaGem /></span>
                                     Technical Details
@@ -448,7 +448,7 @@ const ProductDetailsPage = () => {
                                         { label: 'Condition', value: 'Brand New' },
                                         { label: 'SKU', value: `GN-${product.id}00${product.id}` }
                                     ].map((spec, i) => (
-                                        <div key={i} className="flex justify-between items-center py-4 border-b border-gray-50 last:border-0">
+                                        <div key={i} className="flex justify-between items-center py-4 border-b border-gray-100 last:border-0">
                                             <span className="text-gray-400 font-semibold text-sm">{spec.label}</span>
                                             <span className="text-gray-900 font-bold text-sm">{spec.value}</span>
                                         </div>
@@ -460,7 +460,7 @@ const ProductDetailsPage = () => {
                         {activeTab === 'reviews' && (
                             <div className="animate-fade-up space-y-8">
                                 {/* Aggregate Section */}
-                                <div className="flex flex-col md:flex-row items-center gap-10 bg-white p-8 sm:p-10 rounded-3xl border border-gray-100 shadow-sm">
+                                <div className="flex flex-col md:flex-row items-center gap-10 bg-white p-8 sm:p-10 rounded-3xl border border-gray-200 shadow-sm">
                                     <div className="text-center px-6">
                                         <div className="text-6xl font-black text-gray-900 mb-2">{product.average_rating?.toFixed(1) || '0.0'}</div>
                                         {renderStars(product.average_rating || 0)}
@@ -489,7 +489,7 @@ const ProductDetailsPage = () => {
                                 <div className="space-y-4">
                                     {reviews.length > 0 ? (
                                         reviews.map((review, i) => (
-                                            <div key={i} className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                            <div key={i} className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm transition-shadow">
                                                 <div className="flex justify-between items-start mb-3">
                                                     <div>
                                                         <div className="flex items-center gap-3 mb-1.5">
@@ -511,7 +511,7 @@ const ProductDetailsPage = () => {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-center py-16 bg-white rounded-3xl border border-gray-100">
+                                        <div className="text-center py-16 bg-white rounded-3xl border border-gray-200">
                                             <div className="text-gray-200 text-5xl mb-4">⭐</div>
                                             <h4 className="text-lg font-black text-gray-400 mb-1">No Reviews Yet</h4>
                                             <p className="text-gray-400 text-sm">Be the first to share your experience!</p>
@@ -561,7 +561,7 @@ const ProductDetailsPage = () => {
                                             )
                                         ) : (
                                             <div className="text-center py-4">
-                                                <Link to="/login" className="text-primary font-bold hover:underline">Login to Leave a Review →</Link>
+                                                <Link to="/login" className="text-primary font-bold">Login to Leave a Review →</Link>
                                             </div>
                                         )}
                                     </div>
@@ -571,7 +571,7 @@ const ProductDetailsPage = () => {
 
                         {activeTab === 'shipping' && (
                             <div className="animate-fade-up grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-white p-7 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="bg-white p-7 rounded-3xl border border-gray-100 shadow-sm transition-shadow">
                                     <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
                                         <FaTruck className="text-lg" />
                                     </div>
@@ -581,7 +581,7 @@ const ProductDetailsPage = () => {
                                         <strong className="text-gray-700">Outside Valley:</strong> 3-5 business days
                                     </p>
                                 </div>
-                                <div className="bg-white p-7 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="bg-white p-7 rounded-3xl border border-gray-100 shadow-sm transition-shadow">
                                     <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-4">
                                         <FaSyncAlt className="text-lg" />
                                     </div>

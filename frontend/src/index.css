@@ -22,7 +22,7 @@
   --text-muted:     #9ca3af;
   --bg-light:       #f5f5f5;
   --bg-card:        #ffffff;
-  --border:         #e5e7eb;
+  --border:         #d1d5db;
 
   /* Gradients */
   --grad-hero:      linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
@@ -131,12 +131,6 @@ body {
   transition: var(--t-base);
 }
 
-.dashboard-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #e5e7eb;
-}
-
 /* Section heading underline */
 .section-heading {
   position: relative;
@@ -154,12 +148,8 @@ body {
   border-radius: 2px;
   transition: width 0.3s ease;
 }
-.section-heading:hover::after {
-  width: 100%;
-}
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--primary); }

@@ -92,7 +92,7 @@ export default function AdminReportsPage() {
 
         {/* Global KPI Array */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 group cursor-default">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center">
@@ -109,7 +109,7 @@ export default function AdminReportsPage() {
                 </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 group cursor-default">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center">
@@ -126,7 +126,7 @@ export default function AdminReportsPage() {
                 </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 group cursor-default">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center">
@@ -166,7 +166,7 @@ export default function AdminReportsPage() {
                         return (
                             <div key={i} className="relative flex flex-col items-center group w-full">
                                 <div 
-                                    className="w-8 md:w-12 bg-[#F5F5F5] group-hover:bg-accent transition-all duration-300 relative rounded-t"
+                                    className="w-8 md:w-12 bg-[#F5F5F5] hover:bg-accent transition-all duration-300 relative rounded-t"
                                     style={{ height: `${height}%` }}
                                 >
                                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-gray-900 text-white text-[8px] font-black px-2 py-1 rounded uppercase tracking-widest shadow-xl">

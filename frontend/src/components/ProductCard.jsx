@@ -48,7 +48,7 @@ const ProductCard = ({ product }) => {
             : null);
 
     return (
-        <div className="bg-white border border-gray-100 rounded-lg p-4 transition-all duration-300 flex flex-col h-full group hover:scale-[1.02] hover:shadow-md">
+        <div className="bg-white border border-gray-100 rounded-lg p-4 transition-all duration-300 flex flex-col h-full group hover:shadow-md hover:border-gray-200">
 
             {/* Image Container */}
             <div className="relative h-[240px] bg-gray-50 rounded-md overflow-hidden mb-4">
@@ -56,12 +56,12 @@ const ProductCard = ({ product }) => {
                     <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     />
                 </Link>
 
                 {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 pointer-events-none" />
+                <div className="absolute inset-0 bg-black/0 transition-all duration-300 pointer-events-none" />
 
                 {/* Discount Badge – top left */}
                 {discountPct && (
@@ -78,17 +78,17 @@ const ProductCard = ({ product }) => {
                 )}
 
                 {/* Action Buttons – float in on hover */}
-                <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 z-10">
+                <div className="absolute top-3 right-3 flex flex-col gap-2 transition-all duration-300 z-10">
                     <button
                         onClick={() => handleAction('wishlist')}
-                        className="w-9 h-9 bg-white rounded flex items-center justify-center text-gray-400 shadow-sm hover:text-red-500 hover:scale-105 transition-all duration-200 border border-gray-100"
+                        className="w-9 h-9 bg-white rounded flex items-center justify-center text-gray-400 shadow-sm transition-all duration-200 border border-gray-100 hover:bg-rose-50 hover:text-rose-500"
                         title="Add to Wishlist"
                     >
                         <FaHeart className="text-sm" />
                     </button>
                     <Link
                         to={`/product/${product.id}`}
-                        className="w-9 h-9 bg-white rounded flex items-center justify-center text-gray-400 shadow-sm hover:text-primary hover:scale-105 transition-all duration-200 border border-gray-100"
+                        className="w-9 h-9 bg-white rounded flex items-center justify-center text-gray-400 shadow-sm transition-all duration-200 border border-gray-100 hover:bg-accent hover:text-white"
                         title="Quick View"
                     >
                         <FaEye className="text-sm" />
@@ -101,7 +101,7 @@ const ProductCard = ({ product }) => {
 
                 {/* Product Name */}
                 <Link to={`/product/${product.id}`} className="no-underline">
-                    <h3 className="text-[0.92rem] font-semibold mb-2 text-primary line-clamp-2 leading-snug hover:opacity-80 transition-colors">
+                    <h3 className="text-[0.92rem] font-semibold mb-2 text-primary line-clamp-2 leading-snug transition-colors">
                         {product.name}
                     </h3>
                 </Link>
@@ -124,7 +124,7 @@ const ProductCard = ({ product }) => {
                         <Button 
                             variant="primary"
                             onClick={() => handleAction('cart')}
-                            className={`w-full py-3 text-xs uppercase tracking-widest gap-2 flex items-center justify-center ${isAdded ? '!bg-green-500 !hover:bg-green-600' : ''}`}
+                            className={`w-full py-3 text-xs uppercase tracking-widest gap-2 flex items-center justify-center ${isAdded ? '!bg-green-500' : ''}`}
                         >
                             {isAdded ? (
                                 <>

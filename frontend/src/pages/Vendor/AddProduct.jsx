@@ -89,7 +89,7 @@ export function AddProductPage() {
         <div className="flex flex-col gap-4">
             <button 
                 onClick={() => navigate("/vendor/products")}
-                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-accent transition-colors border-none bg-transparent cursor-pointer group"
+                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all border-none bg-transparent cursor-pointer group hover:text-slate-600 hover:scale-[1.02] active:scale-95"
             >
                 <ChevronLeftIcon className="w-3 h-3 transition-transform group-hover:-translate-x-1" /> Back to Products
             </button>
@@ -249,22 +249,22 @@ export function AddProductPage() {
               
               <div className="space-y-4">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="group relative aspect-square bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 hover:border-accent hover:bg-accent/5 transition-all overflow-hidden">
+                  <div key={i} className="group relative aspect-square bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 transition-all overflow-hidden">
                     {previewUrls[i] ? (
                         <>
-                            <img src={previewUrls[i]} alt={`Preview ${i+1}`} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                            <img src={previewUrls[i]} alt={`Preview ${i+1}`} className="w-full h-full object-cover transition-transform" />
                             <button 
                                 type="button"
                                 onClick={() => removeImage(i)}
-                                className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-rose-500 shadow-lg border-none cursor-pointer hover:bg-rose-500 hover:text-white transition-all"
+                                className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-rose-500 shadow-lg border-none cursor-pointer transition-all"
                             >
                                 <XIcon className="w-4 h-4" />
                             </button>
                         </>
                     ) : (
                         <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-4 text-center">
-                            <PlusIcon className="w-6 h-6 text-gray-300 mb-2 group-hover:text-accent transition-colors" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-accent">{i === 0 ? "Main Cover" : `Angle ${i+1}`}</span>
+                            <PlusIcon className="w-6 h-6 text-gray-300 mb-2 transition-colors" />
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{i === 0 ? "Main Cover" : `Angle ${i+1}`}</span>
                             <input type="file" className="sr-only" onChange={(e) => handleFileChange(e, i)} accept="image/*" />
                         </label>
                     )}
@@ -284,7 +284,7 @@ export function AddProductPage() {
                     <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full h-14 bg-accent hover:bg-[#E65A00] disabled:bg-slate-200 text-white font-black rounded-2xl transition-all shadow-xl shadow-accent/20 active:scale-95 border-none cursor-pointer text-sm uppercase tracking-widest"
+                        className="w-full h-14 bg-accent disabled:bg-slate-200 text-white font-black rounded-2xl transition-all shadow-xl shadow-accent/20 border-none cursor-pointer text-sm uppercase tracking-widest hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95"
                     >
                         {loading ? "Broadcasting..." : "Publish to Store"}
                     </button>

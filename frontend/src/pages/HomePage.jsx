@@ -141,13 +141,13 @@ const HomePage = () => {
         {/* Slider Controls */}
         <button
           onClick={prevSlide}
-          className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white/25 transition-all duration-200"
+          className="absolute left-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all duration-200 hover:bg-white/20 hover:scale-110 active:scale-95"
         >
           <FaChevronLeft className="text-sm" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white/25 transition-all duration-200"
+          className="absolute right-6 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all duration-200 hover:bg-white/20 hover:scale-110 active:scale-95"
         >
           <FaChevronRight className="text-sm" />
         </button>
@@ -160,7 +160,7 @@ const HomePage = () => {
               onClick={() => goToSlide(i)}
               className={`transition-all duration-500 rounded-full h-1.5 ${i === slideIndex
                 ? "w-10 bg-accent"
-                : "w-4 bg-white/40 hover:bg-white/60"
+                : "w-4 bg-white/40"
                 }`}
             />
           ))}
@@ -208,7 +208,7 @@ const HomePage = () => {
 
       {/* ─── DEALS BANNER ───────────────────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-5 py-12">
-        <div className="bg-white p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-gray-100 rounded-xl border-l-[6px] border-l-accent shadow-sm">
+        <div className="bg-white p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-gray-100 rounded-xl border-l-[6px] border-l-accent shadow-sm transition-all hover:shadow-md hover:border-gray-200 cursor-default group">
           <div className="text-center md:text-left pl-2">
             <h3 className="text-gray-900 font-black text-2xl md:text-3xl tracking-tight mb-2 uppercase">
               Up to 30% Off
@@ -241,7 +241,7 @@ const HomePage = () => {
           </div>
           <button
             onClick={() => navigate("/categories")}
-            className="flex items-center gap-2 text-primary font-semibold text-sm border-b border-primary pb-0.5 hover:gap-3 transition-all duration-200 group"
+            className="flex items-center gap-2 text-primary font-semibold text-sm border-b border-primary pb-0.5 transition-all duration-200 group"
           >
             All Categories <FaArrowRight className="text-xs" />
           </button>

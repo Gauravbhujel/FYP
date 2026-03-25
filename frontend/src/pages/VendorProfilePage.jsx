@@ -61,7 +61,7 @@ const VendorProfilePage = () => {
                     </div>
                     <h2 className="text-3xl font-black text-gray-900 mb-3">{error || 'Vendor Not Found'}</h2>
                     <p className="text-gray-500 mb-8 max-w-md">The vendor you are looking for might have closed their store or changed their address.</p>
-                    <Link to="/products" className="bg-gradient-to-r from-primary to-primary-light text-white px-8 py-4 rounded-2xl font-bold no-underline shadow-lg shadow-primary/25 hover:-translate-y-1 transition-all">
+                    <Link to="/products" className="bg-gradient-to-r from-primary to-primary-light text-white px-8 py-4 rounded-2xl font-bold no-underline shadow-lg shadow-primary/25 transition-all hover:scale-[1.02] active:scale-95 hover:brightness-110">
                         Explore Products
                     </Link>
                 </div>

@@ -73,7 +73,7 @@ export const VendorDashboard = () => {
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Business Performance Control Center</p>
           </div>
           <Link to="/vendor/AddProduct">
-            <button className="bg-accent hover:bg-[#E65A00] text-white font-black px-8 py-4 rounded-lg flex items-center gap-3 transition-all active:scale-95 text-[10px] uppercase tracking-[0.2em] border-none cursor-pointer">
+            <button className="bg-accent hover:bg-[#EA580C] text-white font-black px-8 py-4 rounded-lg flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 text-[10px] uppercase tracking-[0.2em] border-none cursor-pointer">
               <PlusIcon size={16} /> Add New Product
             </button>
           </Link>

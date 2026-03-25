@@ -50,18 +50,18 @@ export function QuickActions() {
             <Link
               key={index}
               to={action.href}
-              className="flex items-center gap-5 p-4 rounded-lg hover:bg-gray-50 transition-all group border border-transparent hover:border-gray-100"
+              className="flex items-center gap-5 p-4 rounded-lg transition-all group border border-transparent hover:bg-gray-50 hover:shadow-sm"
             >
-              <div className="w-10 h-10 rounded bg-gray-50 flex items-center justify-center transition-colors group-hover:bg-accent/5 group-hover:text-accent">
-                <Icon className="w-4 h-4 text-gray-400 group-hover:text-accent transition-colors" />
+              <div className="w-10 h-10 rounded bg-gray-50 group-hover:bg-accent/10 flex items-center justify-center transition-colors">
+                <Icon className="w-4 h-4 text-gray-400 group-hover:text-accent group-hover:scale-110 transition-all" />
               </div>
 
               <div className="flex-1">
-                <p className="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none group-hover:text-accent transition-colors">{action.label}</p>
+                <p className="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none transition-colors group-hover:text-accent">{action.label}</p>
                 <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-[0.2em]">{action.desc}</p>
               </div>
 
-              <ChevronRightIcon className="w-3 h-3 text-gray-200 group-hover:text-gray-900 group-hover:translate-x-1 transition-all" />
+              <ChevronRightIcon className="w-3 h-3 text-gray-200 group-hover:text-accent group-hover:translate-x-1 transition-all" />
             </Link>
           );
         })}
@@ -71,7 +71,7 @@ export function QuickActions() {
            <div className="bg-gray-900 rounded-lg p-6 text-white text-center relative overflow-hidden group cursor-pointer">
                 <p className="text-[8px] font-black text-accent uppercase tracking-[0.2em] mb-2">Service Status</p>
                 <p className="text-[10px] font-black leading-relaxed uppercase tracking-widest mb-4">Store integrity is <span className="text-accent underline decoration-2 underline-offset-4">Optimal</span></p>
-                <button className="w-full py-3 bg-white/5 hover:bg-white/10 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded border border-white/10 transition-all">Support Desk</button>
+                <button className="w-full py-3 bg-white/5 text-white text-[9px] font-black uppercase tracking-[0.2em] rounded border border-white/10 transition-all">Support Desk</button>
            </div>
       </div>
     </div>

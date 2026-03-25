@@ -89,19 +89,19 @@ export function AdminVendorsPage() {
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Partner Management</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Vendor Management</h1>
             <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-[3px] leading-none">Verification and oversight of the global vendor ecosystem</p>
           </div>
           <div className="flex items-center gap-4">
              <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center gap-3">
                 <CheckCircle2Icon className="w-4 h-4 text-accent" />
-                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{vendors.filter(v => v.status === 'active').length} Verified Partners</span>
+                <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{vendors.filter(v => v.status === 'active').length} Verified Vendors</span>
              </div>
           </div>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
+        <div className="bg-white border border-gray-300 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
             <div className="flex-1 w-full relative group">
                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
                 <input 
@@ -109,7 +109,7 @@ export function AdminVendorsPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by store name, identity, or system ID..." 
-                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
+                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
                 />
             </div>
             <div className="flex items-center gap-3 w-full lg:w-auto">
@@ -118,7 +118,7 @@ export function AdminVendorsPage() {
                     <select 
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer"
+                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none transition-all cursor-pointer"
                     >
                         <option value="all">All States</option>
                         <option value="active">Verified</option>
@@ -131,16 +131,16 @@ export function AdminVendorsPage() {
         </div>
 
         {/* Records Table */}
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                     <thead className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] text-left bg-gray-50/50">
                         <tr>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Partner Entity</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Contact Vector</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Status</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Registration</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100 text-right">Actions</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">Vendor Entity</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">Contact Vector</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">Status</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">Registration</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -151,7 +151,7 @@ export function AdminVendorsPage() {
                                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
                                             <SearchIcon className="w-8 h-8 text-gray-200" />
                                         </div>
-                                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">No matching partners found</p>
+                                        <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">No matching vendors found</p>
                                     </div>
                                 </td>
                             </tr>
@@ -199,25 +199,25 @@ export function AdminVendorsPage() {
                                         <div className="relative inline-block" ref={openMenuId === vendor.id ? dropdownRef : null}>
                                             <button 
                                                 onClick={() => setOpenMenuId(openMenuId === vendor.id ? null : vendor.id)}
-                                                className="w-10 h-10 flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-100 rounded-xl transition-all shadow-sm cursor-pointer border-none"
+                                                className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl transition-all shadow-sm cursor-pointer border-none hover:bg-gray-50 hover:scale-[1.02] active:scale-95"
                                             >
                                                 <MoreVerticalIcon className="w-4 h-4 text-slate-400" />
                                             </button>
                                             {openMenuId === vendor.id && (
                                                 <div className="absolute right-0 mt-3 w-60 bg-white border border-gray-100 rounded-lg shadow-xl py-2 z-50 animate-fade-down text-left">
-                                                    <p className="px-5 py-3 text-[8px] font-black text-gray-400 uppercase tracking-[2px] border-b border-gray-50">Partner Directives</p>
+                                                    <p className="px-5 py-3 text-[8px] font-black text-gray-400 uppercase tracking-[2px] border-b border-gray-50">Vendor Directives</p>
                                                     
                                                     {vendor.status === "pending" && (
                                                         <div className="p-2 space-y-1">
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'approve')}
-                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-white bg-accent hover:bg-black rounded transition-all uppercase tracking-widest border-none cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-white bg-accent rounded transition-all uppercase tracking-widest border-none cursor-pointer hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95"
                                                             >
                                                                 <CheckCircleIcon className="w-4 h-4 mr-3" /> Execute Approval
                                                             </button>
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'reject')}
-                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-rose-500 hover:bg-rose-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-rose-500 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer hover:bg-rose-50 hover:scale-[1.02] active:scale-95"
                                                             >
                                                                 <XCircleIcon className="w-4 h-4 mr-3" /> Terminate Request
                                                             </button>
@@ -225,21 +225,21 @@ export function AdminVendorsPage() {
                                                     )}
                                                     
                                                     <div className="px-2 space-y-1">
-                                                        <button className="w-full flex items-center px-4 py-3 text-[9px] font-black text-gray-900 hover:bg-gray-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
+                                                        <button className="w-full flex items-center px-4 py-3 text-[9px] font-black text-gray-900 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
                                                             <EyeIcon className="w-4 h-4 mr-3 text-gray-400" /> Ecosystem View
                                                         </button>
 
                                                         {vendor.status === "suspended" ? (
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'unsuspend')}
-                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-gray-900 hover:bg-gray-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-gray-900 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                             >
                                                                 <ShieldCheckIcon className="w-4 h-4 mr-3 text-accent" /> Lift Suspension
                                                             </button>
                                                         ) : (
                                                             <button 
                                                                 onClick={() => handleVendorAction(vendor.id, 'suspend')}
-                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-amber-600 hover:bg-amber-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                className="w-full flex items-center px-4 py-3 text-[9px] font-black text-amber-600 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                             >
                                                                 <ShieldOffIcon className="w-4 h-4 mr-3" /> Suspend Operations
                                                             </button>
@@ -249,7 +249,7 @@ export function AdminVendorsPage() {
                                                         
                                                         <button 
                                                             onClick={() => handleVendorAction(vendor.id, 'delete')}
-                                                            className="w-full flex items-center px-4 py-3 text-[9px] font-black text-rose-500 hover:bg-rose-50 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                            className="w-full flex items-center px-4 py-3 text-[9px] font-black text-rose-500 rounded transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
                                                         >
                                                             <Trash2Icon className="w-4 h-4 mr-3" /> Purge Entity
                                                         </button>
@@ -266,8 +266,8 @@ export function AdminVendorsPage() {
             </div>
 
             {/* Table Footer */}
-            <div className="bg-gray-50/50 px-8 py-5 border-t border-gray-100 flex items-center justify-between">
-                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Global Partner Registry V1.0</p>
+            <div className="bg-gray-50/50 px-8 py-5 border-t border-gray-300 flex items-center justify-between">
+                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Global Vendor Registry V1.0</p>
                 <div className="flex items-center gap-2">
                     <CheckCircle2Icon className="w-3.5 h-3.5 text-accent" />
                     <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Ecosystem Verified</p>

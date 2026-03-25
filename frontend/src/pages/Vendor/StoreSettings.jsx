@@ -283,7 +283,7 @@ export function StoreSettingsPage() {
                 <button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full h-16 bg-accent hover:bg-[#E65A00] text-white font-black rounded-3xl transition-all shadow-xl shadow-accent/20 flex items-center justify-center gap-3 border-none cursor-pointer uppercase tracking-[2px] text-xs"
+                    className="w-full h-16 bg-accent text-white font-black rounded-3xl transition-all shadow-xl shadow-accent/20 flex items-center justify-center gap-3 border-none cursor-pointer uppercase tracking-[2px] text-xs hover:scale-[1.02] active:scale-95 hover:bg-[#EA580C]"
                 >
                     {loading ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>

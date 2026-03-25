@@ -137,10 +137,10 @@ const Navbar = () => {
             <li key={to}>
               <Link
                 to={to}
-                className="no-underline text-text-mid font-medium text-sm transition-all duration-200 hover:text-primary relative group"
+                className="no-underline text-text-mid font-medium text-sm transition-all duration-200 relative group"
               >
                 {label}
-                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300 group-hover:w-full" />
+                <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300" />
               </Link>
             </li>
           ))}
@@ -151,8 +151,8 @@ const Navbar = () => {
           <div
             className={`flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 w-[320px] lg:w-[380px] ${
               showSearchResults || searchQuery
-                ? "border-primary bg-white shadow-sm ring-1 ring-primary/10"
-                : "border-gray-200 bg-gray-50 hover:border-gray-300"
+                 ? "border-primary bg-white shadow-sm ring-1 ring-primary/10"
+                : "border-gray-200 bg-gray-50"
             }`}
           >
             {isSearching ? (
@@ -176,7 +176,7 @@ const Navbar = () => {
                   setSearchQuery("");
                   setShowSearchResults(false);
                 }}
-                className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+                className="flex-shrink-0 text-gray-400 transition-colors"
               >
                 <FaTimes className="text-xs" />
               </button>
@@ -195,7 +195,7 @@ const Navbar = () => {
                     <div
                       key={product.id}
                       onClick={() => handleSearchResultClick(product.id)}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors"
                     >
                       <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
                         {product.image ? (
@@ -226,7 +226,7 @@ const Navbar = () => {
                   <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
                     <Link
                       to={`/products?search=${searchQuery}`}
-                      className="text-xs font-bold text-primary hover:text-primary-light transition-colors"
+                      className="text-xs font-bold text-primary transition-colors"
                       onClick={() => setShowSearchResults(false)}
                     >
                       View all results →
@@ -247,7 +247,7 @@ const Navbar = () => {
           {/* Wishlist */}
           <Link
             to="/wishlist"
-            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-primary hover:bg-gray-100 transition-all duration-200"
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-all duration-200"
             title="Wishlist"
           >
             <FaHeart className="text-lg" />
@@ -261,7 +261,7 @@ const Navbar = () => {
           {/* Cart */}
           <Link
             to="/cart"
-            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-primary hover:bg-gray-100 transition-all duration-200"
+            className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-all duration-200"
             title="Cart"
           >
             <FaShoppingCart className="text-lg" />
@@ -277,7 +277,7 @@ const Navbar = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white shadow-sm hover:shadow-md transition-all duration-200"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white shadow-sm transition-all duration-200"
                 title="Profile"
               >
                 <FaUser className="text-sm" />
@@ -289,20 +289,20 @@ const Navbar = () => {
                   </div>
                   <Link
                     to="/vendor/signup"
-                    className="flex items-center px-4 py-3 no-underline text-text-mid text-sm transition-colors hover:bg-gray-50 hover:text-primary"
+                    className="flex items-center px-4 py-3 no-underline text-text-mid text-sm transition-colors"
                     onClick={() => setShowDropdown(false)}
                   >
                     🏪 Become a Vendor
                   </Link>
                   <Link
                     to="/profile"
-                    className="flex items-center px-4 py-3 no-underline text-text-mid text-sm transition-colors hover:bg-gray-50 hover:text-primary border-t border-gray-50"
+                    className="flex items-center px-4 py-3 no-underline text-text-mid text-sm transition-colors border-t border-gray-50"
                     onClick={() => setShowDropdown(false)}
                   >
                     👤 View Profile
                   </Link>
                   <button
-                    className="w-full flex items-center px-4 py-3 text-red-500 text-sm transition-colors hover:bg-red-50 border-t border-gray-100 cursor-pointer font-medium"
+                    className="w-full flex items-center px-4 py-3 text-red-500 text-sm transition-colors border-t border-gray-100 cursor-pointer font-medium"
                     onClick={handleLogout}
                   >
                     🚪 Sign Out
@@ -313,7 +313,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="bg-accent text-white px-5 py-2.5 rounded-full no-underline font-semibold text-sm transition-all duration-200 hover:shadow-md hover:-translate-y-px"
+              className="bg-accent text-white px-5 py-2.5 rounded-full no-underline font-semibold text-sm transition-all duration-200 shadow-sm"
             >
               Sign In
             </Link>
@@ -321,7 +321,7 @@ const Navbar = () => {
 
           {/* Mobile Hamburger */}
           <button
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full text-gray-500 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <FaTimes /> : <FaBars />}
@@ -350,7 +350,7 @@ const Navbar = () => {
             <Link
               key={to}
               to={to}
-              className="no-underline text-text-mid font-medium text-sm py-2 border-b border-gray-50 hover:text-primary transition-colors"
+              className="no-underline text-text-mid font-medium text-sm py-2 border-b border-gray-50 transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               {label}

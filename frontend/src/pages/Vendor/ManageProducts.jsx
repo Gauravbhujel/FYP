@@ -56,7 +56,7 @@ export function ManageProductsPage() {
     <VendorLayout currentPage="products">
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100 px-8 py-10 lg:px-12">
+        <div className="bg-white border-b border-gray-300 px-8 py-10 lg:px-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-7xl mx-auto w-full">
             <div>
               <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-2">
@@ -67,7 +67,7 @@ export function ManageProductsPage() {
               </p>
             </div>
             <Link to="/vendor/AddProduct">
-              <button className="bg-accent hover:bg-[#E65A00] text-white px-8 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 flex items-center gap-3 border-none">
+              <button className="bg-accent text-white px-8 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center gap-3 border-none cursor-pointer hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95">
                 <PlusIcon size={16} />
                 Add Product
               </button>
@@ -88,22 +88,22 @@ export function ManageProductsPage() {
               <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-accent"></div>
             </div>
           ) : products.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-20 text-center shadow-sm">
+            <div className="bg-white rounded-xl border border-gray-300 p-20 text-center shadow-sm">
               <h3 className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em] mb-4">No Inventory Detected</h3>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-10 max-w-xs mx-auto leading-relaxed">
                 Begin populating your store catalog to initialize revenue streams
               </p>
               <Link to="/vendor/AddProduct">
-                <button className="bg-accent hover:bg-[#E65A00] text-white px-10 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all border-none cursor-pointer">
+                <button className="bg-accent text-white px-10 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all border-none cursor-pointer hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95">
                   Initialize First Asset
                 </button>
               </Link>
             </div>
           ) : (
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-gray-300 rounded-xl overflow-hidden shadow-sm">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-gray-50/50 border-b border-gray-100">
+                  <tr className="bg-gray-50/50 border-b border-gray-300">
                     <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] w-24">Item</th>
                     <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Properties</th>
                     <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Pricing</th>
@@ -111,11 +111,11 @@ export function ManageProductsPage() {
                     <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Control</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-300">
                   {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
+                    <tr key={product.id} className="transition-colors group">
                       <td className="px-8 py-6">
-                        <div className="h-12 w-12 rounded border border-gray-100 overflow-hidden grayscale group-hover:grayscale-0 transition-all">
+                        <div className="h-12 w-12 rounded border border-gray-300 overflow-hidden grayscale transition-all">
                           {product.image ? (
                             <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
@@ -138,7 +138,7 @@ export function ManageProductsPage() {
                       <td className="px-8 py-6">
                         <button 
                           onClick={() => handleToggleStatus(product.id)}
-                          className={`px-3 py-1.5 rounded text-[8px] font-black uppercase tracking-widest transition-all ${
+                          className={`px-3 py-1.5 rounded text-[8px] font-black uppercase tracking-widest transition-all cursor-pointer hover:scale-[1.05] active:scale-95 ${
                             product.is_active 
                             ? "bg-green-50 text-green-600 hover:bg-green-100" 
                             : "bg-red-50 text-red-600 hover:bg-red-100"
@@ -151,13 +151,13 @@ export function ManageProductsPage() {
                         <div className="flex items-center justify-end gap-3">
                           <button
                             onClick={() => navigate(`/vendor/edit-product/${product.id}`)}
-                            className="p-2 text-gray-400 hover:text-gray-900 hover:bg-white rounded transition-colors"
+                            className="p-2 text-gray-400 rounded transition-colors"
                           >
                             <Edit2Icon size={14} />
                           </button>
                           <button
                             onClick={() => handleDelete(product.id)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-2 text-gray-400 rounded transition-colors"
                           >
                             <Trash2Icon size={14} />
                           </button>

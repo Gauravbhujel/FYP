@@ -95,15 +95,15 @@ export function AdminProductsPage() {
         </div>
 
         {/* Filter Toolbar */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
+        <div className="bg-white border border-gray-300 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
             <div className="flex-1 w-full relative group">
                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
                 <input 
                     type="text" 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by name, partner, or SKU..." 
-                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
+                    placeholder="Search by name, vendor, or SKU..." 
+                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
                 />
             </div>
             <div className="flex items-center gap-3 w-full lg:w-auto">
@@ -112,7 +112,7 @@ export function AdminProductsPage() {
                     <select 
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
-                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer"
+                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none transition-all cursor-pointer"
                     >
                         <option value="all">Categories</option>
                         <option value="football">Football</option>
@@ -126,7 +126,7 @@ export function AdminProductsPage() {
                 </div>
                 <button 
                   onClick={fetchProducts}
-                  className="h-11 w-11 flex items-center justify-center bg-white border border-gray-200 rounded hover:bg-gray-50 transition-all text-gray-400 hover:text-accent cursor-pointer"
+                  className="h-11 w-11 flex items-center justify-center bg-white border border-gray-300 rounded transition-all text-gray-400 cursor-pointer hover:scale-[1.02] active:scale-95 hover:border-gray-400 hover:text-gray-600"
                 >
                   <Loader2Icon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                 </button>
@@ -140,7 +140,7 @@ export function AdminProductsPage() {
                     <thead className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] text-left bg-gray-50/50">
                         <tr>
                             <th className="px-8 py-5 font-black border-b border-gray-100">Product Specification</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Partner</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Vendor</th>
                             <th className="px-8 py-5 font-black border-b border-gray-100">Price</th>
                             <th className="px-8 py-5 font-black border-b border-gray-100 text-center">Stock</th>
                             <th className="px-8 py-5 font-black border-b border-gray-100">Status</th>
@@ -227,16 +227,16 @@ export function AdminProductsPage() {
                                         <div className="flex items-center justify-end gap-1">
                                             <button 
                                               onClick={() => window.open(`/product/${product.id}`, '_blank')}
-                                              className="w-9 h-9 flex items-center justify-center bg-white hover:bg-gray-50 border border-gray-100 rounded transition-all shadow-sm text-gray-400 hover:text-gray-900 cursor-pointer"
+                                              className="w-9 h-9 flex items-center justify-center bg-white border border-gray-100 rounded transition-all shadow-sm text-gray-400 cursor-pointer hover:border-gray-200 hover:text-gray-900 hover:shadow-md"
                                             >
                                                 <EyeIcon className="w-3.5 h-3.5" />
                                             </button>
-                                            <button className="w-9 h-9 flex items-center justify-center bg-white hover:bg-gray-50 border border-gray-100 rounded transition-all shadow-sm text-gray-400 hover:text-accent cursor-pointer">
+                                            <button className="w-9 h-9 flex items-center justify-center bg-white border border-gray-100 rounded transition-all shadow-sm text-gray-400 cursor-pointer hover:border-gray-200 hover:text-gray-900 hover:shadow-md">
                                                 <Edit2Icon className="w-3.5 h-3.5" />
                                             </button>
                                             <button 
                                               onClick={() => handleDelete(product.id)}
-                                              className="w-9 h-9 flex items-center justify-center bg-white hover:bg-gray-50 border border-gray-100 rounded transition-all shadow-sm text-gray-400 hover:text-rose-500 cursor-pointer"
+                                              className="w-9 h-9 flex items-center justify-center bg-white border border-gray-100 rounded transition-all shadow-sm text-gray-400 cursor-pointer hover:border-rose-200 hover:text-rose-500 hover:shadow-md"
                                             >
                                                 <Trash2Icon className="w-3.5 h-3.5" />
                                             </button>

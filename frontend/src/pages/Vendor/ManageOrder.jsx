@@ -80,7 +80,7 @@ export function ManageOrdersPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-               <button className="h-12 px-8 bg-white border border-gray-200 rounded text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-accent/5 hover:border-accent/20 hover:text-accent transition-all">
+               <button className="h-12 px-8 bg-white border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-500 transition-all cursor-pointer hover:bg-gray-50 hover:scale-[1.02] active:scale-95">
                    Export Data
                </button>
           </div>
@@ -93,7 +93,7 @@ export function ManageOrdersPage() {
                 <input 
                     type="text" 
                     placeholder="Search by ID or Customer..." 
-                    className="w-full h-14 pl-12 pr-4 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-14 pl-12 pr-4 bg-white border border-gray-300 rounded-lg text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -104,7 +104,7 @@ export function ManageOrdersPage() {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="h-14 pl-12 pr-12 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 appearance-none focus:ring-4 focus:ring-accent/5 focus:border-accent outline-none cursor-pointer min-w-[200px]"
+                        className="h-14 pl-12 pr-12 bg-white border border-gray-300 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 appearance-none focus:ring-4 focus:ring-accent/5 focus:border-accent outline-none cursor-pointer min-w-[200px]"
                     >
                         <option value="all">Global Filter</option>
                         <option value="pending">Pending</option>
@@ -147,7 +147,7 @@ export function ManageOrdersPage() {
                             </tr>
                         ) : (
                             filteredOrders.map((order) => (
-                                <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
+                                <tr key={order.id} className="transition-colors group">
                                     <td className="px-8 py-7">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{order.id}</span>
@@ -175,7 +175,7 @@ export function ManageOrdersPage() {
                                         <div className="relative inline-block group/actions">
                                             <button 
                                                 disabled={updatingId === order.id}
-                                                className="py-2.5 px-6 bg-accent hover:bg-[#E65A00] text-white rounded text-[8px] font-black uppercase tracking-[0.2em] transition-all border-none cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                                                className="py-2.5 px-6 bg-accent text-white rounded text-[8px] font-black uppercase tracking-[0.2em] transition-all border-none cursor-pointer flex items-center gap-2 disabled:opacity-50 hover:bg-[#EA580C] hover:scale-[1.05] active:scale-95"
                                             >
                                                 {updatingId === order.id ? <Loader2Icon className="w-3 h-3 animate-spin" /> : "Manage Order"}
                                             </button>
@@ -186,7 +186,7 @@ export function ManageOrdersPage() {
                                                     <button 
                                                         key={status}
                                                         onClick={() => handleStatusUpdate(order.id, status)}
-                                                        className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'} border-none cursor-pointer bg-white mb-1 last:mb-0`}
+                                                        className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500'} border-none cursor-pointer bg-white mb-1 last:mb-0`}
                                                     >
                                                         Set to {status}
                                                     </button>
@@ -204,7 +204,7 @@ export function ManageOrdersPage() {
 
         {/* Tip Section */}
         <div className="p-10 bg-gray-900 rounded-xl flex items-center gap-8 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl -mr-32 -mt-32 transition-transform group-hover:scale-150" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl -mr-32 -mt-32 transition-transform" />
             <div className="w-14 h-14 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
                 <AlertCircleIcon className="w-6 h-6 text-accent" />
             </div>

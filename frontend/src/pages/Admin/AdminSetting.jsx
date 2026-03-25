@@ -64,7 +64,7 @@ export default function AdminSettingsPage() {
           </div>
           <button 
             onClick={handleSave}
-            className="h-11 px-8 flex items-center gap-3 bg-accent hover:bg-black text-white rounded font-black text-[10px] uppercase tracking-widest transition-all shadow-sm active:scale-95 cursor-pointer border-none"
+            className="h-11 px-8 flex items-center gap-3 bg-accent text-white rounded font-black text-[10px] uppercase tracking-widest shadow-sm cursor-pointer border-none transition-all hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95"
           >
             <SaveIcon className="w-4 h-4" /> Commit Changes
           </button>
@@ -73,20 +73,20 @@ export default function AdminSettingsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Navigation / Sidebar */}
             <div className="lg:col-span-1 space-y-6">
-                <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-sm">
+                <div className="bg-white border border-gray-300 rounded-lg p-2 shadow-sm">
                     <button className="w-full flex items-center gap-4 px-5 py-4 bg-[#F5F5F5] text-accent rounded transition-all border-none cursor-pointer">
                         <GlobeIcon className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Platform Core</span>
                     </button>
-                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 hover:bg-gray-50 rounded transition-all border-none cursor-pointer">
+                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 rounded transition-all border-none cursor-pointer">
                         <CreditCardIcon className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Economic Logic</span>
                     </button>
-                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 hover:bg-gray-50 rounded transition-all border-none cursor-pointer">
+                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 rounded transition-all border-none cursor-pointer">
                         <BellIcon className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Alert Protocols</span>
                     </button>
-                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 hover:bg-gray-50 rounded transition-all border-none cursor-pointer">
+                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 rounded transition-all border-none cursor-pointer">
                         <ShieldCheckIcon className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Security Layer</span>
                     </button>
@@ -114,7 +114,7 @@ export default function AdminSettingsPage() {
             {/* Config Panels */}
             <div className="lg:col-span-2 space-y-8">
                 {/* General Panel */}
-                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                <div className="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center gap-4 mb-10">
                         <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center">
                             <GlobeIcon className="w-6 h-6 text-accent" />
@@ -134,7 +134,7 @@ export default function AdminSettingsPage() {
                                     name="siteName"
                                     value={platformSettings.siteName}
                                     onChange={handlePlatformChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
                                 />
                             </div>
                             <div className="space-y-3">
@@ -144,7 +144,7 @@ export default function AdminSettingsPage() {
                                     name="tagline"
                                     value={platformSettings.tagline}
                                     onChange={handlePlatformChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
                                 />
                             </div>
                         </div>
@@ -155,14 +155,14 @@ export default function AdminSettingsPage() {
                                 name="supportEmail"
                                 value={platformSettings.supportEmail}
                                 onChange={handlePlatformChange}
-                                className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Financial Panel */}
-                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                <div className="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center gap-4 mb-10">
                         <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center">
                             <CreditCardIcon className="w-6 h-6 text-accent" />
@@ -182,7 +182,7 @@ export default function AdminSettingsPage() {
                                     name="defaultRate"
                                     value={commissionSettings.defaultRate}
                                     onChange={handleCommissionChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
                                 />
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 uppercase tracking-widest">%</span>
                             </div>
@@ -195,7 +195,7 @@ export default function AdminSettingsPage() {
                                     name="minimumPayout"
                                     value={commissionSettings.minimumPayout}
                                     onChange={handleCommissionChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all"
                                 />
                                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400 uppercase tracking-widest">NPR</span>
                             </div>

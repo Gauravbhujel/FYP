@@ -8,13 +8,13 @@ export function Button({
   ...props
 }) {
   const baseStyles =
-    "font-semibold rounded-lg transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed";
+    "font-semibold rounded-lg transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-95";
 
   const variants = {
     primary:
-      "bg-[#F97316] text-white hover:bg-[#EA580C] shadow-sm hover:shadow-md border border-transparent",
+      "bg-[#F97316] text-white shadow-sm border border-transparent hover:bg-[#EA580C]",
     secondary:
-      "bg-transparent text-gray-900 border border-gray-300 hover:bg-gray-100 shadow-sm hover:shadow",
+      "bg-transparent text-gray-900 border border-gray-300 shadow-sm hover:bg-gray-50",
   };
 
   const sizes = {

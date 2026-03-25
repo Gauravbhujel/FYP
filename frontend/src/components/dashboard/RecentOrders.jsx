@@ -23,7 +23,7 @@ export function RecentOrders({ orders }) {
         <h3 className="text-sm font-black text-gray-900 tracking-tighter uppercase">Recent Orders</h3>
         <a
           href="/vendor/orders"
-          className="text-[10px] font-black text-accent hover:underline uppercase tracking-widest transition-all"
+          className="text-[10px] font-black text-accent uppercase tracking-widest transition-all"
         >
           View All History
         </a>
@@ -49,7 +49,7 @@ export function RecentOrders({ orders }) {
               </tr>
             ) : (
               orderList.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
+                <tr key={order.id} className="hover:bg-gray-50/80 transition-colors group cursor-pointer">
                   <td className="px-8 py-6">
                     <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">#{order.id}</span>
                   </td>

@@ -231,7 +231,7 @@ const ProfilePage = () => {
           <aside className="w-full lg:w-[320px] flex-shrink-0 lg:sticky lg:top-32 space-y-6">
 
             {/* User Quick Identity Card */}
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 text-center relative overflow-hidden group">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 text-center relative overflow-hidden group hover:bg-white/80 transition-all cursor-pointer">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primary-light"></div>
 
               <div className="relative inline-block mb-4">
@@ -248,7 +248,7 @@ const ProfilePage = () => {
                     )}
                   </div>
                 </div>
-                <label className="absolute -bottom-1 -right-1 w-10 h-10 bg-white shadow-xl border border-gray-100 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors text-primary border-none">
+                <label className="absolute -bottom-1 -right-1 w-10 h-10 bg-white shadow-xl border border-gray-100 rounded-xl flex items-center justify-center cursor-pointer text-primary border-none">
                   <FaCamera size={14} />
                   <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
                 </label>
@@ -284,7 +284,7 @@ const ProfilePage = () => {
                   onClick={() => setActiveTab(nav.id)}
                   className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === nav.id
                       ? 'bg-primary/5 text-primary'
-                      : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'
+                      : 'text-gray-400'
                     }`}
                 >
                   <div className="flex items-center gap-4">
@@ -297,7 +297,7 @@ const ProfilePage = () => {
               <div className="h-[1px] bg-gray-50 mx-4 my-2"></div>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-red-400 hover:bg-red-50 hover:text-red-500 transition-all"
+                className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-red-400 transition-all"
               >
                 <FaSignOutAlt className="text-xs" /> Logout
               </button>
@@ -339,7 +339,7 @@ const ProfilePage = () => {
                     {!isEditingProfile && (
                       <button
                         onClick={() => setIsEditingProfile(true)}
-                        className="flex items-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-white hover:border-primary/30 px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+                        className="flex items-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:bg-gray-100 hover:border-gray-300 hover:scale-[1.02] active:scale-95"
                       >
                         <FaRegEdit /> Edit
                       </button>
@@ -375,7 +375,7 @@ const ProfilePage = () => {
                     <div className="space-y-2 relative">
                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Email Address</label>
                       <div className="relative group">
-                        <FaEnvelope className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-hover:text-amber-500 transition-colors" />
+                        <FaEnvelope className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 transition-colors" />
                         <div className="w-full px-14 py-4 bg-gray-50/20 border border-gray-100 rounded-[1.25rem] font-black text-gray-400 cursor-not-allowed">
                           {user?.email}
                         </div>
@@ -388,13 +388,13 @@ const ProfilePage = () => {
                         <button
                           type="button"
                           onClick={() => { setIsEditingProfile(false); setSelectedFile(null); }}
-                          className="px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-all font-sans"
+                          className="px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-gray-400 transition-all font-sans"
                         >
                           Discard
                         </button>
                         <button
                           type="submit"
-                          className="bg-gradient-to-r from-primary to-primary-light text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all active:scale-95"
+                          className="bg-gradient-to-r from-primary to-primary-light text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:brightness-110 hover:scale-[1.02] active:scale-95"
                         >
                           Update Profile
                         </button>
@@ -413,13 +413,13 @@ const ProfilePage = () => {
                       <p className="text-emerald-800/60 text-xs font-medium uppercase tracking-wider">Nepal Sports Alliance Active</p>
                     </div>
                   </div>
-                  <Link to="/products" className="bg-gray-900 p-8 rounded-[2rem] border border-gray-800 flex items-center gap-6 group hover:translate-x-1 transition-all no-underline">
+                  <Link to="/products" className="bg-gray-900 p-8 rounded-[2rem] border border-gray-800 flex items-center gap-6 transition-all no-underline">
                     <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white text-2xl">
                       <FaStore />
                     </div>
                     <div>
                       <h4 className="text-lg font-black text-white">Marketplace</h4>
-                      <p className="text-white/40 text-xs font-medium uppercase tracking-wider group-hover:text-primary-light transition-colors">Continue Discovery Journey →</p>
+                      <p className="text-white/40 text-xs font-medium uppercase tracking-wider transition-colors">Continue Discovery Journey →</p>
                     </div>
                   </Link>
                 </div>
@@ -444,7 +444,7 @@ const ProfilePage = () => {
                       <p className="text-gray-400 max-w-xs mx-auto text-sm font-medium mb-10">"Every athlete's journey begins with the first piece of equipment."</p>
                       <Link
                         to='/products'
-                        className="bg-primary text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest no-underline shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all inline-block"
+                        className="bg-primary text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest no-underline shadow-xl shadow-primary/20 transition-all inline-block"
                       >
                         Shop Gears Now
                       </Link>
@@ -452,8 +452,8 @@ const ProfilePage = () => {
                   ) : (
                     <div className="space-y-6">
                       {orders.map(order => (
-                        <div key={order.id} className="group bg-gray-50/30 border border-gray-100 rounded-[2rem] p-6 flex flex-col md:flex-row gap-6 items-center hover:bg-white hover:border-primary/20 hover:shadow-xl transition-all duration-500">
-                          <div className="h-24 w-24 bg-white rounded-2xl shadow-sm overflow-hidden p-2 group-hover:scale-105 transition-transform">
+                        <div key={order.id} className="group bg-gray-50/30 border border-gray-100 rounded-[2rem] p-6 flex flex-col md:flex-row gap-6 items-center transition-all duration-500">
+                          <div className="h-24 w-24 bg-white rounded-2xl shadow-sm overflow-hidden p-2 transition-transform">
                             {order.image ? (
                               <img src={order.image} alt={order.product_name} className="h-full w-full object-cover rounded-xl" />
                             ) : (
@@ -521,7 +521,7 @@ const ProfilePage = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200">
+                    <button type="submit" className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-gray-200 hover:scale-[1.02] active:scale-95">
                       Update Details
                     </button>
                   </form>
@@ -557,7 +557,7 @@ const ProfilePage = () => {
                         </div>
                       </div>
                     </div>
-                    <button type="submit" className="bg-primary text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-xl shadow-primary/20">
+                    <button type="submit" className="bg-primary text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95">
                       Override Password
                     </button>
                   </form>
@@ -575,7 +575,7 @@ const ProfilePage = () => {
                   {!showDeleteConfirm ? (
                     <button
                       onClick={() => setShowDeleteConfirm(true)}
-                      className="bg-white border-2 border-red-100 text-red-500 hover:bg-red-500 hover:text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-red-100"
+                      className="bg-white border-2 border-red-100 text-red-500 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-red-100"
                     >
                       Initialize Deletion
                     </button>
@@ -589,13 +589,13 @@ const ProfilePage = () => {
                       <div className="flex flex-col gap-3">
                         <button
                           onClick={handleDeleteAccount}
-                          className="bg-red-600 hover:bg-red-700 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-100"
+                          className="bg-red-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-100"
                         >
                           Confirm Permanent Wipe
                         </button>
                         <button
                           onClick={() => setShowDeleteConfirm(false)}
-                          className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+                          className="bg-gray-100 text-gray-700 py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
                         >
                           Maintain Account
                         </button>

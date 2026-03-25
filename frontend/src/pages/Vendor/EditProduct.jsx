@@ -135,7 +135,7 @@ export function EditProductPage() {
         <div className="flex flex-col gap-4">
             <button 
                 onClick={() => navigate("/vendor/products")}
-                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-accent transition-colors border-none bg-transparent cursor-pointer group"
+                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 transition-all border-none bg-transparent cursor-pointer group hover:text-slate-600 hover:scale-[1.02] active:scale-95"
             >
                 <ChevronLeftIcon className="w-3 h-3 transition-transform group-hover:-translate-x-1" /> Return to Products
             </button>
@@ -179,7 +179,7 @@ export function EditProductPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
                     required
                   />
                 </div>
@@ -191,7 +191,7 @@ export function EditProductPage() {
                     value={formData.description}
                     onChange={handleChange}
                     rows={6}
-                    className="w-full p-4 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none resize-none placeholder:text-gray-300"
+                    className="w-full p-4 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none resize-none placeholder:text-gray-300"
                   />
                 </div>
 
@@ -202,7 +202,7 @@ export function EditProductPage() {
                             name="category"
                             value={formData.category}
                             onChange={handleChange}
-                            className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
+                            className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
                             required
                         >
                             <option value="running">Running</option>
@@ -219,7 +219,7 @@ export function EditProductPage() {
                             name="size"
                             value={formData.size}
                             onChange={handleChange}
-                            className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
+                            className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
                         >
                             <option value="free">Free Size</option>
                             <option value="s">Small (S)</option>
@@ -249,7 +249,7 @@ export function EditProductPage() {
                     name="price"
                     value={formData.price}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-black text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
                     required
                   />
                 </div>
@@ -260,7 +260,7 @@ export function EditProductPage() {
                     name="compare_price"
                     value={formData.compare_price}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-400 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-400 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
                   />
                 </div>
                 <div className="space-y-2 lg:col-span-2">
@@ -270,7 +270,7 @@ export function EditProductPage() {
                     name="quantity"
                     value={formData.quantity}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-black text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
                     required
                   />
                 </div>
@@ -290,22 +290,22 @@ export function EditProductPage() {
               
               <div className="space-y-4">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="group relative aspect-square bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 hover:border-accent transition-all overflow-hidden">
+                  <div key={i} className="group relative aspect-square bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 transition-all overflow-hidden">
                     {previewUrls[i] ? (
                         <>
-                            <img src={previewUrls[i]} alt={`Preview ${i+1}`} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                            <img src={previewUrls[i]} alt={`Preview ${i+1}`} className="w-full h-full object-cover transition-transform" />
                             <button 
                                 type="button"
                                 onClick={() => removeImage(i)}
-                                className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-rose-500 shadow-lg border-none cursor-pointer hover:bg-rose-500 hover:text-white transition-all"
+                                className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center text-rose-500 shadow-lg border-none cursor-pointer transition-all"
                             >
                                 <XIcon className="w-4 h-4" />
                             </button>
                         </>
                     ) : (
                         <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-4 text-center">
-                            <PlusIcon className="w-6 h-6 text-gray-300 mb-2 group-hover:text-accent transition-colors" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-accent">{i === 0 ? "Primary" : `View ${i+1}`}</span>
+                            <PlusIcon className="w-6 h-6 text-gray-300 mb-2 transition-colors" />
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{i === 0 ? "Primary" : `View ${i+1}`}</span>
                             <input type="file" className="sr-only" onChange={(e) => handleFileChange(e, i)} accept="image/*" />
                         </label>
                     )}
@@ -319,14 +319,14 @@ export function EditProductPage() {
                  <button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full h-14 bg-accent hover:bg-[#E65A00] text-white font-black rounded-2xl transition-all shadow-xl shadow-accent/20 active:scale-95 border-none cursor-pointer text-sm uppercase tracking-widest"
+                    className="w-full h-14 bg-accent text-white font-black rounded-2xl transition-all shadow-xl shadow-accent/20 border-none cursor-pointer text-sm uppercase tracking-widest hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95"
                 >
                     {loading ? "Syncing..." : "Update Listing"}
                 </button>
                 <button 
                     type="button"
                     onClick={() => navigate("/vendor/products")}
-                    className="w-full h-12 bg-white border border-slate-200 text-slate-400 font-black rounded-2xl hover:text-slate-600 transition-all text-[10px] uppercase tracking-widest cursor-pointer"
+                    className="w-full h-12 bg-white border border-slate-200 text-slate-400 font-black rounded-2xl transition-all text-[10px] uppercase tracking-widest cursor-pointer hover:bg-slate-50 hover:text-slate-600 hover:scale-[1.02] active:scale-95"
                 >
                     Discard Changes
                 </button>

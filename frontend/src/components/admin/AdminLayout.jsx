@@ -11,7 +11,6 @@ import {
   LogOutIcon,
   ShieldCheckIcon,
   BellIcon,
-  SearchIcon,
   ChevronRightIcon,
   MenuIcon,
   XIcon,
@@ -57,12 +56,12 @@ export function AdminLayout({ children, currentPage }) {
     <div className="flex h-screen bg-[#F5F5F5] font-sans">
       {/* Light Sidebar */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-300 transition-all duration-300 ease-in-out ${
           isSidebarOpen ? "w-60" : "w-20"
         } flex flex-col lg:static`}
       >
         {/* Header */}
-        <div className="h-20 flex items-center px-6 border-b border-gray-100">
+        <div className="h-20 flex items-center px-6 border-b border-gray-300">
           <div className="flex items-center gap-3">
              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
                 <ShieldCheckIcon className="w-6 h-6 text-accent" />
@@ -88,11 +87,11 @@ export function AdminLayout({ children, currentPage }) {
                 className={`flex items-center group h-12 px-3 rounded-lg transition-all duration-200 ${
                   isActive 
                     ? "bg-[#F5F5F5] text-accent font-black" 
-                    : "text-gray-400 hover:bg-gray-50 hover:text-gray-900"
+                    : "text-gray-400 hover:bg-[#F5F5F5]/80 hover:text-gray-900"
                 }`}
               >
                 <div className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all ${
-                    isActive ? "text-accent" : "group-hover:text-gray-900"
+                    isActive ? "text-accent" : ""
                 }`}>
                     <item.icon className="w-5 h-5" />
                 </div>
@@ -110,10 +109,10 @@ export function AdminLayout({ children, currentPage }) {
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-gray-100 space-y-2">
+        <div className="p-4 border-t border-gray-300 space-y-2">
            <Link 
               to="/" 
-              className={`flex items-center h-12 px-3 rounded-lg text-gray-400 hover:text-gray-900 transition-all ${
+              className={`flex items-center h-12 px-3 rounded-lg text-gray-400 transition-all hover:bg-[#F5F5F5] hover:text-gray-900 ${
                 isSidebarOpen ? "" : "justify-center"
               }`}
             >
@@ -126,9 +125,9 @@ export function AdminLayout({ children, currentPage }) {
            </Link>
            <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="w-full flex items-center justify-center h-10 rounded-lg hover:bg-gray-50 text-gray-400 transition-all border-none cursor-pointer"
+              className="w-full flex items-center justify-center h-10 rounded-lg text-gray-400 transition-all border-none cursor-pointer hover:bg-[#F5F5F5] hover:text-gray-900"
             >
-              {isSidebarOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5 transition-transform hover:scale-110" />}
+              {isSidebarOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
            </button>
         </div>
       </aside>
@@ -136,23 +135,13 @@ export function AdminLayout({ children, currentPage }) {
       {/* Main Content Area */}
       <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${isSidebarOpen ? "ml-60 lg:ml-0" : "ml-20 lg:ml-0"}`}>
         {/* Top Navbar */}
-        <header className="h-20 bg-white border-b border-gray-200 sticky top-0 z-40 px-6 flex items-center justify-between">
-           {/* Left: Search */}
-           <div className="flex-1 max-w-xl">
-              <div className="relative group">
-                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
-                 <input 
-                    type="text" 
-                    placeholder="Search anything..." 
-                    className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all placeholder:text-gray-300 shadow-sm"
-                 />
-              </div>
-           </div>
+        <header className="h-20 bg-white border-b border-gray-300 sticky top-0 z-40 px-6 flex items-center justify-between">
+           <div className="flex-1" />
 
            {/* Right: Actions & Profile */}
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                  <button className="p-2.5 text-gray-400 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-all relative group border-none bg-transparent cursor-pointer">
+                  <button className="p-2.5 text-gray-400 rounded-lg transition-all relative group border-none bg-transparent cursor-pointer hover:bg-gray-50 hover:text-gray-900">
                       <BellIcon className="w-4 h-4" />
                       <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-accent rounded-full border-2 border-white" />
                   </button>
@@ -163,31 +152,31 @@ export function AdminLayout({ children, currentPage }) {
               <div className="relative" ref={dropdownRef}>
                   <button 
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-3 p-1.5 pl-3 hover:bg-slate-100/50 rounded-2xl transition-all border-none cursor-pointer"
+                    className="flex items-center gap-3 p-1.5 pl-3 rounded-2xl transition-all border-none cursor-pointer hover:bg-gray-50"
                   >
                       <div className="flex flex-col items-end text-right hidden sm:flex">
                          <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">System Admin</span>
                          <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest mt-1">Super User</span>
                       </div>
-                      <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center text-white font-black text-xs transition-transform group-hover:scale-95">
+                      <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center text-white font-black text-xs transition-transform">
                           AD
                       </div>
                   </button>
 
                   {/* Profile Dropdown */}
                   {isProfileOpen && (
-                    <div className="absolute top-full right-0 mt-4 w-60 bg-white border border-gray-200 rounded-xl shadow-2xl shadow-black/5 overflow-hidden py-2 animate-fade-in z-50">
+                    <div className="absolute top-full right-0 mt-4 w-60 bg-white border border-gray-300 rounded-xl shadow-2xl shadow-black/5 overflow-hidden py-2 animate-fade-in z-50">
                         <div className="px-6 py-4 border-b border-gray-50">
                             <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Session Account</p>
                             <p className="text-xs font-black text-gray-900 truncate tracking-tight">{adminData.email}</p>
                         </div>
-                        <Link to="/admin/settings" className="flex items-center px-6 py-3 text-[10px] font-black text-gray-500 hover:bg-gray-50 uppercase tracking-widest hover:text-gray-900 transition-all">
+                        <Link to="/admin/settings" className="flex items-center px-6 py-3 text-[10px] font-black text-gray-500 uppercase tracking-widest transition-all">
                             <SettingsIcon className="w-3.5 h-3.5 mr-4" /> System Settings
                         </Link>
                         <div className="h-px bg-gray-50 my-1 mx-4" />
                         <button 
                             onClick={handleLogout}
-                            className="w-full flex items-center px-6 py-3 text-[10px] font-black text-rose-500 hover:bg-rose-50 transition-all uppercase tracking-widest border-none cursor-pointer"
+                            className="w-full flex items-center px-6 py-3 text-[10px] font-black text-rose-500 transition-all uppercase tracking-widest border-none cursor-pointer"
                         >
                             <LogOutIcon className="w-3.5 h-3.5 mr-4" /> Log Out Platform
                         </button>

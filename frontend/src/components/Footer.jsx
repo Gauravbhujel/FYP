@@ -61,9 +61,9 @@ const Footer = () => {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="text-gray-400 no-underline text-sm transition-all duration-200 hover:text-accent hover:pl-1 flex items-center gap-1.5 group"
+                    className="text-gray-400 no-underline text-sm transition-all duration-200 flex items-center gap-1.5 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-accent transition-colors flex-shrink-0" />
+                    <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0" />
                     {label}
                   </Link>
                 </li>
@@ -80,8 +80,8 @@ const Footer = () => {
               {['Contact Us', 'Track My Order', 'Shipping Policy', 'Returns & Exchanges', 'FAQs'].map(
                 (item) => (
                   <li key={item}>
-                    <span className="text-gray-400 text-sm transition-all duration-200 hover:text-accent hover:pl-1 cursor-pointer flex items-center gap-1.5 group">
-                      <span className="w-1 h-1 rounded-full bg-gray-600 group-hover:bg-accent transition-colors flex-shrink-0" />
+                    <span className="text-gray-400 text-sm transition-all duration-200 cursor-pointer flex items-center gap-1.5 group">
+                      <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0" />
                       {item}
                     </span>
                   </li>
@@ -97,15 +97,15 @@ const Footer = () => {
             </h4>
             <div className="flex gap-3 mb-8">
               {[
-                { icon: <FaFacebookF />, label: 'Facebook', color: 'hover:bg-[#1877f2]' },
-                { icon: <FaInstagram />, label: 'Instagram', color: 'hover:bg-gradient-to-br hover:from-[#f09433] hover:to-[#bc1888]' },
-                { icon: <FaTwitter />, label: 'Twitter', color: 'hover:bg-[#1da1f2]' },
-                { icon: <FaYoutube />, label: 'YouTube', color: 'hover:bg-[#ff0000]' },
+                { icon: <FaFacebookF />, label: 'Facebook', color: '' },
+                { icon: <FaInstagram />, label: 'Instagram', color: '' },
+                { icon: <FaTwitter />, label: 'Twitter', color: '' },
+                { icon: <FaYoutube />, label: 'YouTube', color: '' },
               ].map(({ icon, label, color }) => (
                 <button
                   key={label}
                   title={label}
-                  className={`w-10 h-10 rounded-full bg-white/8 border border-white/10 flex items-center justify-center text-gray-400 ${color} hover:text-white hover:border-transparent hover:shadow-lg transition-all duration-200 text-sm`}
+                  className={`w-10 h-10 rounded-full bg-white/8 border border-white/10 flex items-center justify-center text-gray-400 ${color} transition-all duration-200 text-sm`}
                 >
                   {icon}
                 </button>
@@ -134,11 +134,11 @@ const Footer = () => {
             © {new Date().getFullYear()} GearUp Nepal. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-gray-500 text-xs">
-            <span className="cursor-pointer hover:text-gray-300 transition-colors">Privacy Policy</span>
+            <span className="cursor-pointer transition-colors">Privacy Policy</span>
             <span className="w-px h-3 bg-gray-700" />
-            <span className="cursor-pointer hover:text-gray-300 transition-colors">Terms of Service</span>
+            <span className="cursor-pointer transition-colors">Terms of Service</span>
             <span className="w-px h-3 bg-gray-700" />
-            <span className="cursor-pointer hover:text-gray-300 transition-colors">Cookie Policy</span>
+            <span className="cursor-pointer transition-colors">Cookie Policy</span>
           </div>
         </div>
       </div>

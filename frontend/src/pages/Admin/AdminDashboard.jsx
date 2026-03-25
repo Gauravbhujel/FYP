@@ -84,7 +84,7 @@ const AdminDashboard = () => {
             <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-[3px] leading-none">Global Management Dashboard</p>
           </div>
           <div className="flex items-center gap-3">
-             <div className="bg-white px-4 py-2 rounded-lg flex items-center gap-3 border border-gray-200 shadow-sm">
+             <div className="bg-white px-4 py-2 rounded-lg flex items-center gap-3 border border-gray-300 shadow-sm">
                 <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Platform Live</span>
              </div>
@@ -99,7 +99,7 @@ const AdminDashboard = () => {
             icon={TrendingUpIcon}
           />
           <MetricCard
-            title="Partners"
+            title="Vendors"
             value={String(stats.active_vendors)}
             icon={StoreIcon}
           />
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Approvals Block */}
             <div className="lg:col-span-8 flex flex-col gap-8">
-                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                <div className="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center text-gray-400">
@@ -127,12 +127,12 @@ const AdminDashboard = () => {
                             </div>
                             <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Pending Approvals</h2>
                         </div>
-                        <span className="px-3 py-1 bg-[#F5F5F5] text-gray-900 text-[10px] font-black rounded uppercase tracking-widest border border-gray-100">{pendingVendors.length} Awaiting</span>
+                        <span className="px-3 py-1 bg-[#F5F5F5] text-gray-900 text-[10px] font-black rounded uppercase tracking-widest border border-gray-300">{pendingVendors.length} Awaiting</span>
                     </div>
 
                     <div className="space-y-4">
                         {pendingVendors.length === 0 ? (
-                            <div className="py-12 text-center border-2 border-dashed border-gray-50 rounded-lg">
+                            <div className="py-12 text-center border-2 border-dashed border-gray-300 rounded-lg">
                                 <CheckCircle2Icon className="w-8 h-8 text-gray-200 mx-auto mb-4" />
                                 <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Queue is currently empty</p>
                             </div>
@@ -140,7 +140,7 @@ const AdminDashboard = () => {
                             pendingVendors.map((vendor) => (
                                 <div key={vendor.id} className="group flex items-center justify-between p-5 bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 rounded-lg transition-all">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white rounded flex items-center justify-center text-[10px] font-black text-gray-400 shadow-sm border border-gray-100 uppercase">
+                                        <div className="w-12 h-12 bg-white rounded flex items-center justify-center text-[10px] font-black text-gray-400 shadow-sm border border-gray-300 uppercase">
                                             {vendor.store_name?.charAt(0)}
                                         </div>
                                         <div>
@@ -151,13 +151,13 @@ const AdminDashboard = () => {
                                     <div className="flex gap-2">
                                         <button 
                                             onClick={() => handleVendorAction(vendor.id, "approve")}
-                                            className="h-9 px-4 bg-accent hover:bg-black text-white font-black text-[9px] rounded transition-all cursor-pointer border-none uppercase tracking-widest"
+                                            className="h-9 px-4 bg-accent hover:bg-[#EA580C] text-white font-black text-[9px] rounded transition-all cursor-pointer border-none uppercase tracking-widest hover:scale-[1.02] active:scale-95"
                                         >
                                             Approve
                                         </button>
                                         <button 
                                             onClick={() => handleVendorAction(vendor.id, "reject")}
-                                            className="h-9 px-4 bg-white hover:bg-rose-50 text-rose-500 font-black text-[9px] rounded transition-all cursor-pointer border border-gray-100 hover:border-rose-100 uppercase tracking-widest"
+                                            className="h-9 px-4 bg-white hover:bg-rose-50 text-rose-500 font-black text-[9px] rounded transition-all cursor-pointer border border-gray-300 hover:border-rose-100 uppercase tracking-widest hover:scale-[1.02] active:scale-95"
                                         >
                                             Reject
                                         </button>
@@ -169,33 +169,33 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Top Vendors Table */}
-                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                <div className="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Top Performing Partners</h2>
-                        <button className="text-[9px] font-black text-accent uppercase tracking-widest hover:underline transition-colors border-none bg-transparent cursor-pointer">Analyze Full Report</button>
+                        <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Top Performing Vendors</h2>
+                        <button className="text-[9px] font-black text-accent uppercase tracking-widest transition-all border-none bg-transparent cursor-pointer hover:text-[#EA580C] hover:underline hover:scale-[1.02] active:scale-95">Analyze Full Report</button>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-left">
                                 <tr>
-                                    <th className="pb-4 border-b border-gray-50">Partner Store</th>
-                                    <th className="pb-4 border-b border-gray-50">Gross Revenue</th>
-                                    <th className="pb-4 border-b border-gray-50 text-center">Volume</th>
-                                    <th className="pb-4 border-b border-gray-50 text-right">Performance</th>
+                                    <th className="pb-4 border-b border-gray-300">Vendor Store</th>
+                                    <th className="pb-4 border-b border-gray-300">Gross Revenue</th>
+                                    <th className="pb-4 border-b border-gray-300 text-center">Volume</th>
+                                    <th className="pb-4 border-b border-gray-300 text-right">Performance</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-gray-300">
                                 {topVendors.map((vendor, index) => (
-                                    <tr key={index} className="group hover:bg-gray-50/50 transition-colors">
+                                    <tr key={index} className="group transition-colors">
                                         <td className="py-5">
                                             <p className="text-xs font-black text-gray-900 tracking-tight leading-none uppercase">{vendor.name}</p>
-                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-wider">Approved Partner</p>
+                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-wider">Approved Vendor</p>
                                         </td>
                                         <td className="py-5">
                                             <span className="text-xs font-black text-gray-900 tracking-tight">Rs. {vendor.revenue.toLocaleString()}</span>
                                         </td>
                                         <td className="py-5 text-center">
-                                            <span className="text-[9px] font-black text-gray-600 px-3 py-1 bg-[#F5F5F5] border border-gray-100 rounded uppercase">{vendor.orders} Orders</span>
+                                            <span className="text-[9px] font-black text-gray-600 px-3 py-1 bg-[#F5F5F5] border border-gray-300 rounded uppercase">{vendor.orders} Orders</span>
                                         </td>
                                         <td className="py-5 text-right">
                                             <div className="flex items-center justify-end gap-1">
@@ -213,7 +213,7 @@ const AdminDashboard = () => {
 
             {/* Right Activity Sidebar */}
             <div className="lg:col-span-4 flex flex-col gap-8">
-                <div className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                <div className="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
                     <div className="flex items-center gap-3 mb-8">
                         <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center text-gray-400">
                             <BellIcon className="w-5 h-5" />
@@ -221,7 +221,7 @@ const AdminDashboard = () => {
                         <h2 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Recent Activity</h2>
                     </div>
  
-                    <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-gray-100">
+                    <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-gray-300">
                         {recentActivities.length > 0 ? (
                             recentActivities.map((act, i) => (
                                 <div key={i} className="relative pl-10">
@@ -239,7 +239,7 @@ const AdminDashboard = () => {
  
                     <Link 
                         to="/admin/activity-logs"
-                        className="w-full mt-8 py-3 bg-[#F5F5F5] hover:bg-gray-100 text-gray-900 font-black text-[9px] rounded transition-all border border-gray-100 cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2 no-underline"
+                        className="w-full mt-8 py-3 bg-[#F5F5F5] hover:bg-gray-100 text-gray-900 font-black text-[9px] rounded transition-all border border-gray-300 cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2 no-underline hover:scale-[1.01] active:scale-[0.98]"
                     >
                         View Full Logs <ArrowRightIcon className="w-3 h-3" />
                     </Link>

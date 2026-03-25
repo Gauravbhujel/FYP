@@ -190,14 +190,14 @@ const Signup = () => {
             <div className="pt-4">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input type="checkbox" required className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent accent-accent cursor-pointer" />
-                <span className="text-xs font-bold text-gray-500 group-hover:text-gray-700 transition-colors">
+                <span className="text-xs font-bold text-gray-500 transition-colors">
                   I agree to the <span className="text-accent underline">Terms of Service</span> and <span className="text-accent underline">Privacy Policy</span>
                 </span>
               </label>
             </div>
 
             <button
-              className="w-full py-4 bg-accent text-white rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-accent/20 hover:bg-[#E65A00] hover:scale-[0.99] active:scale-95 transition-all duration-300"
+              className="w-full py-4 bg-accent text-white rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-accent/20 transition-all duration-300"
               type="submit"
             >
               Create Account
@@ -207,7 +207,7 @@ const Signup = () => {
           <div className="mt-10 pt-10 border-t border-gray-100 flex flex-col gap-4">
             <p className="text-center text-gray-500 font-medium text-sm">
               Already have an account?{" "}
-              <Link to="/login" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2 hover:underline">
+              <Link to="/login" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2">
                 Sign In
               </Link>
             </p>
@@ -218,7 +218,7 @@ const Signup = () => {
             </div>
             <Link
               to="/vendor/signup"
-              className="w-full py-3 border border-gray-200 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-gray-600 hover:bg-gray-50 transition-colors"
+              className="w-full py-3 border border-gray-200 rounded-lg text-center text-[10px] font-black uppercase tracking-widest text-gray-600 transition-colors"
             >
               Become a Vendor <FaArrowRight className="inline-block ml-2 text-[8px]" />
             </Link>

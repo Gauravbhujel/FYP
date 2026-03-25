@@ -10,7 +10,7 @@ export function RecentProducts({ products }) {
         <h3 className="text-sm font-black text-gray-900 tracking-tighter uppercase">Recently Added</h3>
         <a
           href="/vendor/products"
-          className="text-[10px] font-black text-accent hover:underline uppercase tracking-widest transition-all"
+          className="text-[10px] font-black text-accent uppercase tracking-widest transition-all"
         >
           Manage Store
         </a>
@@ -36,10 +36,10 @@ export function RecentProducts({ products }) {
               </tr>
             ) : (
               productList.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
+                <tr key={product.id} className="hover:bg-gray-50/80 transition-colors group cursor-pointer">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded border border-gray-100 overflow-hidden flex-shrink-0 grayscale group-hover:grayscale-0 transition-all">
+                      <div className="h-10 w-10 rounded border border-gray-100 overflow-hidden flex-shrink-0 grayscale group-hover:grayscale-0 transition-all duration-500">
                         {product.image ? (
                           <img 
                             src={product.image} 

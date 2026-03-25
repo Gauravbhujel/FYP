@@ -50,7 +50,7 @@ export function AdminActivityLogsPage() {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
-                        <Link to="/admin/dashboard" className="w-10 h-10 bg-white border border-gray-100 rounded-lg flex items-center justify-center text-gray-400 hover:text-accent transition-colors shadow-sm">
+                        <Link to="/admin/dashboard" className="w-10 h-10 bg-white border border-gray-300 rounded-lg flex items-center justify-center text-gray-400 hover:text-accent transition-colors shadow-sm">
                             <ArrowLeftIcon className="w-5 h-5" />
                         </Link>
                         <div>
@@ -67,7 +67,7 @@ export function AdminActivityLogsPage() {
                         <input 
                             type="text" 
                             placeholder="Search activities..." 
-                            className="w-full h-14 pl-12 pr-4 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
+                            className="w-full h-14 pl-12 pr-4 bg-white border border-gray-300 rounded-lg text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -78,7 +78,7 @@ export function AdminActivityLogsPage() {
                             <select 
                                 value={filterType}
                                 onChange={(e) => setFilterType(e.target.value)}
-                                className="h-14 pl-12 pr-12 bg-white border border-gray-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 appearance-none outline-none cursor-pointer min-w-[180px]"
+                                className="h-14 pl-12 pr-12 bg-white border border-gray-300 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 appearance-none outline-none cursor-pointer min-w-[180px]"
                             >
                                 <option value="all">Global Logs</option>
                                 <option value="product">Product Additions</option>
@@ -90,7 +90,7 @@ export function AdminActivityLogsPage() {
                 </div>
 
                 {/* Registry List */}
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                <div className="bg-white border border-gray-300 rounded-xl overflow-hidden shadow-sm">
                     {loading ? (
                         <div className="py-32 flex flex-col items-center justify-center text-center">
                             <Loader2Icon className="w-10 h-10 text-accent animate-spin mb-4" />
@@ -102,7 +102,7 @@ export function AdminActivityLogsPage() {
                             <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">No activity records match your parameters</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-50">
+                        <div className="divide-y divide-gray-300">
                             {filteredLogs.map((log, i) => (
                                 <div key={i} className="group p-6 hover:bg-gray-50/50 transition-all flex items-center justify-between gap-6">
                                     <div className="flex items-center gap-6">
@@ -112,14 +112,14 @@ export function AdminActivityLogsPage() {
                                         <div>
                                             <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-tight">{log.action}</h3>
                                             <div className="flex items-center gap-3 mt-2">
-                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded border border-gray-200">{log.time}</span>
+                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded border border-gray-300">{log.time}</span>
                                                 <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1">
                                                     <div className="w-1 h-1 rounded-full bg-emerald-500" /> Authorized
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <ChevronRightIcon className="w-4 h-4 text-gray-200 group-hover:text-accent transition-colors group-hover:translate-x-1" />
+                                    <ChevronRightIcon className="w-4 h-4 text-gray-300 group-hover:text-accent transition-colors group-hover:translate-x-1" />
                                 </div>
                             ))}
                         </div>

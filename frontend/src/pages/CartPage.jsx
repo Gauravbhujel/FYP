@@ -72,23 +72,23 @@ const CartPage = () => {
                                 </div>
                                 
                                 {cartItems.map((item) => (
-                                    <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 border-b last:border-b-0 hover:bg-gray-50/30 transition-colors">
+                                    <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 border-b last:border-b-0 transition-colors">
                                         <div className="col-span-2 flex gap-5">
-                                            <Link to={`/product/${item.product.id}`} className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 block hover:border-primary transition-colors">
+                                            <Link to={`/product/${item.product.id}`} className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 block transition-colors">
                                                 <img 
                                                     src={item.product.image || 'https://via.placeholder.com/150'} 
                                                     alt={item.product.name} 
-                                                    className="w-full h-full object-cover hover:scale-110 transition-transform"
+                                                    className="w-full h-full object-cover transition-transform"
                                                 />
                                             </Link>
                                             <div className="flex flex-col justify-center">
                                                 <Link to={`/product/${item.product.id}`} className="no-underline">
-                                                    <h3 className="font-bold text-primary text-lg mb-1 hover:text-gray-700 transition-colors">{item.product.name}</h3>
+                                                    <h3 className="font-bold text-primary text-lg mb-1 transition-colors">{item.product.name}</h3>
                                                 </Link>
                                                 <p className="text-sm text-gray-500 mb-3">{item.product.category_display}</p>
                                                 <button 
                                                     onClick={() => removeItem(item.id)}
-                                                    className="text-[#ef4444] text-sm flex items-center gap-1.5 hover:text-red-700 border-none bg-transparent cursor-pointer p-0 font-medium transition-colors"
+                                                    className="text-[#ef4444] text-sm flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 font-medium transition-colors"
                                                 >
                                                     <FaTrash size={12} /> Remove Item
                                                 </button>
@@ -96,9 +96,9 @@ const CartPage = () => {
                                         </div>
                                         <div className="flex items-center justify-center">
                                             <div className="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
-                                                <button className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600"><FaMinus size={10} /></button>
+                                                <button className="w-8 h-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600"><FaMinus size={10} /></button>
                                                 <span className="w-10 text-center font-bold text-gray-800">{item.quantity}</span>
-                                                <button className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600"><FaPlus size={10} /></button>
+                                                <button className="w-8 h-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600"><FaPlus size={10} /></button>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-end font-bold text-xl text-text-dark">
@@ -138,7 +138,7 @@ const CartPage = () => {
                                     <span className="text-[10px] uppercase font-bold tracking-widest">Secure Payments</span>
                                 </div>
                             </div>
-                            <Link to="/products" className="block text-center mt-8 text-gray-500 font-bold hover:text-primary no-underline transition-colors">
+                            <Link to="/products" className="block text-center mt-8 text-gray-500 font-bold no-underline transition-colors">
                                 ← Back to Shopping
                             </Link>
                         </div>
@@ -150,7 +150,7 @@ const CartPage = () => {
                         </div>
                         <h2 className="text-3xl font-extrabold text-primary mb-4">Your cart is empty</h2>
                         <p className="text-gray-500 mb-10 max-w-sm mx-auto leading-relaxed text-lg">Looks like you haven't added any gear to your cart yet. Time to gear up!</p>
-                        <Link to="/products" className="inline-flex items-center justify-center bg-[#F97316] text-white hover:bg-[#EA580C] px-12 py-5 rounded-lg font-bold transition-all shadow-sm hover:shadow-md no-underline text-lg">
+                        <Link to="/products" className="inline-flex items-center justify-center bg-[#F97316] text-white px-12 py-5 rounded-lg font-bold transition-all shadow-sm no-underline text-lg">
                             Explore Products
                         </Link>
                     </div>

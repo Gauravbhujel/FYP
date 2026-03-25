@@ -258,7 +258,7 @@ export function VendorSignupPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-accent"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300"
                     >
                       {showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                     </button>
@@ -281,7 +281,7 @@ export function VendorSignupPage() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-accent"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300"
                     >
                       {showConfirmPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
                     </button>
@@ -293,14 +293,14 @@ export function VendorSignupPage() {
             <div className="pt-4">
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input type="checkbox" required className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent accent-accent cursor-pointer" />
-                <span className="text-xs font-bold text-gray-500 group-hover:text-gray-700 transition-colors">
+                <span className="text-xs font-bold text-gray-500 transition-colors">
                   I agree to the <span className="text-accent underline">Vendor Terms</span> and <span className="text-accent underline">Privacy Policy</span>
                 </span>
               </label>
             </div>
 
             <button
-              className="w-full py-4 bg-accent text-white rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-accent/20 hover:bg-[#E65A00] hover:scale-[0.99] active:scale-95 transition-all duration-300"
+              className="w-full py-4 bg-accent text-white rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-accent/20 transition-all duration-300"
               type="submit"
             >
               Verify & Launch My Store
@@ -310,7 +310,7 @@ export function VendorSignupPage() {
           <div className="mt-12 pt-10 border-t border-gray-100 text-center">
             <p className="text-gray-500 font-medium text-sm">
               Already representative of a store?{" "}
-              <a href="/login" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2 hover:underline">
+              <a href="/login" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2">
                 Sign In
               </a>
             </p>

@@ -32,7 +32,7 @@ export function SalesChart({ data }) {
                 return (
                 <div key={index} className="flex-1 flex flex-col items-center group relative h-full justify-end">
                     {/* Tooltip */}
-                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-[10px] font-black px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 uppercase tracking-widest translate-y-2 group-hover:translate-y-0">
+                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-[10px] font-black px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 uppercase tracking-widest translate-y-2 group-hover:translate-y-0 shadow-xl">
                         Rs. {item.sales.toLocaleString()}
                     </div>
 

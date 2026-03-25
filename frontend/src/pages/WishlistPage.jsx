@@ -78,16 +78,14 @@ const WishlistPage = () => {
                 {wishlistItems.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {wishlistItems.map((item) => (
-                            <div key={item.id} className="bg-white rounded overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group product-card border border-gray-100 flex flex-col h-full">
+                            <div key={item.id} className="bg-white rounded overflow-hidden transition-all duration-300 group product-card border border-gray-100 flex flex-col h-full">
                                     <Link to={`/product/${item.product.id}`} className="block relative h-64 overflow-hidden bg-gray-50 border-b border-gray-100">
                                         <img 
-                                            src={item.product.image || 'https://via.placeholder.com/300'} 
-                                            alt={item.product.name} 
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            className="w-full h-full object-cover transition-transform duration-500"
                                         />
                                         <button 
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeItem(item.id); }}
-                                            className="absolute top-4 right-4 w-10 h-10 bg-white rounded flex items-center justify-center text-gray-400 shadow-sm border-none cursor-pointer transition-colors hover:text-red-500 z-10"
+                                            className="absolute top-4 right-4 w-10 h-10 bg-white rounded flex items-center justify-center text-gray-400 shadow-sm border-none cursor-pointer transition-colors z-10"
                                             title="Remove from Wishlist"
                                         >
                                             <FaTrash size={16} />
@@ -98,7 +96,7 @@ const WishlistPage = () => {
                                     <div className="mb-2">
                                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{item.product.category_display}</span>
                                         <Link to={`/product/${item.product.id}`} className="no-underline">
-                                            <h3 className="text-lg font-bold text-primary mt-1 line-clamp-2 hover:text-gray-700 transition-colors">{item.product.name}</h3>
+                                            <h3 className="text-lg font-bold text-primary mt-1 line-clamp-2 transition-colors">{item.product.name}</h3>
                                         </Link>
                                     </div>
                                     
@@ -107,7 +105,7 @@ const WishlistPage = () => {
                                             <span className="text-xl font-black text-primary">Rs. {Number(item.product.price).toLocaleString()}</span>
                                             <button 
                                                 onClick={() => addToCart(item.product)}
-                                                className="bg-accent text-white p-3 rounded flex items-center justify-center transition-colors hover:bg-opacity-90 border-none cursor-pointer shadow-sm"
+                                                className="bg-accent text-white p-3 rounded flex items-center justify-center transition-colors border-none cursor-pointer shadow-sm"
                                                 title="Add to Cart"
                                             >
                                                 <FaShoppingCart />
@@ -125,7 +123,7 @@ const WishlistPage = () => {
                         </div>
                         <h2 className="text-3xl font-extrabold text-primary mb-4">Your wishlist is empty</h2>
                         <p className="text-gray-500 mb-10 max-w-sm mx-auto leading-relaxed text-lg">See something you like? Add it to your wishlist so you can find it later!</p>
-                        <Link to="/products" className="inline-flex items-center justify-center bg-[#F97316] text-white hover:bg-[#EA580C] px-12 py-5 rounded-lg font-bold transition-all shadow-sm hover:shadow-md no-underline text-lg">
+                        <Link to="/products" className="inline-flex items-center justify-center bg-[#F97316] text-white px-12 py-5 rounded-lg font-bold transition-all shadow-sm no-underline text-lg">
                             Browse Best Gear
                         </Link>
                     </div>

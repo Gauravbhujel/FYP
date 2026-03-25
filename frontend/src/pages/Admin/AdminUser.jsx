@@ -104,7 +104,7 @@ export function AdminUsersPage() {
         </div>
 
         {/* Filter Toolbar */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
+        <div className="bg-white border border-gray-300 rounded-lg p-4 flex flex-col lg:flex-row items-center gap-4 shadow-sm">
             <div className="flex-1 w-full relative group">
                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
                 <input 
@@ -112,7 +112,7 @@ export function AdminUsersPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by identity, email, or system ID..." 
-                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
+                    className="w-full h-11 pl-11 pr-4 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all placeholder:text-gray-300"
                 />
             </div>
             <div className="flex items-center gap-3 w-full lg:w-auto">
@@ -121,18 +121,18 @@ export function AdminUsersPage() {
                     <select 
                         value={roleFilter}
                         onChange={(e) => setRoleFilter(e.target.value)}
-                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-100 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none hover:bg-white transition-all cursor-pointer"
+                        className="w-full h-11 pl-11 pr-10 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black text-gray-900 uppercase tracking-widest outline-none appearance-none transition-all cursor-pointer"
                     >
                         <option value="all">All Access</option>
                         <option value="customer">Customer</option>
-                        <option value="vendor">Partner</option>
+                        <option value="vendor">Vendor</option>
                         <option value="admin">Super Admin</option>
                     </select>
                     <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
                 <button 
                     onClick={fetchUsers}
-                    className="h-11 w-11 flex items-center justify-center bg-white border border-gray-200 rounded hover:bg-gray-50 text-gray-400 hover:text-accent transition-all shadow-sm cursor-pointer"
+                    className="h-11 w-11 flex items-center justify-center bg-white border border-gray-300 rounded text-gray-400 transition-all shadow-sm cursor-pointer hover:scale-[1.02] active:scale-95 hover:border-gray-400 hover:text-gray-600"
                 >
                     <Loader2Icon className={`w-4 h-4 ${loading ? "animate-spin text-accent" : ""}`} />
                 </button>
@@ -140,16 +140,16 @@ export function AdminUsersPage() {
         </div>
 
         {/* Records Table */}
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+        <div className="bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                     <thead className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] text-left bg-gray-50/50">
                         <tr>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Subject Identity</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Access Level</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">State</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100">Registration</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-100 text-right">Actions</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">Subject Identity</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">Access Level</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">State</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300">Registration</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -211,7 +211,7 @@ export function AdminUsersPage() {
                                         <div className="relative inline-block" ref={openMenuId === user.id ? dropdownRef : null}>
                                             <button 
                                                 onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
-                                                className="w-10 h-10 flex items-center justify-center bg-white hover:bg-slate-50 border border-slate-100 rounded-xl transition-all shadow-sm cursor-pointer border-none"
+                                                className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl transition-all shadow-sm cursor-pointer border-none hover:bg-gray-50 hover:border-gray-200"
                                             >
                                                 <MoreVerticalIcon className="w-4 h-4 text-slate-400" />
                                             </button>
@@ -224,20 +224,20 @@ export function AdminUsersPage() {
                                                             {user.status === "suspended" ? (
                                                                 <button 
                                                                     onClick={() => handleSuspendAction(user.id, "unsuspend")}
-                                                                    className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-white bg-accent hover:bg-black transition-all uppercase tracking-widest border-none cursor-pointer"
+                                                                    className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-white bg-accent transition-all uppercase tracking-widest border-none cursor-pointer hover:bg-[#EA580C]"
                                                                 >
                                                                     <ShieldCheckIcon className="w-4 h-4 mr-3" /> Lift Suspension
                                                                 </button>
                                                             ) : (
                                                                 <button 
                                                                     onClick={() => handleSuspendAction(user.id, "suspend")}
-                                                                    className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-rose-500 hover:bg-rose-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer"
+                                                                    className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-rose-500 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer hover:bg-rose-50"
                                                                 >
                                                                     <ShieldOffIcon className="w-4 h-4 mr-3" /> Suspend (24h)
                                                                 </button>
                                                             )}
                                                             <div className="h-px bg-gray-50 my-1 mx-5" />
-                                                            <button className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-gray-400 hover:bg-gray-50 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
+                                                            <button className="w-full flex items-center px-5 py-3.5 text-[9px] font-black text-gray-400 transition-all uppercase tracking-widest border-none bg-transparent cursor-pointer">
                                                                 Detailed Audit
                                                             </button>
                                                         </>
@@ -258,7 +258,7 @@ export function AdminUsersPage() {
             </div>
             
             {/* Table Footer */}
-            <div className="bg-gray-50/50 px-8 py-5 border-t border-gray-100 flex items-center justify-between">
+            <div className="bg-gray-50/50 px-8 py-5 border-t border-gray-300 flex items-center justify-between">
                 <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest leading-none">Global Identity Vault V1.0</p>
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">

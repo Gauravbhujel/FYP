@@ -86,7 +86,7 @@ const Login = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-end">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Password</label>
-                <Link to="#" className="text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Forgot?</Link>
+                <Link to="#" className="text-[10px] font-black uppercase tracking-widest text-accent">Forgot?</Link>
               </div>
               <div className="relative group">
                 <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors" />
@@ -122,7 +122,7 @@ const Login = () => {
           <div className="mt-12 pt-10 border-t border-gray-100 text-center">
             <p className="text-gray-500 font-medium text-sm">
               Don’t have an account?{" "}
-              <Link to="/signup" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2 hover:underline">
+              <Link to="/signup" className="text-accent font-black uppercase tracking-widest text-[10px] ml-2">
                 Create Account
               </Link>
             </p>

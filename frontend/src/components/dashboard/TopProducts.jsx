@@ -16,7 +16,7 @@ export function TopProducts({ products }) {
 
         <a
           href="/vendor/products"
-          className="text-sm text-orange-600 hover:text-orange-700 font-semibold"
+          className="text-sm text-orange-600 font-semibold"
         >
           View All
         </a>
@@ -32,14 +32,14 @@ export function TopProducts({ products }) {
           {productList.map((product, index) => (
             <div
               key={index}
-              className="flex items-center space-x-4 p-3 rounded-lg hover:bg-slate-50 transition-colors"
+              className="flex items-center space-x-4 p-3 rounded-lg hover:bg-slate-50 transition-colors group cursor-pointer"
             >
-              <Link to={`/product/${product.id}`} className="w-12 h-12 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden hover:border-orange-500 border border-transparent transition-all">
+              <Link to={`/product/${product.id}`} className="w-12 h-12 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden border border-transparent hover:border-orange-500/30 transition-all">
                 {product.image ? (
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover hover:scale-110 transition-transform"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -49,7 +49,7 @@ export function TopProducts({ products }) {
               </Link>
 
               <div className="flex-1 min-w-0">
-                <Link to={`/product/${product.id}`} className="font-semibold text-slate-800 text-sm truncate hover:text-orange-600 transition-colors no-underline block">
+                <Link to={`/product/${product.id}`} className="font-semibold text-slate-800 text-sm truncate transition-colors no-underline block">
                   {product.name}
                 </Link>
                 <p className="text-xs text-slate-600">{product.sales} sales</p>
