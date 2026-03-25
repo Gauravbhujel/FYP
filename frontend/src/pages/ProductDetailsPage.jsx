@@ -22,6 +22,7 @@ import {
     FaChevronRight
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/ui/Button';
 
 const ProductDetailsPage = () => {
     const { productId } = useParams();
@@ -172,9 +173,9 @@ const ProductDetailsPage = () => {
                     </div>
                     <h2 className="text-3xl font-black text-gray-900 mb-3">Product Not Found</h2>
                     <p className="text-gray-500 mb-8 max-w-md">The product you are looking for might have been moved or is currently out of stock.</p>
-                    <Link to="/products" className="bg-primary text-white px-8 py-4 rounded font-bold no-underline shadow-sm hover:bg-opacity-90 hover:-translate-y-px transition-all">
+                    <Button variant="primary" onClick={() => navigate('/products')} className="px-8 py-4">
                         Explore Catalog
-                    </Link>
+                    </Button>
                 </div>
                 <Footer />
             </div>
@@ -340,30 +341,28 @@ const ProductDetailsPage = () => {
                                     </div>
 
                                     {/* Add to Cart */}
-                                    <button 
+                                    <Button 
+                                        variant="primary"
                                         onClick={() => handleAction('cart')}
-                                        className={`flex-grow h-12 rounded font-bold text-sm shadow-sm transition-all duration-300 flex items-center justify-center gap-2.5 ${
-                                            addedToCart 
-                                                ? 'bg-green-500 text-white' 
-                                                : 'bg-accent text-white hover:bg-opacity-90 hover:-translate-y-0.5'
-                                        }`}
+                                        className={`flex-grow h-12 shadow-sm gap-2.5 ${addedToCart ? '!bg-green-500 !hover:bg-green-600' : ''}`}
                                     >
                                         {addedToCart ? (
                                             <><FaCheckCircle /> Added!</>
                                         ) : (
                                             <><FaShoppingCart /> Add to Cart</>
                                         )}
-                                    </button>
+                                    </Button>
                                 </div>
 
                                 {/* Buy Now */}
-                                <button 
+                                <Button 
+                                    variant="secondary"
                                     onClick={() => alert("Redirecting to checkout...")}
-                                    className="w-full h-12 bg-primary text-white rounded font-bold text-sm hover:bg-opacity-90 transition-all flex items-center justify-center gap-2 group"
+                                    className="w-full h-12 gap-2 group border-none shadow-none bg-black !text-white hover:!bg-black/90"
                                 >
                                     <FaBolt className="text-white group-hover:scale-110 transition-transform" />
                                     Buy It Now
-                                </button>
+                                </Button>
                             </div>
 
 
@@ -542,13 +541,14 @@ const ProductDetailsPage = () => {
                                                             onChange={(e) => setUserReview(prev => ({ ...prev, comment: e.target.value }))}
                                                         ></textarea>
                                                     </div>
-                                                    <button 
+                                                    <Button 
+                                                        variant="primary"
                                                         type="submit"
                                                         disabled={isSubmittingReview}
-                                                        className="w-full h-14 bg-accent text-white rounded font-bold text-sm uppercase tracking-wider hover:opacity-90 hover:shadow-sm transition-all disabled:opacity-50"
+                                                        className="w-full h-14 uppercase tracking-wider disabled:opacity-50"
                                                     >
                                                         {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
-                                                    </button>
+                                                    </Button>
                                                 </form>
                                             ) : (
                                                 <div className="bg-white/5 rounded-2xl p-8 border border-white/10 text-center">

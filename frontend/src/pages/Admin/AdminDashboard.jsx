@@ -12,11 +12,13 @@ import {
 } from "lucide-react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { MetricCard } from "../../components/dashboard/MetricCard";
+import { Link } from "react-router-dom";
 import api from "../../api";
 
 const AdminDashboard = () => {
   const [pendingVendors, setPendingVendors] = useState([]);
   const [topVendors, setTopVendors] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
   const [stats, setStats] = useState({
     total_users: 0,
     active_vendors: 0,
@@ -32,15 +34,17 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [pendingRes, statsRes, topRes] = await Promise.all([
+      const [pendingRes, statsRes, topRes, activitiesRes] = await Promise.all([
         api.get("admin/vendors/pending/"),
         api.get("admin/dashboard/stats/"),
-        api.get("admin/dashboard/top-vendors/")
+        api.get("admin/dashboard/top-vendors/"),
+        api.get("admin/dashboard/activities/")
       ]);
       
       setPendingVendors(pendingRes.data);
       setStats(statsRes.data);
       setTopVendors(topRes.data);
+      setRecentActivities(activitiesRes.data);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -185,7 +189,7 @@ const AdminDashboard = () => {
                                     <tr key={index} className="group hover:bg-gray-50/50 transition-colors">
                                         <td className="py-5">
                                             <p className="text-xs font-black text-gray-900 tracking-tight leading-none uppercase">{vendor.name}</p>
-                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-wider">Official Merch</p>
+                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-wider">Approved Partner</p>
                                         </td>
                                         <td className="py-5">
                                             <span className="text-xs font-black text-gray-900 tracking-tight">Rs. {vendor.revenue.toLocaleString()}</span>
@@ -218,25 +222,27 @@ const AdminDashboard = () => {
                     </div>
  
                     <div className="space-y-6 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-gray-100">
-                        {[
-                            { type: "vendor", action: "Nike Sports added 5 products", time: "2h ago", color: "bg-gray-900" },
-                            { type: "order", action: "Order #ORD-1240 completed", time: "3h ago", color: "bg-accent" },
-                            { type: "user", action: "12 new customer registrations", time: "5h ago", color: "bg-gray-400" },
-                            { type: "vendor", action: "Adidas Pro updated info", time: "6h ago", color: "bg-gray-900" },
-                        ].map((act, i) => (
-                            <div key={i} className="relative pl-10">
-                                <div className={`absolute left-0 top-1 w-10 h-10 rounded border-4 border-white ${act.color} flex items-center justify-center text-white scale-75 shadow-sm`}>
-                                    <div className="w-1 h-1 rounded-full bg-white" />
+                        {recentActivities.length > 0 ? (
+                            recentActivities.map((act, i) => (
+                                <div key={i} className="relative pl-10">
+                                    <div className={`absolute left-0 top-1 w-10 h-10 rounded border-4 border-white ${act.color} flex items-center justify-center text-white scale-75 shadow-sm`}>
+                                        <div className="w-1 h-1 rounded-full bg-white" />
+                                    </div>
+                                    <p className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tight">{act.action}</p>
+                                    <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-widest">{act.time}</p>
                                 </div>
-                                <p className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tight">{act.action}</p>
-                                <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-widest">{act.time}</p>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-[10px] font-black text-gray-400 pl-10 uppercase tracking-widest">No recent activity found.</p>
+                        )}
                     </div>
  
-                    <button className="w-full mt-8 py-3 bg-[#F5F5F5] hover:bg-gray-100 text-gray-900 font-black text-[9px] rounded transition-all border border-gray-100 cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2">
+                    <Link 
+                        to="/admin/activity-logs"
+                        className="w-full mt-8 py-3 bg-[#F5F5F5] hover:bg-gray-100 text-gray-900 font-black text-[9px] rounded transition-all border border-gray-100 cursor-pointer uppercase tracking-widest flex items-center justify-center gap-2 no-underline"
+                    >
                         View Full Logs <ArrowRightIcon className="w-3 h-3" />
-                    </button>
+                    </Link>
                 </div>
 
                 {/* Efficiency Score */}

@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { FaShoppingCart, FaStar, FaHeart, FaEye, FaCheckCircle } from 'react-icons/fa';
 import api from '../api';
 import { useCart } from '../context/CartContext';
+import { Button } from './ui/Button';
 
 const ProductCard = ({ product }) => {
     const navigate = useNavigate();
@@ -120,13 +121,10 @@ const ProductCard = ({ product }) => {
                             )}
                         </div>
                         
-                        <button 
+                        <Button 
+                            variant="primary"
                             onClick={() => handleAction('cart')}
-                            className={`w-full py-3 rounded-lg font-bold text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${
-                                isAdded 
-                                ? 'bg-green-500 text-white' 
-                                : 'bg-accent text-white hover:bg-[#E65A00] active:scale-95'
-                            }`}
+                            className={`w-full py-3 text-xs uppercase tracking-widest gap-2 flex items-center justify-center ${isAdded ? '!bg-green-500 !hover:bg-green-600' : ''}`}
                         >
                             {isAdded ? (
                                 <>
@@ -137,7 +135,7 @@ const ProductCard = ({ product }) => {
                                     <FaShoppingCart size={14} /> Add to Cart
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

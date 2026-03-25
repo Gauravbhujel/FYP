@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { Button } from "./ui/Button";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -109,12 +110,13 @@ const Login = () => {
               <label htmlFor="remember" className="text-xs font-bold text-gray-500 cursor-pointer">Stay signed in for 30 days</label>
             </div>
 
-            <button
-              className="w-full py-4 bg-accent text-white rounded-lg font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-accent/20 hover:bg-[#E65A00] hover:scale-[0.99] active:scale-95 transition-all duration-300"
+            <Button
+              variant="primary"
+              className="w-full py-4 text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-orange-500/20"
               type="submit"
             >
               Sign In to GearUp
-            </button>
+            </Button>
           </form>
 
           <div className="mt-12 pt-10 border-t border-gray-100 text-center">

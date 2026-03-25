@@ -9,11 +9,11 @@ import {
   FaShippingFast,
   FaArrowRight,
   FaFire,
-  FaTag,
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
 import { CategoryCard } from "../components/CategoryCard";
+import { Button } from "../components/ui/Button";
 
 /* ─── Hero slides data ─────────────────────────────────────────────── */
 const heroSlides = [
@@ -126,12 +126,13 @@ const HomePage = () => {
             key={`cta-${slideIndex}`}
             className="flex items-center gap-5 flex-wrap justify-center animate-fade-up animate-fade-up-delay-3"
           >
-            <button
+            <Button
+              variant="primary"
               onClick={() => navigate("/products")}
-              className="bg-accent text-white font-semibold px-10 py-4 rounded-lg shadow-lg shadow-accent/20 transition-all duration-300 hover:bg-opacity-90 hover:scale-[1.03] active:scale-95 flex items-center gap-3 text-base"
+              className="px-10 py-4 shadow-lg shadow-orange-500/20 text-base"
             >
-              Get Started <FaArrowRight className="text-sm" />
-            </button>
+              Get Started <FaArrowRight className="ml-2 text-sm" />
+            </Button>
           </div>
 
 
@@ -217,12 +218,13 @@ const HomePage = () => {
             </p>
           </div>
 
-          <button
+          <Button
+            variant="primary"
             onClick={() => navigate("/deals")}
-            className="bg-accent text-white font-bold px-10 py-4 rounded-lg border-none shadow-lg shadow-accent/20 hover:bg-opacity-90 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-sm md:text-base uppercase tracking-wider"
+            className="px-10 py-4 shadow-lg shadow-orange-500/20 text-sm md:text-base uppercase tracking-wider"
           >
             Grab the Deal
-          </button>
+          </Button>
         </div>
       </section>
 

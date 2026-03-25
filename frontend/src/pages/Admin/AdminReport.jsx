@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TrendingUpIcon,
   ShoppingBagIcon,
@@ -9,9 +9,11 @@ import {
   PieChartIcon,
   ArrowUpRightIcon,
   ZapIcon,
-  GlobeIcon
+  GlobeIcon,
+  Loader2Icon
 } from "lucide-react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
+import api from "../../api";
 
 const RsIcon = ({ className }) => (
   <span className={`font-black tracking-tighter ${className}`}>Rs</span>
@@ -19,52 +21,47 @@ const RsIcon = ({ className }) => (
 
 export default function AdminReportsPage() {
   const [dateRange, setDateRange] = useState("this_month");
+  const [loading, setLoading] = useState(true);
+  const [reportData, setReportData] = useState(null);
 
-  const monthlyRevenue = [
-    { month: "JUL", revenue: 68400, orders: 1245 },
-    { month: "AUG", revenue: 72100, orders: 1312 },
-    { month: "SEP", revenue: 81500, orders: 1489 },
-    { month: "OCT", revenue: 95200, orders: 1678 },
-    { month: "NOV", revenue: 112800, orders: 1923 },
-    { month: "DEC", revenue: 134500, orders: 2156 },
-    { month: "JAN", revenue: 120300, orders: 1987 },
-  ];
+  useEffect(() => {
+    fetchReportData();
+  }, [dateRange]);
 
-  const categoryBreakdown = [
-    {
-      category: "Running",
-      revenue: 42300,
-      percentage: 28,
-      color: "bg-indigo-500",
-    },
-    {
-      category: "Football",
-      revenue: 54700,
-      percentage: 37,
-      color: "bg-emerald-500",
-    },
-    {
-      category: "Tennis",
-      revenue: 15200,
-      percentage: 10,
-      color: "bg-amber-500",
-    },
-    {
-      category: "Other",
-      revenue: 15300,
-      percentage: 25,
-      color: "bg-slate-300",
-    },
-  ];
+  const fetchReportData = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("admin/dashboard/reports/", {
+        params: { range: dateRange }
+      });
+      setReportData(response.data);
+    } catch (error) {
+      console.error("Error fetching report data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const topVendors = [
-    { name: "Nike Sports Co.", revenue: 45231, orders: 892, growth: 12.5 },
-    { name: "Adidas Pro", revenue: 38456, orders: 756, growth: 8.3 },
-    { name: "Under Armour", revenue: 32890, orders: 645, growth: -2.1 },
-    { name: "Puma Athletics", revenue: 28934, orders: 589, growth: 15.7 },
-  ];
+  const formatLargeNumber = (num) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+    if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+    return num.toLocaleString();
+  };
 
-  const maxRevenue = Math.max(...monthlyRevenue.map((d) => d.revenue));
+  if (loading || !reportData) {
+    return (
+        <AdminLayout currentPage="reports">
+            <div className="w-full h-[60vh] flex flex-col items-center justify-center">
+                <Loader2Icon className="w-12 h-12 text-accent animate-spin mb-4" />
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[3px]">Aggregating Platform Vectors...</p>
+            </div>
+        </AdminLayout>
+    );
+  }
+
+  const monthlyRevenue = reportData.monthly_revenue;
+  const categoryBreakdown = reportData.category_breakdown;
+  const maxRevenue = Math.max(...monthlyRevenue.map((d) => d.revenue)) || 1;
 
   return (
     <AdminLayout currentPage="reports">
@@ -104,9 +101,9 @@ export default function AdminReportsPage() {
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Platform Yield</p>
                     </div>
                     <div className="flex items-baseline gap-3">
-                        <span className="text-3xl font-black text-gray-900 tracking-tight">Rs. 842.5K</span>
+                        <span className="text-3xl font-black text-gray-900 tracking-tight">Rs. {formatLargeNumber(reportData.platform_yield.total)}</span>
                         <div className="flex items-center text-[9px] font-black text-emerald-600 uppercase tracking-tight bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
-                             +14.2%
+                             +{reportData.platform_yield.growth}%
                         </div>
                     </div>
                 </div>
@@ -121,9 +118,9 @@ export default function AdminReportsPage() {
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Total Orders</p>
                     </div>
                     <div className="flex items-baseline gap-3">
-                        <span className="text-3xl font-black text-gray-900 tracking-tight">12,482</span>
+                        <span className="text-3xl font-black text-gray-900 tracking-tight">{reportData.total_orders.total.toLocaleString()}</span>
                         <div className="flex items-center text-[9px] font-black text-emerald-600 uppercase tracking-tight bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
-                             +8.7%
+                             +{reportData.total_orders.growth}%
                         </div>
                     </div>
                 </div>
@@ -138,9 +135,9 @@ export default function AdminReportsPage() {
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Identity Base</p>
                     </div>
                     <div className="flex items-baseline gap-3">
-                        <span className="text-3xl font-black text-gray-900 tracking-tight">4.2K</span>
+                        <span className="text-3xl font-black text-gray-900 tracking-tight">{formatLargeNumber(reportData.identity_base.total)}</span>
                         <div className="flex items-center text-[9px] font-black text-emerald-600 uppercase tracking-tight bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
-                             +22.4%
+                             +{reportData.identity_base.growth}%
                         </div>
                     </div>
                 </div>
@@ -204,7 +201,7 @@ export default function AdminReportsPage() {
                             </div>
                             <div className="h-1 w-full bg-[#F5F5F5] rounded-full overflow-hidden">
                                 <div 
-                                    className={`h-full ${cat.category === 'Football' ? 'bg-accent' : 'bg-gray-300'} rounded-full transition-all duration-1000`} 
+                                    className={`h-full bg-accent rounded-full transition-all duration-1000`} 
                                     style={{ width: `${cat.percentage}%` }}
                                 />
                             </div>
@@ -214,7 +211,11 @@ export default function AdminReportsPage() {
                 
                 <div className="mt-12 p-5 bg-gray-50 rounded-lg border border-gray-100">
                     <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">Intelligence Insight</p>
-                    <p className="text-[10px] font-black text-gray-900 leading-relaxed uppercase tracking-tight">Segment "Football" shows 37% dominance in current cycle.</p>
+                    <p className="text-[10px] font-black text-gray-900 leading-relaxed uppercase tracking-tight">
+                        {categoryBreakdown[0]?.percentage > 0 
+                            ? `Segment "${categoryBreakdown[0].category.toUpperCase()}" shows ${categoryBreakdown[0].percentage}% dominance in current cycle.`
+                            : "No segment dominance detected in current cycle."}
+                    </p>
                 </div>
             </div>
         </div>

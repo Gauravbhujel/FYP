@@ -346,6 +346,174 @@ def admin_top_vendors(request):
 
 
 @csrf_exempt
+def admin_recent_activities(request):
+    if request.method == "GET":
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+             return JsonResponse({"error": "Unauthorized"}, status=401)
+        
+        token_key = auth_header.split(' ')[1]
+        try:
+            token = Token.objects.get(key=token_key)
+            user = token.user
+            if not (user.is_superuser or user.is_staff):
+                 return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
+            
+            # Optional limit parameter
+            limit_val = request.GET.get('limit', 5)
+            try:
+                limit_val = int(limit_val)
+            except ValueError:
+                limit_val = 5
+            
+            activities = []
+            
+            # 1. Fetch recent Products
+            recent_products = Product.objects.all().select_related('vendor').order_by('-created_at')[:limit_val]
+            for p in recent_products:
+                activities.append({
+                    "type": "vendor",
+                    "action": f"{p.vendor.store_name} added a new product: {p.name}",
+                    "timestamp": p.created_at,
+                    "color": "bg-gray-900"
+                })
+                
+            # 2. Fetch recent Orders
+            recent_orders = Order.objects.all().order_by('-created_at')[:limit_val]
+            for o in recent_orders:
+                activities.append({
+                    "type": "order",
+                    "action": f"Order #ORD-{o.id:04d} completed",
+                    "timestamp": o.created_at,
+                    "color": "bg-accent"
+                })
+                
+            # 3. Fetch recent Users
+            recent_users = User.objects.filter(role='customer').order_by('-date_joined')[:limit_val]
+            for u in recent_users:
+                activities.append({
+                    "type": "user",
+                    "action": f"New customer registration: {u.first_name} {u.last_name}".strip() or f"New customer registration: {u.username}",
+                    "timestamp": u.date_joined,
+                    "color": "bg-gray-400"
+                })
+                
+            # Sort combined list by timestamp descending
+            activities.sort(key=lambda x: x['timestamp'], reverse=True)
+            
+            # Format timestamps for display
+            from django.utils import timezone
+            import math
+            now = timezone.now()
+            
+            for act in activities:
+                diff = now - act['timestamp']
+                seconds = diff.total_seconds()
+                if seconds < 60:
+                    act['time'] = "Just now"
+                elif seconds < 3600:
+                    act['time'] = f"{math.floor(seconds / 60)}m ago"
+                elif seconds < 86400:
+                    act['time'] = f"{math.floor(seconds / 3600)}h ago"
+                else:
+                    act['time'] = f"{math.floor(seconds / 86400)}d ago"
+                
+                # Remove non-serializable datetime
+                del act['timestamp']
+
+            return JsonResponse(activities, safe=False, status=200)
+
+        except Token.DoesNotExist:
+            return JsonResponse({"error": "Invalid token"}, status=401)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def admin_reports_stats(request):
+    if request.method == "GET":
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+             return JsonResponse({"error": "Unauthorized"}, status=401)
+        
+        token_key = auth_header.split(' ')[1]
+        try:
+            token = Token.objects.get(key=token_key)
+            user = token.user
+            if not (user.is_superuser or user.is_staff):
+                 return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
+            
+            # Period filtering logic (simplified for baseline)
+            # 1. Platform Totals
+            total_revenue = Order.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+            total_orders = Order.objects.count()
+            identity_base = User.objects.filter(role='customer').count()
+            
+            # 2. Monthly Revenue Velocity (Last 7 Months)
+            from django.utils import timezone
+            from datetime import timedelta
+            from django.db.models.functions import TruncMonth
+            
+            monthly_data = []
+            now = timezone.now()
+            start_date = (now - timedelta(days=210)).replace(day=1)
+            
+            # Group by month
+            history = Order.objects.filter(created_at__gte=start_date)\
+                .annotate(month=TruncMonth('created_at'))\
+                .values('month')\
+                .annotate(revenue=Sum('total_amount'), count=Count('id'))\
+                .order_by('month')
+            
+            # Fill gaps and format
+            month_map = {h['month'].strftime('%b').upper(): h for h in history}
+            for i in range(7):
+                m_date = (now - timedelta(days=30*i))
+                m_name = m_date.strftime('%b').upper()
+                m_data = month_map.get(m_name, {'revenue': 0, 'count': 0})
+                monthly_data.append({
+                    "month": m_name,
+                    "revenue": float(m_data['revenue']),
+                    "orders": m_data['count']
+                })
+            monthly_data.reverse()
+            
+            # 3. Categorical Distribution (Segment Share)
+            category_stats = Order.objects.values('product__category')\
+                .annotate(revenue=Sum('total_amount'))\
+                .order_by('-revenue')
+            
+            category_breakdown = []
+            total_cat_rev = sum([float(c['revenue']) for c in category_stats]) if category_stats else 1
+            
+            for c in category_stats:
+                rev = float(c['revenue'])
+                cat_name = c['product__category'].capitalize() if c['product__category'] else "Other"
+                category_breakdown.append({
+                    "category": cat_name,
+                    "revenue": rev,
+                    "percentage": round((rev / total_cat_rev) * 100) if total_cat_rev > 0 else 0,
+                })
+            
+            # Add "Other" if categories are missing or to ensure UI consistency
+            if not category_breakdown:
+                category_breakdown = [{"category": "Other", "revenue": 0, "percentage": 0}]
+
+            return JsonResponse({
+                "platform_yield": {"total": float(total_revenue), "growth": 14.2}, # Growth hardcoded for now or calculated later
+                "total_orders": {"total": total_orders, "growth": 8.7},
+                "identity_base": {"total": identity_base, "growth": 22.4},
+                "monthly_revenue": monthly_data,
+                "category_breakdown": category_breakdown
+            }, status=200)
+
+        except Token.DoesNotExist:
+            return JsonResponse({"error": "Invalid token"}, status=401)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
 def admin_users_list(request):
     if request.method == "GET":
         auth_header = request.headers.get('Authorization')
@@ -527,6 +695,71 @@ def vendor_recent_orders(request):
             })
         
         return JsonResponse(orders_data, safe=False, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def vendor_orders_list(request):
+    if request.method == "GET":
+        vendor, error = _get_vendor_from_token(request)
+        if error:
+            return error
+        
+        orders = Order.objects.filter(vendor=vendor).select_related(
+            'product', 'customer').order_by('-created_at')
+        
+        orders_data = []
+        for order in orders:
+            orders_data.append({
+                "id": f"#ORD-{order.id:04d}",
+                "raw_id": order.id,
+                "customer": f"{order.customer.first_name} {order.customer.last_name}".strip() or order.customer.username,
+                "product": order.product.name,
+                "quantity": order.quantity,
+                "amount": float(order.total_amount),
+                "status": order.status,
+                "date": order.created_at.strftime("%Y-%m-%d"),
+                "address": order.shipping_address,
+            })
+        
+        return JsonResponse(orders_data, safe=False, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def vendor_update_order_status(request):
+    if request.method == "POST":
+        vendor, error = _get_vendor_from_token(request)
+        if error:
+            return error
+        
+        data = json.loads(request.body)
+        order_id = data.get("order_id")
+        new_status = data.get("status")
+        
+        if not order_id or not new_status:
+            return JsonResponse({"error": "Missing order_id or status"}, status=400)
+        
+        try:
+            # Strip the #ORD- prefix if it exists in the incoming ID
+            if isinstance(order_id, str) and order_id.startswith("#ORD-"):
+                order_id = int(order_id.replace("#ORD-", ""))
+            
+            order = Order.objects.get(id=order_id, vendor=vendor)
+            
+            valid_statuses = [choice[0] for choice in Order.STATUS_CHOICES]
+            if new_status not in valid_statuses:
+                return JsonResponse({"error": "Invalid status"}, status=400)
+            
+            order.status = new_status
+            order.save()
+            return JsonResponse({"message": "Order status updated successfully"}, status=200)
+        except Order.DoesNotExist:
+            return JsonResponse({"error": "Order not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 

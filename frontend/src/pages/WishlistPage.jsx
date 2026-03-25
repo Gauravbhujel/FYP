@@ -125,7 +125,7 @@ const WishlistPage = () => {
                         </div>
                         <h2 className="text-3xl font-extrabold text-primary mb-4">Your wishlist is empty</h2>
                         <p className="text-gray-500 mb-10 max-w-sm mx-auto leading-relaxed text-lg">See something you like? Add it to your wishlist so you can find it later!</p>
-                        <Link to="/products" className="inline-block bg-primary text-white px-12 py-5 rounded font-bold transition-all hover:bg-opacity-90 hover:-translate-y-px shadow-sm no-underline text-lg">
+                        <Link to="/products" className="inline-flex items-center justify-center bg-[#F97316] text-white hover:bg-[#EA580C] px-12 py-5 rounded-lg font-bold transition-all shadow-sm hover:shadow-md no-underline text-lg">
                             Browse Best Gear
                         </Link>
                     </div>

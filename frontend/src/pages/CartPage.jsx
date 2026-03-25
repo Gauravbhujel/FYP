@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import { useCart } from '../context/CartContext';
 import { FaTrash, FaMinus, FaPlus, FaShoppingCart } from 'react-icons/fa';
+import { Button } from '../components/ui/Button';
 
 const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -130,9 +131,9 @@ const CartPage = () => {
                                         <span className="text-primary">Rs. {calculateTotal()}</span>
                                     </div>
                                 </div>
-                                <button className="w-full bg-accent text-white py-4 rounded font-bold transition-all hover:bg-opacity-90 hover:-translate-y-px shadow-sm text-lg mb-4">
+                                <Button variant="primary" className="w-full text-lg mb-4 py-4 rounded font-bold shadow-sm">
                                     Proceed to Checkout
-                                </button>
+                                </Button>
                                 <div className="flex items-center justify-center gap-3 text-gray-400">
                                     <span className="text-[10px] uppercase font-bold tracking-widest">Secure Payments</span>
                                 </div>
@@ -149,7 +150,7 @@ const CartPage = () => {
                         </div>
                         <h2 className="text-3xl font-extrabold text-primary mb-4">Your cart is empty</h2>
                         <p className="text-gray-500 mb-10 max-w-sm mx-auto leading-relaxed text-lg">Looks like you haven't added any gear to your cart yet. Time to gear up!</p>
-                        <Link to="/products" className="inline-block bg-primary text-white px-12 py-5 rounded font-bold transition-all hover:bg-opacity-90 hover:-translate-y-px shadow-sm no-underline text-lg">
+                        <Link to="/products" className="inline-flex items-center justify-center bg-[#F97316] text-white hover:bg-[#EA580C] px-12 py-5 rounded-lg font-bold transition-all shadow-sm hover:shadow-md no-underline text-lg">
                             Explore Products
                         </Link>
                     </div>

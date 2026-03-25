@@ -21,6 +21,7 @@ import { AdminVendorsPage } from "./pages/Admin/AdminVendors";
 import { AdminProductsPage } from "./pages/Admin/AdminProduct";
 import AdminReportsPage from "./pages/Admin/AdminReport";
 import AdminSettingsPage from "./pages/Admin/AdminSetting";
+import { AdminActivityLogsPage } from "./pages/Admin/AdminActivityLogs";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
@@ -179,6 +180,14 @@ function App() {
             element={
               <ProtectedRoute allowedRole="admin">
                 <AdminSettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/activity-logs"
+            element={
+              <ProtectedRoute allowedRole="admin">
+                <AdminActivityLogsPage />
               </ProtectedRoute>
             }
           />

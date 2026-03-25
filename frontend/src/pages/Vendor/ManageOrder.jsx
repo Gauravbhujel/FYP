@@ -1,53 +1,47 @@
-import React, { useState } from "react";
-import { SearchIcon, FilterIcon, CalendarIcon, ChevronDownIcon, PackageIcon, AlertCircleIcon } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { SearchIcon, FilterIcon, CalendarIcon, ChevronDownIcon, PackageIcon, AlertCircleIcon, Loader2Icon } from "lucide-react";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
+import api from "../../api";
 
 export function ManageOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
 
-  const orders = [
-    {
-      id: "#ORD-1234",
-      customer: "John Smith",
-      product: "Pro Running Shoes",
-      quantity: 1,
-      amount: 4500,
-      status: "pending",
-      date: "2024-03-22",
-      address: "Baneshwor, Kathmandu",
-    },
-    {
-      id: "#ORD-1235",
-      customer: "Sarah Johnson",
-      product: "Basketball Pro",
-      quantity: 2,
-      amount: 8000,
-      status: "processing",
-      date: "2024-03-21",
-      address: "Pokhara, Kaski",
-    },
-    {
-      id: "#ORD-1236",
-      customer: "Mike Davis",
-      product: "Yoga Mat Premium",
-      quantity: 1,
-      amount: 2500,
-      status: "shipped",
-      date: "2024-03-20",
-      address: "Dharan, Sunsari",
-    },
-    {
-      id: "#ORD-1237",
-      customer: "Emily Brown",
-      product: "Dumbbells Set",
-      quantity: 1,
-      amount: 15000,
-      status: "delivered",
-      date: "2024-03-19",
-      address: "Butwal, Rupandehi",
-    },
-  ];
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("vendor/orders/");
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      setUpdatingId(orderId);
+      await api.post("vendor/orders/update-status/", {
+        order_id: orderId,
+        status: newStatus,
+      });
+      // Update local state instead of refetching for better UX
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update order status");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -138,7 +132,14 @@ export function ManageOrdersPage() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 font-sans">
-                        {filteredOrders.length === 0 ? (
+                        {loading ? (
+                            <tr>
+                                <td colSpan="6" className="px-8 py-20 text-center">
+                                    <Loader2Icon className="w-10 h-10 text-accent animate-spin mx-auto mb-4" />
+                                    <p className="uppercase tracking-widest text-[10px] font-black text-gray-300">Synchronizing registry data...</p>
+                                </td>
+                            </tr>
+                        ) : filteredOrders.length === 0 ? (
                             <tr>
                                 <td colSpan="6" className="px-8 py-20 text-center uppercase tracking-widest text-[10px] font-black text-gray-300">
                                     No transaction records match criteria
@@ -171,9 +172,27 @@ export function ManageOrdersPage() {
                                         </span>
                                     </td>
                                     <td className="px-8 py-7 text-right">
-                                        <button className="py-2.5 px-6 bg-accent hover:bg-[#E65A00] text-white rounded text-[8px] font-black uppercase tracking-[0.2em] transition-all border-none cursor-pointer">
-                                            Manage Order
-                                        </button>
+                                        <div className="relative inline-block group/actions">
+                                            <button 
+                                                disabled={updatingId === order.id}
+                                                className="py-2.5 px-6 bg-accent hover:bg-[#E65A00] text-white rounded text-[8px] font-black uppercase tracking-[0.2em] transition-all border-none cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                                            >
+                                                {updatingId === order.id ? <Loader2Icon className="w-3 h-3 animate-spin" /> : "Manage Order"}
+                                            </button>
+                                            
+                                            {/* Status Update Popover */}
+                                            <div className="absolute right-0 bottom-full mb-2 hidden group-hover/actions:block bg-white border border-gray-100 shadow-2xl rounded-lg p-2 z-50 min-w-[150px]">
+                                                {["pending", "processing", "shipped", "delivered"].map(status => (
+                                                    <button 
+                                                        key={status}
+                                                        onClick={() => handleStatusUpdate(order.id, status)}
+                                                        className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'} border-none cursor-pointer bg-white mb-1 last:mb-0`}
+                                                    >
+                                                        Set to {status}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
