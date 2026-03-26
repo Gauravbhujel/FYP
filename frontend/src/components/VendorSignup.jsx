@@ -70,8 +70,8 @@ export function VendorSignupPage() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Vendor account created successfully 🎉");
-        window.location.href = "/login";
+        alert("Vendor account created! Check your email for OTP verification 🎉");
+        window.location.href = `/verify-email?email=${encodeURIComponent(formData.email)}`;
       } else {
         setErrors({ form: data.error || "Signup failed" });
         alert(data.error || "Signup failed");

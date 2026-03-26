@@ -4,6 +4,10 @@ from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
 import json
+import random
+from django.core.cache import cache
+from django.core.mail import send_mail
+from django.conf import settings
 from django.db.models import Sum, Count, Q
 from datetime import date
 from rest_framework.authtoken.models import Token
@@ -12,6 +16,9 @@ from .serializers import (
     ProductSerializer, UserProfileSerializer, VendorSerializer, 
     CartItemSerializer, WishlistItemSerializer, ProductReviewSerializer
 )
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
 
 User = get_user_model()
 
@@ -40,17 +47,31 @@ def signup(request):
                 status=400
             )
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            role='customer' # Explicitly set default role
-        )
+        otp = generate_otp()
+        cache.set(f"signup_otp_{email}", otp, timeout=600)
+        cache.set(f"signup_data_{email}", {
+            "username": username,
+            "email": email,
+            "password": password,
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": "customer"
+        }, timeout=600)
+
+        try:
+            send_mail(
+                'Verify your email',
+                f'Your OTP for GearUpNepal registration is: {otp}',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            print("Failed to send email:", e)
+            return JsonResponse({"error": "Failed to send email. Check SMTP settings."}, status=500)
 
         return JsonResponse(
-            {"message": "User created successfully"},
+            {"message": "Verification code sent to your email."},
             status=201
         )
 
@@ -82,32 +103,100 @@ def vendor_signup(request):
                 status=400
             )
 
-        try:
-            user = User.objects.create_user(
-                username=email, # Using email as username to ensure uniqueness easily
-                email=email,
-                password=password,
-                first_name=first_name,
-                last_name=last_name,
-                role='vendor'
-            )
-            
-            Vendor.objects.create(
-                user=user,
-                store_name=store_name,
-                phone=phone,
-                address=address,
-                city=city,
-                state=state,
-                zip_code=zip_code
-            )
+        otp = generate_otp()
+        cache.set(f"signup_otp_{email}", otp, timeout=600)
+        cache.set(f"signup_data_{email}", {
+            "username": email,
+            "email": email,
+            "password": password,
+            "first_name": first_name,
+            "last_name": last_name,
+            "role": "vendor",
+            "store_name": store_name,
+            "phone": phone,
+            "address": address,
+            "city": city,
+            "state": state,
+            "zip_code": zip_code
+        }, timeout=600)
 
-            return JsonResponse(
-                {"message": "Vendor account created successfully"},
-                status=201
+        try:
+            send_mail(
+                'Verify your vendor account email',
+                f'Your OTP for GearUpNepal Vendor registration is: {otp}',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
             )
         except Exception as e:
+            print("Failed to send email:", e)
+            return JsonResponse({"error": "Failed to send email. Check SMTP settings."}, status=500)
+
+        return JsonResponse(
+            {"message": "Verification code sent to your email."},
+            status=201
+        )
             return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def verify_email(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        email = data.get("email")
+        otp = data.get("otp")
+
+        if not email or not otp:
+            return JsonResponse({"error": "Email and OTP are required"}, status=400)
+
+        cached_otp = cache.get(f"signup_otp_{email}")
+        
+        if not cached_otp:
+            # Maybe the user is already verified?
+            try:
+                user = User.objects.get(email=email)
+                if user.is_active:
+                    return JsonResponse({"message": "Email is already verified"}, status=200)
+            except User.DoesNotExist:
+                pass
+            return JsonResponse({"error": "OTP has expired or is invalid. Please sign up again."}, status=400)
+
+        if cached_otp == otp:
+            data = cache.get(f"signup_data_{email}")
+            if not data:
+                return JsonResponse({"error": "Registration data not found. Please sign up again."}, status=400)
+
+            try:
+                user = User.objects.create_user(
+                    username=data["username"],
+                    email=data["email"],
+                    password=data["password"],
+                    first_name=data["first_name"],
+                    last_name=data["last_name"],
+                    role=data["role"]
+                )
+
+                if data["role"] == "vendor":
+                    Vendor.objects.create(
+                        user=user,
+                        store_name=data.get("store_name"),
+                        phone=data.get("phone"),
+                        address=data.get("address"),
+                        city=data.get("city"),
+                        state=data.get("state"),
+                        zip_code=data.get("zip_code")
+                    )
+
+                cache.delete(f"signup_otp_{email}")
+                cache.delete(f"signup_data_{email}")
+
+                return JsonResponse({"message": "Email verified and account created successfully!"}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": str(e)}, status=500)
+        else:
+            return JsonResponse({"error": "Invalid OTP"}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
@@ -123,6 +212,9 @@ def login_user(request):
 
         try:
             user_obj = User.objects.get(email=email)
+            if not user_obj.is_active:
+                return JsonResponse({"error": "Please verify your email before logging in"}, status=403)
+                
             user = authenticate(username=user_obj.username, password=password)
             if user:
                 # Check if user is suspended

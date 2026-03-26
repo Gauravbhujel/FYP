@@ -15,6 +15,7 @@ import { EditProductPage } from "./pages/Vendor/EditProduct";
 import { ManageOrdersPage } from "./pages/Vendor/ManageOrder";
 import { StoreSettingsPage } from "./pages/Vendor/StoreSettings";
 import { VendorSignupPage } from "./components/VendorSignup";
+import VerifyEmailPage from "./components/VerifyEmail";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import { AdminUsersPage } from "./pages/Admin/AdminUser";
 import { AdminVendorsPage } from "./pages/Admin/AdminVendors";
@@ -82,6 +83,7 @@ function App() {
           <Route path="/wishlist" element={<CustomerOrPublicRoute><WishlistPage /></CustomerOrPublicRoute>} />
           <Route path="/login" element={<PublicAuthRoute><Login /></PublicAuthRoute>} />
           <Route path="/signup" element={<PublicAuthRoute><Signup /></PublicAuthRoute>} />
+          <Route path="/verify-email" element={<PublicAuthRoute><VerifyEmailPage /></PublicAuthRoute>} />
           <Route path="/profile" element={<CustomerOrPublicRoute><ProfilePage /></CustomerOrPublicRoute>} />
           <Route path="/product/:productId" element={<CustomerOrPublicRoute><ProductDetailsPage /></CustomerOrPublicRoute>} />
           <Route path="/vendor/:vendorId" element={<CustomerOrPublicRoute><VendorProfilePage /></CustomerOrPublicRoute>} />

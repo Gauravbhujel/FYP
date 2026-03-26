@@ -39,8 +39,8 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("User created successfully 🎉");
-        navigate("/login");
+        alert("User created! Check your email for OTP verification 🎉");
+        navigate("/verify-email", { state: { email } });
       } else {
         alert(data.error || "Signup failed");
       }
