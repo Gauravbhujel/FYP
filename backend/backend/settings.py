@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-import pymysql
-pymysql.install_as_MySQLdb()
 APPEND_SLASH = False
 
 
@@ -163,4 +161,4 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'gauravbhujel036@gmail.com'  
-EMAIL_HOST_PASSWORD = 'wget xlbx klox swmb' 
+EMAIL_HOST_PASSWORD = 'ptni ceyk uond tflx' 

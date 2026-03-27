@@ -13,6 +13,7 @@ import { SalesChart } from "../../components/dashboard/SalesChart";
 import { RecentOrders } from "../../components/dashboard/RecentOrders";
 import { QuickActions } from "../../components/dashboard/QuickActions";
 import { RecentProducts } from "../../components/dashboard/RecentProducts";
+import api from "../../api";
 
 export const VendorDashboard = () => {
   const [stats, setStats] = useState({
@@ -21,6 +22,7 @@ export const VendorDashboard = () => {
     products_listed: 0,
     pending_orders: 0,
   });
+  const [profile, setProfile] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [recentProducts, setRecentProducts] = useState([]);
   const [salesData, setSalesData] = useState([]);
@@ -31,21 +33,26 @@ export const VendorDashboard = () => {
   }, []);
 
   const fetchDashboardData = async () => {
-    const token = localStorage.getItem("token");
-    const headers = { Authorization: `Token ${token}` };
-
     try {
+      try {
+        const profileResponse = await api.get("vendor/profile/");
+        setProfile(profileResponse.data);
+      } catch (e) {
+        console.error("Profile fetch error", e);
+      }
+
       const [statsRes, ordersRes, productsRes, chartRes] = await Promise.all([
-        fetch("http://127.0.0.1:8000/api/vendor/dashboard/stats/", { headers }),
-        fetch("http://127.0.0.1:8000/api/vendor/dashboard/recent-orders/", { headers }),
-        fetch("http://127.0.0.1:8000/api/vendor/dashboard/recent-products/", { headers }),
-        fetch("http://127.0.0.1:8000/api/vendor/dashboard/sales-chart/", { headers }),
+        api.get("vendor/dashboard/stats/"),
+        api.get("vendor/dashboard/recent-orders/"),
+        api.get("vendor/dashboard/recent-products/"),
+        api.get("vendor/dashboard/sales-chart/"),
       ]);
 
-      if (statsRes.ok) setStats(await statsRes.json());
-      if (ordersRes.ok) setRecentOrders(await ordersRes.json());
-      if (productsRes.ok) setRecentProducts(await productsRes.json());
-      if (chartRes.ok) setSalesData(await chartRes.json());
+      setStats(statsRes.data);
+      setRecentOrders(ordersRes.data);
+      setRecentProducts(productsRes.data);
+      setSalesData(chartRes.data);
+      
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -66,66 +73,110 @@ export const VendorDashboard = () => {
   return (
     <VendorLayout currentPage="dashboard">
       <div className="max-w-7xl mx-auto space-y-12 animate-fade-in">
+        {profile?.status === "rejected" && (
+          <div className="bg-red-50 text-red-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-red-200 shadow-sm">
+            Your vendor account has been rejected.
+            {profile?.admin_feedback && (
+              <span className="block mt-2 font-medium text-xs opacity-80 normal-case">
+                Reason: {profile.admin_feedback}
+              </span>
+            )}
+          </div>
+        )}
+
+        {profile?.status === "pending" && (
+          <div className="bg-amber-50 text-amber-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-amber-200 shadow-sm">
+            Your account is under review. You will be notified once approved by admin.
+          </div>
+        )}
+
+        {profile?.status === "approved" && (
+          <div className="bg-emerald-50 text-emerald-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-emerald-200 shadow-sm">
+             Your account has been approved.
+             {profile?.admin_feedback && (
+               <span className="block mt-2 font-medium text-xs opacity-80 normal-case">
+                 Message from Admin: {profile.admin_feedback}
+               </span>
+             )}
+          </div>
+        )}
+
         {/* Welcome Section */}
+        {profile?.status !== "rejected" && (
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-3">Store Overview</h1>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Business Performance Control Center</p>
           </div>
-          <Link to="/vendor/AddProduct">
-            <button className="bg-accent hover:bg-[#EA580C] text-white font-black px-8 py-4 rounded-lg flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 text-[10px] uppercase tracking-[0.2em] border-none cursor-pointer">
-              <PlusIcon size={16} /> Add New Product
-            </button>
-          </Link>
+          {profile?.status === "approved" && (
+            <Link to="/vendor/AddProduct">
+              <button className="bg-accent hover:bg-[#EA580C] text-white font-black px-8 py-4 rounded-lg flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-95 text-[10px] uppercase tracking-[0.2em] border-none cursor-pointer">
+                <PlusIcon size={16} /> Add New Product
+              </button>
+            </Link>
+          )}
         </div>
+        )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricCard
-            title="Total Revenue"
-            value={`Rs. ${stats.total_revenue.toLocaleString()}`}
-            change={5.2}
-            icon={TrendingUpIcon}
-          />
-          <MetricCard
-            title="Total Orders"
-            value={String(stats.total_orders)}
-            change={2.1}
-            icon={ShoppingBagIcon}
-          />
-          <MetricCard
-            title="Listed Products"
-            value={String(stats.products_listed)}
-            icon={PackageIcon}
-          />
-          <MetricCard
-            title="Pending Actions"
-            value={String(stats.pending_orders)}
-            icon={ClockIcon}
-          />
-        </div>
-
-        {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Sales Chart */}
-            <div className="lg:col-span-8">
-                <SalesChart data={salesData} />
+        {profile?.status !== "rejected" && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <MetricCard
+                title="Total Revenue"
+                value={`Rs. ${stats.total_revenue.toLocaleString()}`}
+                change={5.2}
+                icon={TrendingUpIcon}
+              />
+              <MetricCard
+                title="Total Orders"
+                value={String(stats.total_orders)}
+                change={2.1}
+                icon={ShoppingBagIcon}
+              />
+              <MetricCard
+                title="Listed Products"
+                value={String(stats.products_listed)}
+                icon={PackageIcon}
+              />
+              <MetricCard
+                title="Pending Actions"
+                value={String(stats.pending_orders)}
+                icon={ClockIcon}
+              />
             </div>
 
-            {/* Quick Actions */}
-            <div className="lg:col-span-4">
-                <QuickActions />
-            </div>
+            {/* Main Dashboard Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Sales Chart */}
+                <div className="lg:col-span-8">
+                    <SalesChart data={salesData} />
+                </div>
 
-            {/* Recent Activity Section */}
-            <div className="lg:col-span-7">
-                <RecentOrders orders={recentOrders} />
-            </div>
+                {/* Quick Actions */}
+                {profile?.status === "approved" && (
+                  <div className="lg:col-span-4">
+                      <QuickActions />
+                  </div>
+                )}
+                
+                {profile?.status !== "approved" && (
+                  <div className="lg:col-span-4 flex items-center justify-center p-8 bg-gray-50 rounded-xl border border-gray-100">
+                    <p className="text-gray-400 text-xs text-center font-black uppercase tracking-widest">Quick actions locked pending approval</p>
+                  </div>
+                )}
 
-            <div className="lg:col-span-5">
-                <RecentProducts products={recentProducts} />
+                {/* Recent Activity Section */}
+                <div className="lg:col-span-7">
+                    <RecentOrders orders={recentOrders} />
+                </div>
+
+                <div className="lg:col-span-5">
+                    <RecentProducts products={recentProducts} />
+                </div>
             </div>
-        </div>
+          </>
+        )}
       </div>
     </VendorLayout>
   );

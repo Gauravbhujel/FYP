@@ -15,6 +15,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../api";
 
 export function VendorLayout({ children, currentPage }) {
   const [vendor, setVendor] = useState(null);
@@ -33,24 +34,14 @@ export function VendorLayout({ children, currentPage }) {
       }
 
       try {
-        const response = await fetch(
-          "http://127.0.0.1:8000/api/vendor/profile/",
-          {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          },
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.status === 'suspended') {
-            alert("Your vendor account has been suspended by the admin.");
-            handleLogout();
-            return;
-          }
-          setVendor(data);
+        const response = await api.get("vendor/profile/");
+        const data = response.data;
+        if (data.status === 'suspended') {
+          alert("Your vendor account has been suspended by the admin.");
+          handleLogout();
+          return;
         }
+        setVendor(data);
       } catch (error) {
         console.error("Error fetching vendor profile:", error);
       }
@@ -75,13 +66,16 @@ export function VendorLayout({ children, currentPage }) {
   };
 
   const navItems = [
-    { icon: LayoutGridIcon, label: "Overview", href: "/vendor/dashboard", id: "dashboard" },
-    { icon: PackageIcon, label: "Products", href: "/vendor/products", id: "products" },
-    { icon: ShoppingBagIcon, label: "Orders", href: "/vendor/orders", id: "orders" },
-    { icon: BarChart3Icon, label: "Analytics", href: "/vendor/dashboard", id: "analytics" },
-    { icon: TrendingUpIcon, label: "Earnings", href: "/vendor/dashboard", id: "earnings" },
-    { icon: SettingsIcon, label: "Store Profile", href: "/vendor/settings", id: "settings" },
-  ];
+    { icon: LayoutGridIcon, label: "Overview", href: "/vendor/dashboard", id: "dashboard", restrict: false },
+    { icon: PackageIcon, label: "Products", href: "/vendor/products", id: "products", restrict: true },
+    { icon: ShoppingBagIcon, label: "Orders", href: "/vendor/orders", id: "orders", restrict: true },
+    { icon: BarChart3Icon, label: "Analytics", href: "/vendor/dashboard", id: "analytics", restrict: true },
+    { icon: TrendingUpIcon, label: "Earnings", href: "/vendor/dashboard", id: "earnings", restrict: true },
+    { icon: SettingsIcon, label: "Store Profile", href: "/vendor/settings", id: "settings", restrict: false },
+  ].filter(item => {
+    if (!item.restrict) return true;
+    return vendor?.status === "approved";
+  });
 
   return (
     <div className="flex h-screen bg-[#F5F5F5] font-sans">

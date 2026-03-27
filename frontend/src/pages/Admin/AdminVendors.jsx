@@ -56,12 +56,23 @@ export function AdminVendorsPage() {
   };
 
   const handleVendorAction = async (vendorId, action) => {
+    let message = "";
+    if (action === "approve" || action === "reject") {
+      message = window.prompt(`Enter an optional message for the vendor (${action}):`) || "";
+    }
+
     try {
-      await api.post("admin/vendors/action/", { vendor_id: vendorId, action });
+      await api.post("admin/vendors/update-status/", { vendor_id: vendorId, action, message });
       fetchVendors();
       setOpenMenuId(null);
+      if (action === "approve") {
+        alert("Account approved successfully.");
+      } else if (action === "reject") {
+        alert("Account rejected successfully.");
+      }
     } catch (err) {
       console.error("Error executing vendor action:", err);
+      alert("Failed to process vendor action.");
     }
   };
 

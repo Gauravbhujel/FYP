@@ -266,7 +266,8 @@ def vendor_profile(request):
                     "first_name": user.first_name,
                     "last_name": user.last_name,
                     "role": vendor.role,
-                    "status": vendor.status
+                    "status": vendor.status,
+                    "admin_feedback": vendor.admin_feedback
                 }, status=200)
             else:
                 return JsonResponse({"error": "Vendor profile not found"}, status=404)
@@ -330,6 +331,7 @@ def admin_update_vendor_status(request):
             data = json.loads(request.body)
             vendor_id = data.get("vendor_id")
             action = data.get("action") # 'approve' or 'reject'
+            admin_feedback = data.get("message", "") # optional message
             
             if not vendor_id or not action:
                 return JsonResponse({"error": "Missing vendor_id or action"}, status=400)
@@ -338,8 +340,40 @@ def admin_update_vendor_status(request):
                 vendor = Vendor.objects.get(id=vendor_id)
                 if action == 'approve':
                     vendor.status = 'approved'
+                    if admin_feedback:
+                        vendor.admin_feedback = admin_feedback
+                    try:
+                        email_body = 'Congratulations! Your vendor account on GearUpNepal has been approved. You can now login and start listing your products.'
+                        if admin_feedback:
+                            email_body += f'\n\nMessage from Admin:\n{admin_feedback}'
+                        
+                        send_mail(
+                            'Your Vendor Account has been Approved',
+                            email_body,
+                            settings.EMAIL_HOST_USER,
+                            [vendor.user.email],
+                            fail_silently=True,
+                        )
+                    except Exception as e:
+                        print("Failed to send approval email:", e)
                 elif action == 'reject':
                     vendor.status = 'rejected'
+                    if admin_feedback:
+                        vendor.admin_feedback = admin_feedback
+                    try:
+                        email_body = 'Unfortunately, your recent vendor account registration on GearUpNepal has been rejected. Please contact the administrator for more information.'
+                        if admin_feedback:
+                            email_body += f'\n\nMessage from Admin:\n{admin_feedback}'
+
+                        send_mail(
+                            'Update regarding your Vendor Account',
+                            email_body,
+                            settings.EMAIL_HOST_USER,
+                            [vendor.user.email],
+                            fail_silently=True,
+                        )
+                    except Exception as e:
+                        print("Failed to send rejection email:", e)
                 elif action == 'suspend':
                     vendor.status = 'suspended'
                 elif action == 'unsuspend':
