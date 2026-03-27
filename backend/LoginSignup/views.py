@@ -136,7 +136,6 @@ def vendor_signup(request):
             {"message": "Verification code sent to your email."},
             status=201
         )
-            return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
