@@ -81,7 +81,9 @@ const WishlistPage = () => {
                             <div key={item.id} className="bg-white rounded overflow-hidden transition-all duration-300 group product-card border border-gray-100 flex flex-col h-full">
                                     <Link to={`/product/${item.product.id}`} className="block relative h-64 overflow-hidden bg-gray-50 border-b border-gray-100">
                                         <img 
-                                            className="w-full h-full object-cover transition-transform duration-500"
+                                            src={item.product.image} 
+                                            alt={item.product.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                                         />
                                         <button 
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeItem(item.id); }}

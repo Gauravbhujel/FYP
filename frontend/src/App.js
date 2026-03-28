@@ -28,13 +28,15 @@ import ProductDetailsPage from "./pages/ProductDetailsPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import { useEffect, useState } from "react";
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { isAuthenticated, role: userRole } = useAuth();
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" state={{ from: window.location.pathname }} replace />;
   }
 
   if (allowedRole && userRole !== allowedRole) {
@@ -80,9 +82,11 @@ function App() {
           <Route path="/deals" element={<CustomerOrPublicRoute><DealsPage /></CustomerOrPublicRoute>} />
           <Route path="/categories" element={<CustomerOrPublicRoute><CategoryPage /></CustomerOrPublicRoute>} />
           <Route path="/cart" element={<CustomerOrPublicRoute><CartPage /></CustomerOrPublicRoute>} />
-          <Route path="/wishlist" element={<CustomerOrPublicRoute><WishlistPage /></CustomerOrPublicRoute>} />
+          <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
           <Route path="/login" element={<PublicAuthRoute><Login /></PublicAuthRoute>} />
           <Route path="/signup" element={<PublicAuthRoute><Signup /></PublicAuthRoute>} />
+          <Route path="/forgot-password" element={<PublicAuthRoute><ForgotPassword /></PublicAuthRoute>} />
+          <Route path="/reset-password/:uid/:token" element={<PublicAuthRoute><ResetPassword /></PublicAuthRoute>} />
           <Route path="/verify-email" element={<PublicAuthRoute><VerifyEmailPage /></PublicAuthRoute>} />
           <Route path="/profile" element={<CustomerOrPublicRoute><ProfilePage /></CustomerOrPublicRoute>} />
           <Route path="/product/:productId" element={<CustomerOrPublicRoute><ProductDetailsPage /></CustomerOrPublicRoute>} />

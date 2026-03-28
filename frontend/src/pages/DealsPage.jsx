@@ -128,7 +128,7 @@ const DealsPage = () => {
               </p>
               <Link
                 to="/products"
-                className="px-8 py-4 bg-gray-900 text-white rounded-xl transition-all hover:bg-black hover:scale-[1.05] active:scale-95 font-black text-[10px] uppercase tracking-widest shadow-xl flex items-center gap-3"
+                className="px-10 py-5 bg-accent text-white rounded-2xl transition-all hover:bg-[#EA580C] hover:scale-[1.05] active:scale-95 font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-accent/20 flex items-center gap-3 border-none no-underline"
               >
                 Explore Full Inventory
               </Link>

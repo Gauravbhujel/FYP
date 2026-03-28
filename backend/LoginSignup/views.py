@@ -10,6 +10,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Sum, Count, Q
 from datetime import date
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 from rest_framework.authtoken.models import Token
 from .models import CustomUser, Vendor, Product, Order, CartItem, WishlistItem, ProductReview
 from .serializers import (
@@ -1719,6 +1722,75 @@ def admin_delete_product(request, product_id):
             return JsonResponse({"message": "Product removed from platform catalog"}, status=200)
         except Product.DoesNotExist:
             return JsonResponse({"error": "Product not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+            
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+@csrf_exempt
+def forgot_password(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            email = data.get("email")
+            
+            if not email:
+                return JsonResponse({"error": "Email is required"}, status=400)
+                
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                # Security best practice: don't reveal if email exists or not
+                return JsonResponse({"message": "If an account with this email exists, a reset link will be sent."}, status=200)
+
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            
+            # Use FRONTEND_URL from settings (defaults to localhost if not found)
+            frontend_base = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+            reset_url = f"{frontend_base}/reset-password/{uid}/{token}/"
+            
+            send_mail(
+                'Password Reset Request - GearUpNepal',
+                f'Hi {user.first_name or user.username},\n\nYou requested a password reset. Please click the link below to set a new password:\n\n{reset_url}\n\nThis link will expire in 10-15 minutes.\n\nIf you did not request this, please ignore this email.',
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
+            
+            return JsonResponse({"message": "If an account with this email exists, a reset link will be sent."}, status=200)
+            
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+            
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def reset_password(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            uidb64 = data.get("uid")
+            token = data.get("token")
+            new_password = data.get("new_password")
+            
+            if not uidb64 or not token or not new_password:
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+                
+            try:
+                uid = force_str(urlsafe_base64_decode(uidb64))
+                user = User.objects.get(pk=uid)
+            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+                return JsonResponse({"error": "Invalid reset link"}, status=400)
+
+            if default_token_generator.check_token(user, token):
+                user.set_password(new_password)
+                user.save()
+                return JsonResponse({"message": "Password reset successful! You can now log in with your new password."}, status=200)
+            else:
+                return JsonResponse({"error": "Invalid or expired reset token"}, status=400)
+                
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
             

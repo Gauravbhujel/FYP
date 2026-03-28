@@ -90,14 +90,9 @@ export function ManageProductsPage() {
           ) : products.length === 0 ? (
             <div className="bg-white rounded-xl border border-gray-300 p-20 text-center shadow-sm">
               <h3 className="text-[10px] font-black text-gray-900 uppercase tracking-[0.2em] mb-4">No Inventory Detected</h3>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-10 max-w-xs mx-auto leading-relaxed">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 max-w-xs mx-auto leading-relaxed">
                 Begin populating your store catalog to initialize revenue streams
               </p>
-              <Link to="/vendor/AddProduct">
-                <button className="bg-accent text-white px-10 py-4 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all border-none cursor-pointer hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95">
-                  Initialize First Asset
-                </button>
-              </Link>
             </div>
           ) : (
             <div className="bg-white border border-gray-300 rounded-xl overflow-hidden shadow-sm">

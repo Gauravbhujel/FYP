@@ -5,6 +5,7 @@ import {
   TrendingUpIcon,
   ClockIcon,
   PlusIcon,
+  XIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
@@ -27,6 +28,7 @@ export const VendorDashboard = () => {
   const [recentProducts, setRecentProducts] = useState([]);
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showApproval, setShowApproval] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
@@ -37,6 +39,22 @@ export const VendorDashboard = () => {
       try {
         const profileResponse = await api.get("vendor/profile/");
         setProfile(profileResponse.data);
+
+        // Check if this status notification was already seen
+        const currentStatus = profileResponse.data.status;
+        const profileId = profileResponse.data.id;
+        
+        if (currentStatus === "approved" || currentStatus === "rejected") {
+          const seenKey = `seen_status_${profileId}_${currentStatus}`;
+          const hasSeen = localStorage.getItem(seenKey);
+          if (hasSeen) {
+            setShowApproval(false);
+          } else {
+            setShowApproval(true);
+            // Mark as seen immediately so it doesn't show next time
+            localStorage.setItem(seenKey, "true");
+          }
+        }
       } catch (e) {
         console.error("Profile fetch error", e);
       }
@@ -60,6 +78,13 @@ export const VendorDashboard = () => {
     }
   };
 
+  const handleDismissApproval = () => {
+    if (profile?.id) {
+      localStorage.setItem(`dismissed_approval_${profile.id}`, "true");
+    }
+    setShowApproval(false);
+  };
+
   if (loading) {
     return (
       <VendorLayout currentPage="dashboard">
@@ -73,14 +98,21 @@ export const VendorDashboard = () => {
   return (
     <VendorLayout currentPage="dashboard">
       <div className="max-w-7xl mx-auto space-y-12 animate-fade-in">
-        {profile?.status === "rejected" && (
-          <div className="bg-red-50 text-red-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-red-200 shadow-sm">
-            Your vendor account has been rejected.
-            {profile?.admin_feedback && (
-              <span className="block mt-2 font-medium text-xs opacity-80 normal-case">
-                Reason: {profile.admin_feedback}
-              </span>
-            )}
+        {profile?.status === "rejected" && showApproval && (
+          <div className="bg-red-50 text-red-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-red-200 shadow-sm relative group animate-fade-in">
+             Your vendor account has been rejected.
+             {profile?.admin_feedback && (
+               <span className="block mt-2 font-medium text-xs opacity-80 normal-case">
+                 Reason: {profile.admin_feedback}
+               </span>
+             )}
+             <button 
+                onClick={handleDismissApproval}
+                className="absolute top-4 right-4 text-red-600/50 hover:text-red-600 transition-colors p-1"
+                title="Dismiss"
+             >
+                <XIcon size={16} />
+             </button>
           </div>
         )}
 
@@ -90,14 +122,21 @@ export const VendorDashboard = () => {
           </div>
         )}
 
-        {profile?.status === "approved" && (
-          <div className="bg-emerald-50 text-emerald-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-emerald-200 shadow-sm">
+        {profile?.status === "approved" && showApproval && (
+          <div className="bg-emerald-50 text-emerald-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-emerald-200 shadow-sm relative group">
              Your account has been approved.
              {profile?.admin_feedback && (
                <span className="block mt-2 font-medium text-xs opacity-80 normal-case">
                  Message from Admin: {profile.admin_feedback}
                </span>
              )}
+             <button 
+                onClick={handleDismissApproval}
+                className="absolute top-4 right-4 text-emerald-600/50 hover:text-emerald-600 transition-colors p-1"
+                title="Dismiss"
+             >
+                <XIcon size={16} />
+             </button>
           </div>
         )}
 

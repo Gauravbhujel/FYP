@@ -3,23 +3,28 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [role, setRole] = useState(null);
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem("isAuthenticated") === "true";
+  });
+  const [role, setRole] = useState(() => {
+    return localStorage.getItem("role");
+  });
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem("token");
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Clear potentially lingering state unconditionally on app start
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    sessionStorage.removeItem("isAuthenticated");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("role");
+    // Check if we have a token and set initial state
+    const savedToken = localStorage.getItem("token");
+    const savedRole = localStorage.getItem("role");
+    const savedIsAuth = localStorage.getItem("isAuthenticated") === "true";
 
-    setToken(null);
-    setRole(null);
-    setIsAuthenticated(false);
+    if (savedToken && savedIsAuth) {
+      setToken(savedToken);
+      setRole(savedRole);
+      setIsAuthenticated(true);
+    }
     setLoading(false);
   }, []);
 

@@ -20,7 +20,6 @@ export function VendorSignupPage() {
     email: "",
     phone: "",
     storeName: "",
-    businessType: "",
     address: "",
     city: "",
     state: "",
@@ -182,7 +181,7 @@ export function VendorSignupPage() {
                 <div className="h-px bg-gray-100 flex-1"></div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Store Name</label>
                   <div className="relative group">
@@ -198,21 +197,6 @@ export function VendorSignupPage() {
                       }`}
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Business Type</label>
-                  <select
-                    name="businessType"
-                    value={formData.businessType}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium text-gray-500"
-                  >
-                    <option value="">Select type</option>
-                    <option value="manufacturer">Manufacturer</option>
-                    <option value="distributor">Distributor</option>
-                    <option value="retailer">Retailer</option>
-                    <option value="individual">Individual Seller</option>
-                  </select>
                 </div>
               </div>
 

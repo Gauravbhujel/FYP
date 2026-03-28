@@ -260,21 +260,6 @@ export function StoreSettingsPage() {
                     />
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Official Website</label>
-                  <div className="relative">
-                    <GlobeIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
-                    <input
-                        type="url"
-                        name="website"
-                        value={formData.website}
-                        onChange={handleChange}
-                        className="w-full h-12 pl-11 pr-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-500 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
-                        placeholder="https://"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -283,14 +268,14 @@ export function StoreSettingsPage() {
                 <button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full h-16 bg-accent text-white font-black rounded-3xl transition-all shadow-xl shadow-accent/20 flex items-center justify-center gap-3 border-none cursor-pointer uppercase tracking-[2px] text-xs hover:scale-[1.02] active:scale-95 hover:bg-[#EA580C]"
+                    className="w-full h-12 bg-accent text-white font-black rounded-2xl transition-all shadow-xl shadow-accent/20 flex items-center justify-center gap-3 border-none cursor-pointer uppercase tracking-[2px] text-xs hover:scale-[1.02] active:scale-95 hover:bg-[#EA580C]"
                 >
                     {loading ? (
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
                     ) : (
                         <>
-                            <SaveIcon className="w-5 h-5" />
-                            Synchronize Profile
+                            <SaveIcon className="w-4 h-4" />
+                            Edit Profile
                         </>
                     )}
                 </button>

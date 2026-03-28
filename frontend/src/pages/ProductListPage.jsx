@@ -208,7 +208,7 @@ const ProductListPage = () => {
                                     <input 
                                         type="text" 
                                         placeholder="Keywords..." 
-                                        className="w-full py-4 px-4 bg-gray-50/50 border-2 border-transparent focus:border-primary/10 rounded-xl transition-all text-xs font-black placeholder:text-gray-400 focus:outline-none focus:bg-white"
+                                        className="w-full py-4 px-4 bg-gray-50/50 border-2 border-gray-200 focus:border-primary/10 rounded-xl transition-all text-xs font-black placeholder:text-gray-400 focus:outline-none focus:bg-white"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
