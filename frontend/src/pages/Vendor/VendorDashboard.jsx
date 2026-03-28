@@ -28,11 +28,29 @@ export const VendorDashboard = () => {
   const [recentProducts, setRecentProducts] = useState([]);
   const [salesData, setSalesData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showApproval, setShowApproval] = useState(true);
+  const [showApproval, setShowApproval] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Sync approval message visibility with localStorage whenever profile changes
+  useEffect(() => {
+    if (profile?.id && profile?.status) {
+      const currentStatus = profile.status.trim().toLowerCase();
+      if (currentStatus === "approved" || currentStatus === "rejected") {
+        const dismissKey = `dismissed_status_${profile.id}_${currentStatus}`;
+        const isDismissed = window.localStorage.getItem(dismissKey);
+        if (isDismissed === "true") {
+          setShowApproval(false);
+        } else {
+          setShowApproval(true);
+        }
+      } else {
+        setShowApproval(true);
+      }
+    }
+  }, [profile]);
 
   const fetchDashboardData = async () => {
     try {
@@ -40,21 +58,6 @@ export const VendorDashboard = () => {
         const profileResponse = await api.get("vendor/profile/");
         setProfile(profileResponse.data);
 
-        // Check if this status notification was already seen
-        const currentStatus = profileResponse.data.status;
-        const profileId = profileResponse.data.id;
-        
-        if (currentStatus === "approved" || currentStatus === "rejected") {
-          const seenKey = `seen_status_${profileId}_${currentStatus}`;
-          const hasSeen = localStorage.getItem(seenKey);
-          if (hasSeen) {
-            setShowApproval(false);
-          } else {
-            setShowApproval(true);
-            // Mark as seen immediately so it doesn't show next time
-            localStorage.setItem(seenKey, "true");
-          }
-        }
       } catch (e) {
         console.error("Profile fetch error", e);
       }
@@ -79,8 +82,11 @@ export const VendorDashboard = () => {
   };
 
   const handleDismissApproval = () => {
-    if (profile?.id) {
-      localStorage.setItem(`dismissed_approval_${profile.id}`, "true");
+    if (profile?.id && profile?.status) {
+      const currentStatus = profile.status.toLowerCase();
+      const dismissKey = `dismissed_status_${profile.id}_${currentStatus}`;
+      window.localStorage.setItem(dismissKey, "true");
+      console.log("Dismissed notification for key:", dismissKey);
     }
     setShowApproval(false);
   };
@@ -117,8 +123,11 @@ export const VendorDashboard = () => {
         )}
 
         {profile?.status === "pending" && (
-          <div className="bg-amber-50 text-amber-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-amber-200 shadow-sm">
-            Your account is under review. You will be notified once approved by admin.
+          <div className="bg-amber-50 text-amber-600 p-6 rounded-xl text-center font-black uppercase tracking-widest text-sm mt-6 border border-amber-200 shadow-sm animate-pulse-subtle">
+            Your account is currently under review by our administration team.
+            <span className="block mt-2 font-medium text-xs opacity-80 normal-case">
+              You will be notified here once your application has been processed.
+            </span>
           </div>
         )}
 

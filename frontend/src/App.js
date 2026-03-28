@@ -26,10 +26,11 @@ import { AdminActivityLogsPage } from "./pages/Admin/AdminActivityLogs";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import VerifyOTP from "./pages/Auth/VerifyOTP";
+import ResetPassword from "./pages/Auth/ResetPassword";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
 import { useEffect, useState } from "react";
 
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -86,7 +87,8 @@ function App() {
           <Route path="/login" element={<PublicAuthRoute><Login /></PublicAuthRoute>} />
           <Route path="/signup" element={<PublicAuthRoute><Signup /></PublicAuthRoute>} />
           <Route path="/forgot-password" element={<PublicAuthRoute><ForgotPassword /></PublicAuthRoute>} />
-          <Route path="/reset-password/:uid/:token" element={<PublicAuthRoute><ResetPassword /></PublicAuthRoute>} />
+          <Route path="/verify-otp" element={<PublicAuthRoute><VerifyOTP /></PublicAuthRoute>} />
+          <Route path="/reset-password" element={<PublicAuthRoute><ResetPassword /></PublicAuthRoute>} />
           <Route path="/verify-email" element={<PublicAuthRoute><VerifyEmailPage /></PublicAuthRoute>} />
           <Route path="/profile" element={<CustomerOrPublicRoute><ProfilePage /></CustomerOrPublicRoute>} />
           <Route path="/product/:productId" element={<CustomerOrPublicRoute><ProductDetailsPage /></CustomerOrPublicRoute>} />

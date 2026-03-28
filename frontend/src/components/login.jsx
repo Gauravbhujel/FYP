@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://192.168.1.70:8000/api/login/", {
+      const response = await fetch("http://127.0.0.1:8000/api/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +86,7 @@ const Login = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-end">
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-1">Password</label>
-                <Link to="/forgot-password" size={14} className="text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Forgot?</Link>
+                <Link to="/forgot-password" title="Click here to reset your password" className="text-[10px] font-black uppercase tracking-widest text-accent hover:underline">Forgot?</Link>
               </div>
               <div className="relative group">
                 <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-colors" />

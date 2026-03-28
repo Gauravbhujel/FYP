@@ -10,9 +10,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models import Sum, Count, Q
 from datetime import date
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
 from rest_framework.authtoken.models import Token
 from .models import CustomUser, Vendor, Product, Order, CartItem, WishlistItem, ProductReview
 from .serializers import (
@@ -1726,7 +1723,6 @@ def admin_delete_product(request, product_id):
             return JsonResponse({"error": str(e)}, status=500)
             
     return JsonResponse({"error": "Invalid request method"}, status=405)
-
 @csrf_exempt
 def forgot_password(request):
     if request.method == "POST":
@@ -1740,29 +1736,66 @@ def forgot_password(request):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                # Security best practice: don't reveal if email exists or not
-                return JsonResponse({"message": "If an account with this email exists, a reset link will be sent."}, status=200)
-
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
+                return JsonResponse({"error": "User with this email does not exist"}, status=404)
             
-            # Use FRONTEND_URL from settings (defaults to localhost if not found)
-            frontend_base = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
-            reset_url = f"{frontend_base}/reset-password/{uid}/{token}/"
+            otp = generate_otp()
+            # Store OTP in cache for 10 minutes
+            cache.set(f"password_reset_otp_{email}", otp, timeout=600)
             
-            send_mail(
-                'Password Reset Request - GearUpNepal',
-                f'Hi {user.first_name or user.username},\n\nYou requested a password reset. Please click the link below to set a new password:\n\n{reset_url}\n\nThis link will expire in 10-15 minutes.\n\nIf you did not request this, please ignore this email.',
-                settings.EMAIL_HOST_USER,
-                [email],
-                fail_silently=False,
-            )
+            # Send the email
+            try:
+                send_mail(
+                    'Password Reset OTP - GearUpNepal',
+                    f'Your password reset OTP is: {otp}. It will expire in 10 minutes.',
+                    settings.EMAIL_HOST_USER,
+                    [email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print("Failed to send reset email:", e)
+                return JsonResponse({"error": "Failed to send email. Check SMTP settings."}, status=500)
             
-            return JsonResponse({"message": "If an account with this email exists, a reset link will be sent."}, status=200)
+            return JsonResponse({"message": "Password reset OTP sent to your email."}, status=200)
             
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def verify_reset_otp(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            email = data.get("email")
+            otp = data.get("otp")
             
+            if not email or not otp:
+                return JsonResponse({"error": "Email and OTP are required"}, status=400)
+            
+            cached_otp = cache.get(f"password_reset_otp_{email}")
+            
+            if not cached_otp:
+                return JsonResponse({"error": "OTP has expired or is invalid."}, status=400)
+            
+            if cached_otp == otp:
+                # Store a "verified" flag in cache for 5 minutes
+                cache.set(f"password_reset_verified_{email}", True, timeout=300)
+                # Clear the OTP so it can't be reused
+                cache.delete(f"password_reset_otp_{email}")
+                
+                return JsonResponse({"message": "OTP verified successfully. You can now reset your password."}, status=200)
+            else:
+                return JsonResponse({"error": "Invalid OTP"}, status=400)
+                
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
@@ -1771,27 +1804,36 @@ def reset_password(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            uidb64 = data.get("uid")
-            token = data.get("token")
+            email = data.get("email")
             new_password = data.get("new_password")
+            confirm_password = data.get("confirm_password")
             
-            if not uidb64 or not token or not new_password:
-                return JsonResponse({"error": "Missing required fields"}, status=400)
-                
+            if not email or not new_password or not confirm_password:
+                return JsonResponse({"error": "All fields are required"}, status=400)
+            
+            if new_password != confirm_password:
+                return JsonResponse({"error": "Passwords do not match"}, status=400)
+            
+            # Check if OTP was verified
+            is_verified = cache.get(f"password_reset_verified_{email}")
+            if not is_verified:
+                return JsonResponse({"error": "Session expired or email not verified. Please try again."}, status=403)
+            
             try:
-                uid = force_str(urlsafe_base64_decode(uidb64))
-                user = User.objects.get(pk=uid)
-            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-                return JsonResponse({"error": "Invalid reset link"}, status=400)
-
-            if default_token_generator.check_token(user, token):
+                user = User.objects.get(email=email)
                 user.set_password(new_password)
                 user.save()
-                return JsonResponse({"message": "Password reset successful! You can now log in with your new password."}, status=200)
-            else:
-                return JsonResponse({"error": "Invalid or expired reset token"}, status=400)
                 
+                # Clear the verified flag
+                cache.delete(f"password_reset_verified_{email}")
+                
+                return JsonResponse({"message": "Password reset successfully. You can now log in."}, status=200)
+            except User.DoesNotExist:
+                return JsonResponse({"error": "User not found"}, status=404)
+                
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
-            
+
     return JsonResponse({"error": "Invalid request method"}, status=405)

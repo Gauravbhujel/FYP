@@ -51,8 +51,9 @@ urlpatterns = [
     # Admin Product Management
     path('admin/products/list/', views.admin_products_list, name='admin_products_list'),
     path('admin/products/delete/<int:product_id>/', views.admin_delete_product, name='admin_delete_product'),
-
+    
     # Password Reset
     path('forgot-password/', views.forgot_password, name='forgot_password'),
+    path('verify-reset-otp/', views.verify_reset_otp, name='verify_reset_otp'),
     path('reset-password/', views.reset_password, name='reset_password'),
 ]

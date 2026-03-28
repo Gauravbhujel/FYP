@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-d8tayflw+x1d1e2kr#@0b60)jehg_o!ib!v7wb1j%#_k&!x%s8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.70', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = []
 
 
 
@@ -71,8 +71,8 @@ MIDDLEWARE = [
 
 # Allow frontend
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://192.168.1.70:3000",  # Added for mobile testing
+    "http://localhost:3000",  # React dev server
+    "http://localhost:3001",  # React dev server (alternative port)
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -151,9 +151,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-# Frontend URL for links (Change 'localhost' to your Computer's IP for Mobile Testing)
-FRONTEND_URL = 'http://192.168.1.70:3000'
 
 # Email Configuration
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Outputs emails to the terminal console for testing
