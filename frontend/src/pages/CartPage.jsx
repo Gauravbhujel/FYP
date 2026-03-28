@@ -38,6 +38,19 @@ const CartPage = () => {
         }
     };
 
+    const updateQuantity = async (itemId, newQuantity) => {
+        if (newQuantity < 1) return;
+        try {
+            const response = await api.post(`cart/update/${itemId}/`, { quantity: newQuantity });
+            setCartItems(cartItems.map(item => 
+                item.id === itemId ? { ...item, quantity: response.data.quantity } : item
+            ));
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            alert(error.response?.data?.error || 'Failed to update quantity');
+        }
+    };
+
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0).toLocaleString();
     };
@@ -96,9 +109,20 @@ const CartPage = () => {
                                         </div>
                                         <div className="flex items-center justify-center">
                                             <div className="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
-                                                <button className="w-8 h-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600"><FaMinus size={10} /></button>
+                                                <button 
+                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                    disabled={item.quantity <= 1}
+                                                    className="w-8 h-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <FaMinus size={10} />
+                                                </button>
                                                 <span className="w-10 text-center font-bold text-gray-800">{item.quantity}</span>
-                                                <button className="w-8 h-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600"><FaPlus size={10} /></button>
+                                                <button 
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    className="w-8 h-8 flex items-center justify-center rounded-md border-none bg-transparent cursor-pointer transition-colors text-gray-600"
+                                                >
+                                                    <FaPlus size={10} />
+                                                </button>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-end font-bold text-xl text-text-dark">
@@ -131,9 +155,11 @@ const CartPage = () => {
                                         <span className="text-primary">Rs. {calculateTotal()}</span>
                                     </div>
                                 </div>
-                                <Button variant="primary" className="w-full text-lg mb-4 py-4 rounded font-bold shadow-sm">
-                                    Proceed to Checkout
-                                </Button>
+                                <Link to="/checkout" className="no-underline">
+                                    <Button variant="primary" className="w-full text-lg mb-4 py-4 rounded font-bold shadow-sm">
+                                        Proceed to Checkout
+                                    </Button>
+                                </Link>
                                 <div className="flex items-center justify-center gap-3 text-gray-400">
                                     <span className="text-[10px] uppercase font-bold tracking-widest">Secure Payments</span>
                                 </div>

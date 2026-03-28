@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, get_user_model
+from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
@@ -16,6 +17,9 @@ from .serializers import (
     ProductSerializer, UserProfileSerializer, VendorSerializer, 
     CartItemSerializer, WishlistItemSerializer, ProductReviewSerializer
 )
+import uuid
+import base64
+from .esewa_utils import generate_esewa_signature, verify_esewa_payment
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -1375,6 +1379,36 @@ def cart_remove(request, item_id):
 
 
 @csrf_exempt
+def cart_update(request, item_id):
+    if request.method == "POST":
+        user, error = _get_user_from_token(request)
+        if error:
+            return error
+            
+        try:
+            cart_item = CartItem.objects.get(id=item_id, customer=user)
+            data = json.loads(request.body)
+            new_quantity = int(data.get('quantity', 1))
+            
+            if new_quantity <= 0:
+                cart_item.delete()
+                return JsonResponse({"message": "Item removed"}, status=200)
+                
+            if new_quantity > cart_item.product.quantity:
+                return JsonResponse({"error": f"Only {cart_item.product.quantity} left in stock"}, status=400)
+                
+            cart_item.quantity = new_quantity
+            cart_item.save()
+            return JsonResponse({"message": "Quantity updated", "quantity": new_quantity}, status=200)
+        except CartItem.DoesNotExist:
+            return JsonResponse({"error": "Item not found in cart"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+            
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
 def wishlist_list(request):
     if request.method == "GET":
         user, error = _get_user_from_token(request)
@@ -1528,6 +1562,7 @@ def customer_orders(request):
         for order in orders:
             orders_data.append({
                 "id": f"#ORD-{order.id:04d}",
+                "product": order.product.id,
                 "product_name": order.product.name,
                 "vendor_name": order.vendor.store_name,
                 "amount": float(order.total_amount),
@@ -1640,6 +1675,11 @@ def check_review_eligibility(request, product_id):
         try:
             product = Product.objects.get(id=product_id)
             
+            has_purchased_ever = Order.objects.filter(
+                customer=user,
+                product=product
+            ).exists()
+            
             has_delivered_order = Order.objects.filter(
                 customer=user,
                 product=product,
@@ -1650,7 +1690,7 @@ def check_review_eligibility(request, product_id):
             
             return JsonResponse({
                 "can_review": has_delivered_order,
-                "has_purchased": has_delivered_order,
+                "has_purchased": has_purchased_ever,
                 "existing_review": {
                     "rating": existing_review.rating,
                     "comment": existing_review.comment
@@ -1702,6 +1742,59 @@ def admin_products_list(request):
                 })
             
             return JsonResponse(products_data, safe=False, status=200)
+
+        except Token.DoesNotExist:
+            return JsonResponse({"error": "Invalid token"}, status=401)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def admin_orders_list(request):
+    if request.method == "GET":
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Token '):
+             return JsonResponse({"error": "Unauthorized"}, status=401)
+        
+        token_key = auth_header.split(' ')[1]
+        try:
+            token = Token.objects.get(key=token_key)
+            user = token.user
+            if not (user.is_superuser or user.is_staff):
+                 return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
+            
+            orders = Order.objects.all().select_related('product', 'vendor', 'customer').order_by('-created_at')
+
+            orders_data = []
+            for o in orders:
+                orders_data.append({
+                    "id": f"#ORD-{o.id:04d}",
+                    "transaction_uuid": o.transaction_uuid,
+                    "product": {
+                        "id": o.product.id,
+                        "name": o.product.name,
+                        "image": request.build_absolute_uri(o.product.image.url) if o.product.image else ""
+                    },
+                    "vendor": {
+                        "id": o.vendor.id,
+                        "store_name": o.vendor.store_name
+                    },
+                    "customer": {
+                        "id": o.customer.id,
+                        "name": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
+                        "email": o.customer.email
+                    },
+                    "amount": float(o.total_amount),
+                    "status": o.status,
+                    "is_paid": o.is_paid,
+                    "esewa_ref_id": o.esewa_ref_id,
+                    "date": o.created_at.strftime("%Y-%m-%d %H:%M"),
+                    "shipping_address": o.shipping_address
+                })
+            
+            return JsonResponse(orders_data, safe=False, status=200)
 
         except Token.DoesNotExist:
             return JsonResponse({"error": "Invalid token"}, status=401)
@@ -1848,3 +1941,176 @@ def reset_password(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def initiate_payment(request):
+    if request.method == "POST":
+        user, error_resp = _get_user_from_token(request)
+        if error_resp:
+            return error_resp
+
+        try:
+            data = json.loads(request.body)
+            cart_items_data = data.get('cart_items', [])
+            shipping_address = data.get('shipping_address', '')
+
+            if not cart_items_data:
+                return JsonResponse({"error": "Cart is empty"}, status=400)
+
+            # In this simplified model, we create one Order per product (as per current Order model)
+            # or we could modify Order to handle multiple items. 
+            # Given the current model has 'product' as a ForeignKey, we'll create multiple orders if needed,
+            # but for eSewa, we need ONE transaction_uuid for the WHOLE payment.
+            
+            # For now, let's assume the user checks out with one or more items, 
+            # and we generate a single eSewa payment for the total.
+            
+            total_amount = 0
+            orders = []
+            transaction_uuid = str(uuid.uuid4())
+            
+            # 1. Stock verification pass
+            for item in cart_items_data:
+                product_id = item.get('product_id')
+                quantity = int(item.get('quantity', 1))
+                
+                try:
+                    product = Product.objects.get(id=product_id)
+                    if product.quantity < quantity:
+                        return JsonResponse({
+                            "error": f"Insufficient stock available: Only {product.quantity} left for '{product.name}'."
+                        }, status=400)
+                except Product.DoesNotExist:
+                    return JsonResponse({"error": f"Product (ID: {product_id}) not found in catalog."}, status=404)
+
+            # 2. Proceed with order creation if all stock is available
+            with transaction.atomic():
+                for item in cart_items_data:
+                    product_id = item.get('product_id')
+                    quantity = int(item.get('quantity', 1))
+                    
+                    product = Product.objects.get(id=product_id)
+                    amount = product.price * quantity
+                    total_amount += amount
+                    
+                    order = Order.objects.create(
+                        product=product,
+                        customer=user,
+                        vendor=product.vendor,
+                        quantity=quantity,
+                        total_amount=amount,
+                        status='pending',
+                        shipping_address=shipping_address,
+                        transaction_uuid=transaction_uuid
+                    )
+                    orders.append(order)
+
+            # Format amount string consistently
+            # eSewa v2 often fails if there are trailing zeros or decimal point for whole numbers
+            # We must use exactly the same string for signature and form data.
+            amount_str = str(total_amount).rstrip('0').rstrip('.') if '.' in str(total_amount) else str(total_amount)
+            
+            # eSewa Parameters
+            product_code = getattr(settings, 'ESEWA_PRODUCT_CODE', 'EPAYTEST')
+            signature = generate_esewa_signature(amount_str, transaction_uuid, product_code)
+            
+            # URLs
+            base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+            success_url = f"{base_url}/api/payment/success/"
+            failure_url = f"{base_url}/api/payment/failure/"
+
+            payment_data = {
+                "amount": amount_str,
+                "tax_amount": "0",
+                "total_amount": amount_str,
+                "transaction_uuid": transaction_uuid,
+                "product_code": product_code,
+                "product_service_charge": "0",
+                "product_delivery_charge": "0",
+                "success_url": success_url,
+                "failure_url": failure_url,
+                "signed_field_names": "total_amount,transaction_uuid,product_code",
+                "signature": signature,
+                "esewa_url": "https://rc-epay.esewa.com.np/api/epay/main/v2/form" if getattr(settings, 'ESEWA_IS_SANDBOX', True) else "https://epay.esewa.com.np/api/epay/main/v2/form"
+            }
+
+            return JsonResponse(payment_data, status=200)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def payment_success(request):
+    # eSewa redirects with 'data' query parameter (Base64 encoded JSON)
+    data_encoded = request.GET.get('data')
+    if not data_encoded:
+        return JsonResponse({"error": "No data received"}, status=400)
+    
+    try:
+        # Decode base64 data
+        decoded_bytes = base64.b64decode(data_encoded)
+        decoded_str = decoded_bytes.decode('utf-8')
+        data = json.loads(decoded_str)
+        
+        # Example data: { "transaction_code": "...", "status": "COMPLETE", "total_amount": "110.0", "transaction_uuid": "...", ... }
+        transaction_uuid = data.get('transaction_uuid')
+        total_amount = data.get('total_amount')
+        status = data.get('status')
+        ref_id = data.get('transaction_code')
+        
+        if status == 'COMPLETE':
+            # Verify with eSewa Status API for extra security
+            product_code = getattr(settings, 'ESEWA_PRODUCT_CODE', 'EPAYTEST')
+            # total_amount in decoded data might have .0, need to match exact string or float
+            success, verification_data = verify_esewa_payment(transaction_uuid, total_amount, product_code)
+            
+            if success:
+                # Update all orders with this transaction_uuid
+                with transaction.atomic():
+                    order_items = Order.objects.filter(transaction_uuid=transaction_uuid)
+                    
+                    for order in order_items:
+                        # Reduce stock
+                        product = order.product
+                        product.quantity = max(0, product.quantity - order.quantity)
+                        product.save()
+                        
+                    # Mark orders as paid
+                    order_items.update(
+                        is_paid=True,
+                        esewa_ref_id=ref_id,
+                        status='processing'
+                    )
+                
+                # Clear cart for this user
+                first_order = Order.objects.filter(transaction_uuid=transaction_uuid).first()
+                if first_order:
+                    CartItem.objects.filter(customer=first_order.customer).delete()
+
+                # Redirect to frontend success page
+                frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+                from django.shortcuts import redirect
+                return redirect(f"{frontend_url}/payment-success?oid={transaction_uuid}")
+            else:
+                return JsonResponse({"error": "Verification failed", "details": verification_data}, status=400)
+        else:
+            return JsonResponse({"error": "Payment not completed"}, status=400)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@csrf_exempt
+def payment_failure(request):
+    transaction_uuid = request.GET.get('oid') # Custom param if we added it, but eSewa usually just redirects
+    # Update orders to canceled
+    if transaction_uuid:
+        Order.objects.filter(transaction_uuid=transaction_uuid).update(status='canceled')
+    
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+    from django.shortcuts import redirect
+    return redirect(f"{frontend_url}/payment-failure")

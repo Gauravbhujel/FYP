@@ -39,6 +39,7 @@ urlpatterns = [
     path('cart/', views.cart_list, name='cart_list'),
     path('cart/add/', views.cart_add, name='cart_add'),
     path('cart/remove/<int:item_id>/', views.cart_remove, name='cart_remove'),
+    path('cart/update/<int:item_id>/', views.cart_update, name='cart_update'),
     path('wishlist/', views.wishlist_list, name='wishlist_list'),
     path('wishlist/add/', views.wishlist_add, name='wishlist_add'),
     path('wishlist/remove/<int:item_id>/', views.wishlist_remove, name='wishlist_remove'),
@@ -48,6 +49,9 @@ urlpatterns = [
     path('products/<int:product_id>/review/submit/', views.submit_review, name='submit_review'),
     path('products/<int:product_id>/review/check-eligibility/', views.check_review_eligibility, name='check_review_eligibility'),
     
+    # Admin Orders Management
+    path('admin/orders/list/', views.admin_orders_list, name='admin_orders_list'),
+    
     # Admin Product Management
     path('admin/products/list/', views.admin_products_list, name='admin_products_list'),
     path('admin/products/delete/<int:product_id>/', views.admin_delete_product, name='admin_delete_product'),
@@ -56,4 +60,9 @@ urlpatterns = [
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('verify-reset-otp/', views.verify_reset_otp, name='verify_reset_otp'),
     path('reset-password/', views.reset_password, name='reset_password'),
+    
+    # eSewa Payment
+    path('checkout/initiate/', views.initiate_payment, name='initiate_payment'),
+    path('payment/success/', views.payment_success, name='payment_success'),
+    path('payment/failure/', views.payment_failure, name='payment_failure'),
 ]

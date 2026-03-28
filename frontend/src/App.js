@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import { AdminUsersPage } from "./pages/Admin/AdminUser";
 import { AdminVendorsPage } from "./pages/Admin/AdminVendors";
 import { AdminProductsPage } from "./pages/Admin/AdminProduct";
+import { AdminOrdersPage } from "./pages/Admin/AdminOrders";
 import AdminReportsPage from "./pages/Admin/AdminReport";
 import AdminSettingsPage from "./pages/Admin/AdminSetting";
 import { AdminActivityLogsPage } from "./pages/Admin/AdminActivityLogs";
@@ -29,6 +30,9 @@ import VendorProfilePage from "./pages/VendorProfilePage";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import VerifyOTP from "./pages/Auth/VerifyOTP";
 import ResetPassword from "./pages/Auth/ResetPassword";
+import CheckoutPage from "./pages/CheckoutPage";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { useEffect, useState } from "react";
@@ -93,6 +97,9 @@ function App() {
           <Route path="/profile" element={<CustomerOrPublicRoute><ProfilePage /></CustomerOrPublicRoute>} />
           <Route path="/product/:productId" element={<CustomerOrPublicRoute><ProductDetailsPage /></CustomerOrPublicRoute>} />
           <Route path="/vendor/:vendorId" element={<CustomerOrPublicRoute><VendorProfilePage /></CustomerOrPublicRoute>} />
+          <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+          <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+          <Route path="/payment-failure" element={<ProtectedRoute><PaymentFailure /></ProtectedRoute>} />
           <Route
             path="/vendor/dashboard"
             element={
@@ -172,6 +179,14 @@ function App() {
             element={
               <ProtectedRoute allowedRole="admin">
                 <AdminProductsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <ProtectedRoute allowedRole="admin">
+                <AdminOrdersPage />
               </ProtectedRoute>
             }
           />

@@ -522,6 +522,16 @@ const ProfilePage = () => {
                                   'bg-amber-50 text-amber-600 border border-amber-100'}`}>
                               {order.status}
                             </span>
+                            
+                            {order.status === 'delivered' ? (
+                                <Link to={`/product/${order.product}?tab=reviews`} className="mt-1 w-full text-center py-2.5 px-4 bg-primary text-white text-[10px] font-black rounded hover:bg-primary-dark transition-all no-underline uppercase tracking-widest shadow-sm">
+                                  Write Review
+                                </Link>
+                            ) : (
+                                <button disabled className="mt-1 w-full text-center py-2.5 px-4 bg-gray-100 text-gray-400 text-[10px] font-black rounded cursor-not-allowed uppercase tracking-widest shadow-sm border border-gray-200" title="You can review this product after delivery">
+                                  Write Review
+                                </button>
+                            )}
                           </div>
                         </div>
                       ))}

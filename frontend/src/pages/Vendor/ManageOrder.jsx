@@ -181,16 +181,18 @@ export function ManageOrdersPage() {
                                             </button>
                                             
                                             {/* Status Update Popover */}
-                                            <div className="absolute right-0 bottom-full mb-2 hidden group-hover/actions:block bg-white border border-gray-100 shadow-2xl rounded-lg p-2 z-50 min-w-[150px]">
-                                                {["pending", "processing", "shipped", "delivered"].map(status => (
-                                                    <button 
-                                                        key={status}
-                                                        onClick={() => handleStatusUpdate(order.id, status)}
-                                                        className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500'} border-none cursor-pointer bg-white mb-1 last:mb-0`}
-                                                    >
-                                                        Set to {status}
-                                                    </button>
-                                                ))}
+                                            <div className="absolute right-0 bottom-full pb-2 hidden group-hover/actions:block z-50 min-w-[150px]">
+                                                <div className="bg-white border border-gray-100 shadow-2xl rounded-lg p-2">
+                                                    {["processing", "shipped", "delivered"].map(status => (
+                                                        <button 
+                                                            key={status}
+                                                            onClick={() => handleStatusUpdate(order.id, status)}
+                                                            className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500'} border-none cursor-pointer bg-white mb-1 last:mb-0 hover:bg-gray-50`}
+                                                        >
+                                                            Set to {status}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </td>

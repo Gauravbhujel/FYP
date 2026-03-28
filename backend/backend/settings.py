@@ -162,3 +162,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'gauravbhujel036@gmail.com'  
 EMAIL_HOST_PASSWORD = 'ptni ceyk uond tflx' 
+
+# eSewa Configuration (UAT/Sandbox Defaults)
+ESEWA_PRODUCT_CODE = 'EPAYTEST'
+ESEWA_SECRET_KEY = '8gBm/:&EnhH.1/q'
+ESEWA_IS_SANDBOX = True
+BASE_URL = 'http://localhost:8000'
+FRONTEND_URL = 'http://localhost:3000'

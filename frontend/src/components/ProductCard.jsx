@@ -56,9 +56,18 @@ const ProductCard = ({ product }) => {
                     <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out ${product.quantity <= 0 ? 'grayscale' : ''}`}
                     />
                 </Link>
+
+                {/* Sold Out Overlay */}
+                {product.quantity <= 0 && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
+                        <span className="bg-white/90 text-black text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-[2px] shadow-lg">
+                            Sold Out
+                        </span>
+                    </div>
+                )}
 
                 {/* Overlay on hover */}
                 <div className="absolute inset-0 bg-black/0 transition-all duration-300 pointer-events-none" />
@@ -124,9 +133,12 @@ const ProductCard = ({ product }) => {
                         <Button 
                             variant="primary"
                             onClick={() => handleAction('cart')}
-                            className={`w-full py-3 text-xs uppercase tracking-widest gap-2 flex items-center justify-center ${isAdded ? '!bg-green-500' : ''}`}
+                            disabled={product.quantity <= 0}
+                            className={`w-full py-3 text-xs uppercase tracking-widest gap-2 flex items-center justify-center transition-all ${isAdded ? '!bg-green-500' : ''} ${product.quantity <= 0 ? 'bg-gray-200 text-gray-400 border-gray-100 cursor-not-allowed pointer-events-none' : ''}`}
                         >
-                            {isAdded ? (
+                            {product.quantity <= 0 ? (
+                                "Unavailable"
+                            ) : isAdded ? (
                                 <>
                                     <FaCheckCircle size={14} /> Added
                                 </>

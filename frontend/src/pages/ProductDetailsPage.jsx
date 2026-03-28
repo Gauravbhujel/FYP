@@ -286,13 +286,22 @@ const ProductDetailsPage = () => {
                                     <span className="text-amber-800 font-black text-xs">{product.average_rating?.toFixed(1) || '4.8'}</span>
                                 </div>
                                 <span className="text-gray-400 font-semibold text-xs transition-colors cursor-pointer underline decoration-dashed underline-offset-4">{reviews.length || '128'} Reviews</span>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="relative flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                    </span>
-                                    <span className="text-emerald-600 font-bold text-xs">In Stock</span>
-                                </div>
+                                {product.quantity > 0 ? (
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="relative flex h-2 w-2">
+                                            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${product.quantity < 5 ? 'bg-amber-400' : 'bg-emerald-400'} opacity-75`}></span>
+                                            <span className={`relative inline-flex rounded-full h-2 w-2 ${product.quantity < 5 ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
+                                        </span>
+                                        <span className={`${product.quantity < 5 ? 'text-amber-600' : 'text-emerald-600'} font-bold text-xs`}>
+                                            {product.quantity < 5 ? `Only ${product.quantity} left in stock` : `In Stock (${product.quantity})`}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-2 h-2 rounded-full bg-rose-500"></div>
+                                        <span className="text-rose-600 font-bold text-xs uppercase tracking-wider">Out of Stock</span>
+                                    </div>
+                                )}
                             </div>
 
                             {/* ─── PRICING SECTION ─── */}
@@ -328,15 +337,17 @@ const ProductDetailsPage = () => {
                             <div className="space-y-4 mb-7">
                                 <div className="flex items-center gap-4">
                                     {/* Quantity selector */}
-                                    <div className="flex items-center border-b border-gray-200 overflow-hidden">
+                                    <div className={`flex items-center border-b border-gray-200 overflow-hidden ${product.quantity <= 0 ? 'opacity-30 pointer-events-none' : ''}`}>
                                         <button 
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="w-12 h-12 flex items-center justify-center transition-all text-lg font-bold text-gray-500"
+                                            disabled={product.quantity <= 0}
+                                            className="w-12 h-12 flex items-center justify-center transition-all text-lg font-bold text-gray-500 disabled:cursor-not-allowed"
                                         >−</button>
-                                        <span className="w-12 text-center font-black text-base text-gray-900 select-none">{quantity}</span>
+                                        <span className="w-12 text-center font-black text-base text-gray-900 select-none">{product.quantity <= 0 ? 0 : quantity}</span>
                                         <button 
-                                            onClick={() => setQuantity(quantity + 1)}
-                                            className="w-12 h-12 flex items-center justify-center transition-all text-lg font-bold text-gray-500"
+                                            onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
+                                            disabled={product.quantity <= 0 || quantity >= product.quantity}
+                                            className="w-12 h-12 flex items-center justify-center transition-all text-lg font-bold text-gray-500 disabled:text-gray-200 disabled:cursor-not-allowed"
                                         >+</button>
                                     </div>
 
@@ -344,9 +355,12 @@ const ProductDetailsPage = () => {
                                     <Button 
                                         variant="primary"
                                         onClick={() => handleAction('cart')}
-                                        className={`flex-grow h-12 shadow-sm gap-2.5 ${addedToCart ? '!bg-green-500' : ''}`}
+                                        disabled={product.quantity <= 0}
+                                        className={`flex-grow h-12 shadow-sm gap-2.5 transition-all ${addedToCart ? '!bg-green-500' : ''} ${product.quantity <= 0 ? 'grayscale opacity-50 cursor-not-allowed' : ''}`}
                                     >
-                                        {addedToCart ? (
+                                        {product.quantity <= 0 ? (
+                                            "Sold Out"
+                                        ) : addedToCart ? (
                                             <><FaCheckCircle /> Added!</>
                                         ) : (
                                             <><FaShoppingCart /> Add to Cart</>
@@ -356,12 +370,13 @@ const ProductDetailsPage = () => {
 
                                 {/* Buy Now */}
                                 <Button 
-                                    variant="secondary"
-                                    onClick={() => alert("Redirecting to checkout...")}
-                                    className="w-full h-12 gap-2 group border-none shadow-none bg-black !text-white"
+                                    variant="primary"
+                                    onClick={() => product.quantity > 0 ? navigate('/checkout', { state: { product, quantity } }) : null}
+                                    disabled={product.quantity <= 0}
+                                    className={`w-full h-11 gap-2 shadow-sm transition-all flex items-center justify-center font-bold ${product.quantity <= 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                                 >
-                                    <FaBolt className="text-white transition-transform" />
-                                    Buy It Now
+                                    <FaBolt />
+                                    {product.quantity <= 0 ? "Unavailable" : "Buy It Now"}
                                 </Button>
                             </div>
 
@@ -520,50 +535,45 @@ const ProductDetailsPage = () => {
                                 </div>
 
                                 {/* Review Form */}
-                                <div className="bg-primary text-white p-8 sm:p-10 rounded-xl shadow-sm relative overflow-hidden">
+                                <div className="bg-primary text-white p-8 sm:p-10 rounded-xl shadow-sm relative overflow-hidden mt-8">
                                     <div className="relative z-10">
                                         <h3 className="text-2xl font-black mb-1">Write a Review</h3>
                                         <p className="text-gray-400 mb-8 text-sm">Your feedback helps the community choose the best gear.</p>
 
-                                        {isAuthenticated ? (
-                                            canReview ? (
-                                                <form onSubmit={handleReviewSubmit} className="space-y-5">
-                                                    <div>
-                                                        <label className="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Your Rating</label>
-                                                        {renderStars(0, true)}
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Your Review</label>
-                                                        <textarea 
-                                                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-sm focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all min-h-[120px]"
-                                                            placeholder="Tell us about the performance, durability, and fit..."
-                                                            value={userReview.comment}
-                                                            onChange={(e) => setUserReview(prev => ({ ...prev, comment: e.target.value }))}
-                                                        ></textarea>
-                                                    </div>
-                                                    <Button 
-                                                        variant="primary"
-                                                        type="submit"
-                                                        disabled={isSubmittingReview}
-                                                        className="w-full h-14 uppercase tracking-wider disabled:opacity-50"
-                                                    >
-                                                        {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
-                                                    </Button>
-                                                </form>
-                                            ) : (
-                                                <div className="bg-white/5 rounded-2xl p-8 border border-white/10 text-center">
-                                                    <p className="text-amber-400 font-bold">
-                                                        {hasPurchased 
-                                                            ? "Only delivered orders can be reviewed. Please wait for your gear to arrive!"
-                                                            : "Only verified purchasers can leave a review."}
-                                                    </p>
-                                                </div>
-                                            )
-                                        ) : (
-                                            <div className="text-center py-4">
-                                                <Link to="/login" className="text-primary font-bold">Login to Leave a Review →</Link>
+                                        <form onSubmit={(e) => { e.preventDefault(); if (canReview) handleReviewSubmit(e); }} className="space-y-5">
+                                            <div>
+                                                <label className="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Your Rating</label>
+                                                {renderStars(0, isAuthenticated && canReview)}
                                             </div>
-                                        )}
+                                            <div>
+                                                <label className="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Your Review</label>
+                                                <textarea 
+                                                    className={`w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-sm focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all min-h-[120px] ${(!isAuthenticated || !canReview) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    placeholder="Tell us about the performance, durability, and fit..."
+                                                    value={userReview.comment}
+                                                    onChange={(e) => isAuthenticated && canReview && setUserReview(prev => ({ ...prev, comment: e.target.value }))}
+                                                    disabled={!isAuthenticated || !canReview}
+                                                ></textarea>
+                                            </div>
+                                            
+                                            {!isAuthenticated ? (
+                                                <Link to="/login" className="block w-full text-center py-4 bg-white/10 text-white font-black uppercase tracking-wider rounded-lg hover:bg-white/20 transition-all no-underline">
+                                                    Login to Leave a Review
+                                                </Link>
+                                            ) : (
+                                                <Button 
+                                                    variant="primary"
+                                                    type="submit"
+                                                    disabled={!canReview || isSubmittingReview}
+                                                    className="w-full h-14 uppercase tracking-wider disabled:opacity-50"
+                                                    title={!canReview ? (hasPurchased ? "You can review this product after delivery" : "Only verified purchasers can leave a review") : ""}
+                                                >
+                                                    {!canReview 
+                                                        ? (hasPurchased ? "Review After Delivery" : "Not Eligible to Review") 
+                                                        : (isSubmittingReview ? 'Submitting...' : 'Submit Review')}
+                                                </Button>
+                                            )}
+                                        </form>
                                     </div>
                                 </div>
                             </div>

@@ -127,7 +127,13 @@ export function ManageProductsPage() {
                       <td className="px-8 py-6">
                         <div className="flex flex-col gap-1">
                           <span className="text-[10px] font-black text-accent uppercase tracking-widest">Rs. {product.price.toLocaleString()}</span>
-                          <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">Stock: {product.quantity}</span>
+                          <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${
+                            product.quantity === 0 ? "text-rose-600 animate-pulse" : 
+                            product.quantity < 5 ? "text-amber-500" : 
+                            "text-gray-400"
+                          }`}>
+                            Stock: {product.quantity} {product.quantity === 0 ? "(Sold Out)" : product.quantity < 5 ? "(Low Stock)" : ""}
+                          </span>
                         </div>
                       </td>
                       <td className="px-8 py-6">
