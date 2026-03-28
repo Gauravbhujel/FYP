@@ -22,7 +22,7 @@
   --text-muted:     #9ca3af;
   --bg-light:       #f5f5f5;
   --bg-card:        #ffffff;
-  --border:         #d1d5db;
+  --border:         #9ca3af; /* Darker border for better visibility */
 
   /* Gradients */
   --grad-hero:      linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
@@ -156,6 +156,18 @@ body {
   background: var(--grad-accent);
   border-radius: 2px;
   transition: width 0.3s ease;
+}
+
+/* Global Input Styling */
+input, textarea, select {
+  border-color: var(--border) !important;
+  transition: var(--t-fast);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent) !important;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255,107,0,0.1);
 }
 
 /* Scrollbar */

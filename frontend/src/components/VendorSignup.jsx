@@ -115,7 +115,7 @@ export function VendorSignupPage() {
                       onChange={handleChange}
                       placeholder="e.g. Ram"
                       className={`w-full pl-11 pr-4 py-3.5 bg-white border rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium ${
-                        errors.firstName ? "border-red-500" : "border-gray-200"
+                        errors.firstName ? "border-red-500" : "border-gray-300"
                       }`}
                     />
                   </div>
@@ -166,7 +166,7 @@ export function VendorSignupPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+977"
-                      className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
@@ -210,7 +210,7 @@ export function VendorSignupPage() {
                     value={formData.address}
                     onChange={handleChange}
                     placeholder="Physical location or main hub"
-                    className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                    className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                   />
                 </div>
               </div>

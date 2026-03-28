@@ -1261,12 +1261,23 @@ def user_profile(request):
             # Support both JSON and multipart/form-data
             if request.content_type.startswith('multipart/form-data'):
                 # For multipart, we need to merge POST data and FILES
-                # Using a copy of POST to avoid modifying the original and then updating with FILES
                 data = request.POST.copy()
+                
+                # Check for explicit removal flag
+                if data.get('remove_picture') == 'true':
+                    user.profile_picture = None
+                    user.save()
+                
                 data.update(request.FILES)
                 serializer = UserProfileSerializer(user, data=data, partial=True)
             else:
                 data = json.loads(request.body)
+                
+                # Check for explicit removal flag in JSON
+                if data.get('remove_picture'):
+                    user.profile_picture = None
+                    user.save()
+                
                 serializer = UserProfileSerializer(user, data=data, partial=True)
                 
             if serializer.is_valid():

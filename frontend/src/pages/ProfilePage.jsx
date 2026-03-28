@@ -10,10 +10,11 @@ import {
   FaRegEdit, FaCheckCircle, FaChevronRight, FaStore
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { Button } from "../components/ui/Button";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, role } = useAuth();
   const [activeTab, setActiveTab] = useState("profile"); // profile, orders, settings
 
   const [user, setUser] = useState(null);
@@ -108,6 +109,24 @@ const ProfilePage = () => {
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRemovePicture = async () => {
+    if (!window.confirm("Are you sure you want to remove your profile picture?")) return;
+
+    try {
+      const data = new FormData();
+      data.append("remove_picture", "true");
+      // Include mandatory fields for partial update consistency if needed
+      data.append("first_name", profileForm.first_name);
+      data.append("last_name", profileForm.last_name);
+
+      await api.post("user/profile/", data);
+      showMessage("Profile picture removed!", "success");
+      fetchProfile();
+    } catch (err) {
+      showMessage("Failed to remove picture.", "error");
+    }
   };
 
   const handleFileChange = async (e) => {
@@ -231,8 +250,8 @@ const ProfilePage = () => {
           <aside className="w-full lg:w-[320px] flex-shrink-0 lg:sticky lg:top-32 space-y-6">
 
             {/* User Quick Identity Card */}
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 text-center relative overflow-hidden group hover:bg-white/80 transition-all cursor-pointer">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primary-light"></div>
+            <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 text-center relative overflow-hidden group hover:shadow-lg transition-all cursor-pointer">
+              <div className="absolute top-0 left-0 w-full h-1 bg-accent"></div>
 
               <div className="relative inline-block mb-4">
                 <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-primary-dark p-1 shadow-lg shadow-primary/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
@@ -248,14 +267,38 @@ const ProfilePage = () => {
                     )}
                   </div>
                 </div>
-                <label className="absolute -bottom-1 -right-1 w-10 h-10 bg-white shadow-xl border border-gray-100 rounded-xl flex items-center justify-center cursor-pointer text-primary border-none">
-                  <FaCamera size={14} />
-                  <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
-                </label>
+                <div className="flex absolute -bottom-1 -right-1 gap-2">
+                  <label className="w-10 h-10 bg-white shadow-xl border border-gray-100 rounded-xl flex items-center justify-center cursor-pointer text-primary border-none hover:bg-gray-50 transition-colors">
+                    <FaCamera size={14} />
+                    <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+                  </label>
+                  {user?.profile_picture && (
+                    <button 
+                      onClick={handleRemovePicture}
+                      className="w-10 h-10 bg-white shadow-xl border border-gray-100 rounded-xl flex items-center justify-center cursor-pointer text-primary border-none hover:bg-gray-50 transition-colors"
+                      title="Remove Profile Picture"
+                    >
+                      <FaTrash size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <h3 className="text-xl font-black text-gray-900 leading-tight mb-1">{user?.first_name} {user?.last_name}</h3>
-              <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-6">{user?.email}</p>
+              <h3 className="text-2xl font-black text-gray-900 leading-tight mb-1">{user?.first_name} {user?.last_name}</h3>
+              <p className="text-gray-500 font-medium text-sm mb-4">{user?.email}</p>
+
+              {/* Role Badge */}
+              <div className="flex justify-center mb-6">
+                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm border ${
+                  role === 'admin' 
+                    ? 'bg-gray-900 text-white border-gray-800' 
+                    : role === 'vendor' 
+                      ? 'bg-accent text-white border-accent-dark' 
+                      : 'bg-gray-100 text-gray-600 border-gray-200'
+                }`}>
+                  {role || 'User'}
+                </span>
+              </div>
 
               <div className="h-[1px] bg-gray-50 w-full mb-6"></div>
 
@@ -273,7 +316,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Sidebar Navigation */}
-            <nav className="bg-white p-3 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 space-y-1">
+            <nav className="bg-white p-3 rounded-2xl shadow-md border border-gray-100 space-y-1">
               {[
                 { id: 'profile', icon: <FaUser />, label: 'My Profile' },
                 { id: 'orders', icon: <FaBox />, label: 'Order History' },
@@ -330,19 +373,21 @@ const ProfilePage = () => {
             {/* TAB: PROFILE */}
             {activeTab === "profile" && (
               <div className="animate-fade-up space-y-8">
-                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100">
-                  <div className="flex justify-between items-center mb-10 pb-6 border-b border-gray-50">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-md border border-gray-100">
+                  <div className="flex justify-between items-center mb-10 pb-6 border-b border-gray-100">
                     <div>
-                      <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Main Profile</h2>
-                      <p className="text-gray-400 font-medium text-sm">Personal identity and account verification status.</p>
+                      <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Personal Information</h2>
+                      <p className="text-gray-500 font-medium text-sm">Manage your profile details and preferences.</p>
                     </div>
                     {!isEditingProfile && (
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={() => setIsEditingProfile(true)}
-                        className="flex items-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:bg-gray-100 hover:border-gray-300 hover:scale-[1.02] active:scale-95"
+                        className="gap-2"
                       >
                         <FaRegEdit /> Edit
-                      </button>
+                      </Button>
                     )}
                   </div>
 
@@ -353,7 +398,7 @@ const ProfilePage = () => {
                         {isEditingProfile ? (
                           <input
                             name="first_name" value={profileForm.first_name} onChange={handleProfileChange}
-                            className="w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent rounded-[1.25rem] focus:outline-none focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all font-bold text-gray-900"
+                            className="w-full px-6 py-4 bg-white border-2 border-gray-300 rounded-[1.25rem] focus:outline-none focus:border-accent focus:bg-white transition-all font-bold text-gray-900 shadow-sm"
                           />
                         ) : (
                           <div className="px-6 py-4 bg-gray-50/30 rounded-[1.25rem] font-black text-gray-900 border border-gray-50">{user?.first_name || "—"}</div>
@@ -364,7 +409,7 @@ const ProfilePage = () => {
                         {isEditingProfile ? (
                           <input
                             name="last_name" value={profileForm.last_name} onChange={handleProfileChange}
-                            className="w-full px-6 py-4 bg-gray-50/50 border-2 border-transparent rounded-[1.25rem] focus:outline-none focus:border-primary/20 focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all font-bold text-gray-900"
+                            className="w-full px-6 py-4 bg-white border-2 border-gray-300 rounded-[1.25rem] focus:outline-none focus:border-accent focus:bg-white transition-all font-bold text-gray-900 shadow-sm"
                           />
                         ) : (
                           <div className="px-6 py-4 bg-gray-50/30 rounded-[1.25rem] font-black text-gray-900 border border-gray-50">{user?.last_name || "—"}</div>
@@ -385,41 +430,41 @@ const ProfilePage = () => {
 
                     {isEditingProfile && (
                       <div className="flex gap-4 justify-end pt-6">
-                        <button
+                        <Button
                           type="button"
+                          variant="outline"
                           onClick={() => { setIsEditingProfile(false); setSelectedFile(null); }}
-                          className="px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-gray-400 transition-all font-sans"
                         >
                           Discard
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="submit"
-                          className="bg-gradient-to-r from-primary to-primary-light text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:brightness-110 hover:scale-[1.02] active:scale-95"
+                          variant="primary"
                         >
                           Update Profile
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </form>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-emerald-50/50 p-8 rounded-[2rem] border border-emerald-100 flex items-center gap-6">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-primary shadow-sm text-2xl">
+                  <div className="bg-emerald-50/20 p-6 rounded-2xl border border-emerald-100 flex items-center gap-6">
+                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-emerald-600 shadow-sm text-lg">
                       <FaCheckCircle />
                     </div>
                     <div>
-                      <h4 className="text-lg font-black text-emerald-900">Verified Member</h4>
-                      <p className="text-emerald-800/60 text-xs font-medium uppercase tracking-wider">Nepal Sports Alliance Active</p>
+                      <h4 className="text-base font-black text-emerald-900">Verified Member</h4>
+                      <p className="text-emerald-800/60 text-[10px] font-medium uppercase tracking-wider">Active Community Status</p>
                     </div>
                   </div>
-                  <Link to="/products" className="bg-gray-900 p-8 rounded-[2rem] border border-gray-800 flex items-center gap-6 transition-all no-underline">
-                    <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center text-white text-2xl">
+                  <Link to="/products" className="bg-accent p-6 rounded-2xl border border-accent flex items-center gap-6 transition-all no-underline group hover:scale-[1.02] active:scale-95 shadow-lg shadow-accent/10">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-white text-lg">
                       <FaStore />
                     </div>
                     <div>
-                      <h4 className="text-lg font-black text-white">Marketplace</h4>
-                      <p className="text-white/40 text-xs font-medium uppercase tracking-wider transition-colors">Continue Discovery Journey →</p>
+                      <h4 className="text-base font-black text-white">Marketplace</h4>
+                      <p className="text-white/80 text-[10px] font-medium uppercase tracking-wider">Explore Gear Store →</p>
                     </div>
                   </Link>
                 </div>
@@ -429,9 +474,9 @@ const ProfilePage = () => {
             {/* TAB: ORDERS */}
             {activeTab === "orders" && (
               <div className="animate-fade-up">
-                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 min-h-[500px]">
-                  <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight mb-3">Order History</h2>
-                  <p className="text-gray-400 font-medium text-sm mb-12">Tracking all your gear acquisitions and service history.</p>
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-md border border-gray-100 min-h-[500px]">
+                  <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">Order History</h2>
+                  <p className="text-gray-500 font-medium text-sm mb-10">Track your past purchases and service history.</p>
 
                   {loadingOrders ? (
                     <div className="flex justify-center py-20">
@@ -442,11 +487,10 @@ const ProfilePage = () => {
                       <FaBox className="text-5xl text-gray-100 mx-auto mb-6" />
                       <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">The Archive is Empty</h3>
                       <p className="text-gray-400 max-w-xs mx-auto text-sm font-medium mb-10">"Every athlete's journey begins with the first piece of equipment."</p>
-                      <Link
-                        to='/products'
-                        className="bg-primary text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest no-underline shadow-xl shadow-primary/20 transition-all inline-block"
-                      >
-                        Shop Gears Now
+                      <Link to="/products">
+                        <Button variant="primary" className="inline-block no-underline">
+                          Shop Gears Now
+                        </Button>
                       </Link>
                     </div>
                   ) : (
@@ -492,9 +536,9 @@ const ProfilePage = () => {
               <div className="animate-fade-up space-y-10">
 
                 {/* Contact Settings Card */}
-                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100">
-                  <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight mb-2">Delivery Intelligence</h2>
-                  <p className="text-gray-400 font-medium text-sm mb-10">Global shipping routes and contact verification points.</p>
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-md border border-gray-100">
+                  <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">Contact Details</h2>
+                  <p className="text-gray-500 font-medium text-sm mb-10">Manage your shipping address and contact information.</p>
 
                   <form onSubmit={handleSaveContact} className="max-w-2xl space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -505,7 +549,7 @@ const ProfilePage = () => {
                           <input
                             name="phone_number" value={contactForm.phone_number} onChange={handleContactChange}
                             placeholder="e.g. +977-98..."
-                            className="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-2 border-transparent rounded-[1.25rem] focus:outline-none focus:border-primary/20 focus:bg-white transition-all font-bold text-gray-900"
+                            className="w-full pl-14 pr-6 py-4 bg-white border-2 border-gray-300 rounded-[1.25rem] focus:outline-none focus:border-accent focus:bg-white transition-all font-bold text-gray-900 shadow-sm"
                           />
                         </div>
                       </div>
@@ -516,21 +560,21 @@ const ProfilePage = () => {
                           <textarea
                             name="address" value={contactForm.address} onChange={handleContactChange}
                             rows="1" placeholder="City, Location..."
-                            className="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-2 border-transparent rounded-[1.25rem] focus:outline-none focus:border-primary/20 focus:bg-white transition-all font-bold text-gray-900 resize-none h-[56px]"
+                            className="w-full pl-14 pr-6 py-4 bg-white border-2 border-gray-300 rounded-[1.25rem] focus:outline-none focus:border-accent focus:bg-white transition-all font-bold text-gray-900 shadow-sm resize-none h-[56px]"
                           />
                         </div>
                       </div>
                     </div>
-                    <button type="submit" className="bg-gray-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-gray-200 hover:scale-[1.02] active:scale-95">
+                    <Button type="submit" variant="primary">
                       Update Details
-                    </button>
+                    </Button>
                   </form>
                 </div>
 
                 {/* Password Box */}
-                <div className="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100">
-                  <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight mb-2">Security Vault</h2>
-                  <p className="text-gray-400 font-medium text-sm mb-10">Advanced key management and security protocol updates.</p>
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-md border border-gray-100">
+                  <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-2">Security Settings</h2>
+                  <p className="text-gray-500 font-medium text-sm mb-10">Manage your password and account security encryption.</p>
 
                   <form onSubmit={handleSavePassword} className="max-w-2xl space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -541,7 +585,7 @@ const ProfilePage = () => {
                           <input
                             type="password" name="current_password" value={passwordForm.current_password} onChange={handlePasswordChange}
                             placeholder="Current Password"
-                            className="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-2 border-transparent rounded-[1.25rem] focus:outline-none focus:border-primary/20 focus:bg-white transition-all font-bold"
+                            className="w-full pl-14 pr-6 py-4 bg-white border-2 border-gray-300 rounded-[1.25rem] focus:outline-none focus:border-accent focus:bg-white transition-all font-bold shadow-sm"
                           />
                         </div>
                       </div>
@@ -552,33 +596,34 @@ const ProfilePage = () => {
                           <input
                             type="password" name="new_password" value={passwordForm.new_password} onChange={handlePasswordChange}
                             placeholder="New Password"
-                            className="w-full pl-14 pr-6 py-4 bg-gray-50/50 border-2 border-transparent rounded-[1.25rem] focus:outline-none focus:border-primary/20 focus:bg-white transition-all font-bold"
+                            className="w-full pl-14 pr-6 py-4 bg-white border-2 border-gray-300 rounded-[1.25rem] focus:outline-none focus:border-accent focus:bg-white transition-all font-bold shadow-sm"
                           />
                         </div>
                       </div>
                     </div>
-                    <button type="submit" className="bg-primary text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95">
+                    <Button type="submit" variant="primary">
                       Override Password
-                    </button>
+                    </Button>
                   </form>
                 </div>
 
                 {/* Danger Zone */}
-                <div className="bg-red-50/30 p-8 md:p-12 rounded-[2.5rem] border border-red-100">
-                  <h2 className="text-xl font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-3">
-                    <FaSignOutAlt /> Terminal Protocol
+                <div className="bg-red-50/30 p-8 md:p-10 rounded-2xl border border-red-100">
+                  <h2 className="text-lg font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-3">
+                    <FaExclamationTriangle className="text-red-500" /> Danger Zone
                   </h2>
-                  <p className="text-gray-500 font-medium text-sm mb-10 max-w-xl">
-                    "Deleting your account will result in permanent loss of all gear history, credits, and verification certificates. This action is irrevocable."
+                  <p className="text-gray-600 font-medium text-sm mb-10 max-w-xl">
+                    Once you delete your account, there is no going back. Please be certain.
                   </p>
 
                   {!showDeleteConfirm ? (
-                    <button
+                    <Button
+                      variant="secondary"
                       onClick={() => setShowDeleteConfirm(true)}
-                      className="bg-white border-2 border-red-100 text-red-500 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-red-100"
+                      className="!text-red-500 !border-red-200 hover:!bg-red-50"
                     >
                       Initialize Deletion
-                    </button>
+                    </Button>
                   ) : (
                     <div className="bg-white p-10 rounded-[2rem] border border-red-200 shadow-2xl animate-fade-in text-center max-w-md mx-auto">
                       <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 mx-auto mb-6">
@@ -587,18 +632,19 @@ const ProfilePage = () => {
                       <h3 className="text-2xl font-black text-gray-900 mb-2 uppercase">FINAL WARNING</h3>
                       <p className="text-gray-400 font-medium text-sm mb-10">Are you absolutely sure you want to scrub your identity from GearUp Nepal?</p>
                       <div className="flex flex-col gap-3">
-                        <button
+                        <Button
                           onClick={handleDeleteAccount}
-                          className="bg-red-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-100"
+                          variant="primary"
+                          className="!bg-red-600 hover:!bg-red-700 !shadow-none"
                         >
                           Confirm Permanent Wipe
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => setShowDeleteConfirm(false)}
-                          className="bg-gray-100 text-gray-700 py-4 rounded-2xl font-black text-xs uppercase tracking-widest"
+                          variant="secondary"
                         >
                           Maintain Account
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   )}

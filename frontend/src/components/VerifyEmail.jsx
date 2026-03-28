@@ -72,7 +72,7 @@ export function VerifyEmailPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your registered email"
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                 />
               </div>
             </div>
@@ -88,7 +88,7 @@ export function VerifyEmailPage() {
                   placeholder="123456"
                   required
                   maxLength={6}
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium tracking-[0.5em] text-center"
+                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium tracking-[0.5em] text-center"
                 />
               </div>
             </div>

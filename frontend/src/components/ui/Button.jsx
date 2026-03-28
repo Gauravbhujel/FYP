@@ -12,15 +12,17 @@ export function Button({
 
   const variants = {
     primary:
-      "bg-[#F97316] text-white shadow-sm border border-transparent hover:bg-[#EA580C]",
+      "bg-accent text-white shadow-lg border border-transparent hover:bg-accent-dark hover:shadow-accent/40 active:scale-95 transition-all duration-300",
     secondary:
-      "bg-transparent text-gray-900 border border-gray-300 shadow-sm hover:bg-gray-50",
+      "bg-transparent text-gray-900 border-2 border-gray-900 hover:bg-accent hover:text-white hover:border-accent hover:shadow-lg hover:shadow-accent/30 active:scale-95 transition-all duration-300",
+    outline:
+      "bg-transparent text-gray-600 border border-gray-200 hover:border-gray-900 hover:text-gray-900 transition-all duration-300",
   };
 
   const sizes = {
-    sm: "px-4 py-2 text-sm",
-    md: "px-6 py-2.5 text-base",
-    lg: "px-8 py-3 text-lg",
+    sm: "px-4 py-2 text-[10px] font-black uppercase tracking-widest",
+    md: "px-8 py-3.5 text-xs font-black uppercase tracking-widest",
+    lg: "px-10 py-4 text-sm font-black uppercase tracking-widest",
   };
 
   return (

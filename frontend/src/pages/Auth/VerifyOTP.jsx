@@ -88,7 +88,7 @@ const VerifyOTP = () => {
                   onChange={(e) => setOtp(e.target.value)}
                   maxLength={6}
                   required
-                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium placeholder:text-gray-300 tracking-[0.5em] text-center"
+                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium placeholder:text-gray-300 tracking-[0.5em] text-center"
                 />
               </div>
             </div>

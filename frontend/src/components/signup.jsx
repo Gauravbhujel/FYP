@@ -82,7 +82,7 @@ const Signup = () => {
                       placeholder="John"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
@@ -95,7 +95,7 @@ const Signup = () => {
                       placeholder="Doe"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
@@ -112,7 +112,7 @@ const Signup = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
@@ -125,7 +125,7 @@ const Signup = () => {
                       placeholder="+977"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
@@ -166,7 +166,7 @@ const Signup = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
@@ -180,7 +180,7 @@ const Signup = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
+                      className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-lg outline-none transition-all duration-300 focus:border-accent focus:ring-4 focus:ring-accent/5 font-medium"
                     />
                   </div>
                 </div>
