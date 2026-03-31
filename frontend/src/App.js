@@ -108,7 +108,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/vendor/signup" element={<PublicAuthRoute><VendorSignupPage /></PublicAuthRoute>} />
+          <Route path="/vendor/signup" element={<CustomerOrPublicRoute><VendorSignupPage /></CustomerOrPublicRoute>} />
           <Route
             path="/vendor/products"
             element={
