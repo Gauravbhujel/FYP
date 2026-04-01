@@ -6,6 +6,7 @@ import {
   ClockIcon,
   PlusIcon,
   XIcon,
+  CheckCircle2Icon
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
@@ -19,6 +20,7 @@ import api from "../../api";
 export const VendorDashboard = () => {
   const [stats, setStats] = useState({
     total_revenue: 0,
+    total_earnings: 0,
     total_orders: 0,
     products_listed: 0,
     pending_orders: 0,
@@ -169,12 +171,19 @@ export const VendorDashboard = () => {
         {/* Stats Grid */}
         {profile?.status !== "rejected" && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <MetricCard
-                title="Total Revenue"
+                title="Total Sales"
                 value={`Rs. ${stats.total_revenue.toLocaleString()}`}
                 change={5.2}
                 icon={TrendingUpIcon}
+              />
+              <MetricCard
+                title="Your Earnings"
+                value={`Rs. ${(stats.total_earnings || 0).toLocaleString()}`}
+                change={4.8}
+                icon={CheckCircle2Icon}
+                variant="accent"
               />
               <MetricCard
                 title="Total Orders"

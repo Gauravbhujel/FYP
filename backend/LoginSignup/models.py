@@ -51,6 +51,31 @@ class Vendor(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def average_rating(self):
+        from .models import ProductReview, VendorReview
+        p_reviews = ProductReview.objects.filter(product__vendor=self)
+        v_reviews = VendorReview.objects.filter(vendor=self)
+        
+        all_ratings = [r.rating for r in p_reviews] + [r.rating for r in v_reviews]
+        if not all_ratings:
+            return 0.0
+        return round(sum(all_ratings) / len(all_ratings), 1)
+    
+    @property
+    def review_count(self):
+        from .models import ProductReview, VendorReview
+        return ProductReview.objects.filter(product__vendor=self).count() + VendorReview.objects.filter(vendor=self).count()
+
+    @property
+    def service_rating(self):
+        """Direct ratings for the vendor's service (not product specific)"""
+        from .models import VendorReview
+        v_reviews = VendorReview.objects.filter(vendor=self)
+        if not v_reviews.exists():
+            return 0.0
+        return round(sum(r.rating for r in v_reviews) / v_reviews.count(), 1)
+
     def __str__(self):
         return self.store_name
 
@@ -105,6 +130,8 @@ class Order(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendor_orders')
     quantity = models.PositiveIntegerField(default=1)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    commission_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    vendor_earning = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     shipping_address = models.TextField(blank=True)
     transaction_uuid = models.CharField(max_length=100, unique=False, null=True, blank=True)
@@ -166,3 +193,30 @@ class ProductReview(models.Model):
 
     def __str__(self):
         return f"Review by {self.customer.username} on {self.product.name}"
+
+
+class VendorReview(models.Model):
+    RATING_CHOICES = (
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+    )
+
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='vendor_reviews')
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendor_reviews')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='vendor_review')
+    rating = models.IntegerField(choices=RATING_CHOICES)
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        # One review per user + vendor per order
+        unique_together = ('customer', 'vendor', 'order')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Vendor Review by {self.customer.username} for {self.vendor.store_name}"
+

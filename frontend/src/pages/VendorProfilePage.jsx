@@ -20,6 +20,8 @@ const VendorProfilePage = () => {
     const [vendor, setVendor] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState('products'); // 'products' or 'reviews'
+
 
     useEffect(() => {
         const fetchVendorDetail = async () => {
@@ -70,6 +72,19 @@ const VendorProfilePage = () => {
         );
     }
 
+    const renderStars = (rating) => {
+        return (
+            <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <FaStar 
+                        key={star}
+                        className={`text-xs ${star <= rating ? 'text-amber-400' : 'text-gray-100'}`}
+                    />
+                ))}
+            </div>
+        );
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
             <Navbar />
@@ -104,12 +119,21 @@ const VendorProfilePage = () => {
                             </div>
                         </div>
                         
-                        {/* Stats Box */}
-                        <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100 min-w-[180px]">
-                            <div className="text-center">
-                                <span className="block text-3xl font-black text-gray-900 mb-1">{vendor.products_count}</span>
+                        {/* Stats Boxes */}
+                        <div className="flex gap-4">
+                            <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100 min-w-[150px] text-center">
+                                <span className="block text-3xl font-black text-gray-900 mb-1">{vendor.products_count || 0}</span>
                                 <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
-                                    <FaBoxOpen className="text-primary" /> Products Listed
+                                    <FaBoxOpen className="text-primary" /> Products
+                                </span>
+                            </div>
+                            <div className="bg-amber-50 rounded-3xl p-6 border border-amber-100 min-w-[150px] text-center">
+                                <div className="flex items-center justify-center gap-2 mb-1">
+                                    <span className="text-3xl font-black text-gray-900">{(vendor.average_rating || 0).toFixed(1)}</span>
+                                    <FaStar className="text-amber-500 text-xl" />
+                                </div>
+                                <span className="block text-[10px] font-black text-amber-700 uppercase tracking-widest">
+                                    {vendor.review_count || 0} Reviews
                                 </span>
                             </div>
                         </div>
@@ -117,31 +141,105 @@ const VendorProfilePage = () => {
                 </div>
             </div>
 
-            {/* ─── VENDOR PRODUCTS ─── */}
-            <div className="max-w-[1280px] mx-auto px-6 py-16 w-full flex-grow">
-                <div className="flex justify-between items-end mb-12">
-                    <div>
-                        <p className="text-primary font-bold text-xs uppercase tracking-[0.2em] mb-2">Store Collection</p>
-                        <h2 className="text-3xl font-black text-gray-900">Featured Products</h2>
-                    </div>
-                    <div className="text-gray-400 font-bold text-sm bg-white px-4 py-2 rounded-xl border border-gray-100">
-                        Total {vendor.products_count} Items
-                    </div>
+            {/* ─── TABS ─── */}
+            <div className="max-w-[1280px] mx-auto px-6 mt-12">
+                <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-white border border-gray-100 rounded-3xl w-fit shadow-sm">
+                    <button
+                        onClick={() => setActiveTab('products')}
+                        className={`px-8 py-4 rounded-2xl font-black text-sm transition-all flex items-center gap-2.5 ${
+                            activeTab === 'products' 
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                        }`}
+                    >
+                        <FaBoxOpen className={activeTab === 'products' ? 'text-white' : 'text-gray-200'} />
+                        Products Collection
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('reviews')}
+                        className={`px-8 py-4 rounded-2xl font-black text-sm transition-all flex items-center gap-2.5 ${
+                            activeTab === 'reviews' 
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                        }`}
+                    >
+                        <FaStar className={activeTab === 'reviews' ? 'text-white' : 'text-gray-200'} />
+                        Service Reviews ({vendor.vendor_reviews?.length || 0})
+                    </button>
                 </div>
+            </div>
 
-                {vendor.products && vendor.products.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {vendor.products.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
+            {/* ─── TAB CONTENT ─── */}
+            <div className="max-w-[1280px] mx-auto px-6 py-12 w-full flex-grow">
+                {activeTab === 'products' ? (
+                    <div className="animate-fade-in">
+                        <div className="flex justify-between items-end mb-12">
+                            <div>
+                                <p className="text-primary font-bold text-xs uppercase tracking-[0.2em] mb-2">Store Collection</p>
+                                <h2 className="text-3xl font-black text-gray-900">Featured Products</h2>
+                            </div>
+                            <div className="text-gray-400 font-bold text-sm bg-white px-4 py-2 rounded-xl border border-gray-100">
+                                Total {vendor.products_count} Items
+                            </div>
+                        </div>
+
+                        {vendor.products && vendor.products.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                                {vendor.products.map((product) => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-[3rem] border border-gray-100 p-20 text-center shadow-sm">
+                                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-200 mx-auto mb-6">
+                                    <FaBoxOpen size={40} />
+                                </div>
+                                <h3 className="text-2xl font-black text-gray-900 mb-2">No Products Yet</h3>
+                                <p className="text-gray-400 font-medium">This vendor hasn't listed any products available for purchase yet.</p>
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-[3rem] border border-gray-100 p-20 text-center shadow-sm">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-200 mx-auto mb-6">
-                            <FaBoxOpen size={40} />
+                    <div className="animate-fade-in max-w-4xl">
+                        <div className="mb-12">
+                            <p className="text-amber-500 font-bold text-xs uppercase tracking-[0.2em] mb-2">User Feedback</p>
+                            <h2 className="text-3xl font-black text-gray-900">Vendor Service Experience</h2>
                         </div>
-                        <h3 className="text-2xl font-black text-gray-900 mb-2">No Products Yet</h3>
-                        <p className="text-gray-400 font-medium">This vendor hasn't listed any products available for purchase yet.</p>
+
+                        {vendor.vendor_reviews && vendor.vendor_reviews.length > 0 ? (
+                            <div className="space-y-6">
+                                {vendor.vendor_reviews.map((review, i) => (
+                                    <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-primary font-black text-sm border border-gray-100">
+                                                    {review.customer_name?.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="font-black text-gray-900 text-sm">{review.customer_name}</span>
+                                                        <span className="bg-emerald-50 text-emerald-600 text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                                            <FaCheckCircle className="text-[7px]" /> Verified Purchase
+                                                        </span>
+                                                    </div>
+                                                    {renderStars(review.rating)}
+                                                </div>
+                                            </div>
+                                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{new Date(review.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        <p className="text-gray-600 font-medium leading-relaxed text-sm">{review.comment}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-[3rem] border border-gray-100 p-20 text-center shadow-sm">
+                                <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center text-amber-200 mx-auto mb-6">
+                                    <FaStar size={40} />
+                                </div>
+                                <h3 className="text-2xl font-black text-gray-900 mb-2">No Service Reviews</h3>
+                                <p className="text-gray-400 font-medium">Be the first to rate this vendor's service after your purchase!</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

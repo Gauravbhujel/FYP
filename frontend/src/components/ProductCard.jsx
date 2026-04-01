@@ -114,9 +114,18 @@ const ProductCard = ({ product }) => {
                         {product.name}
                     </h3>
                 </Link>
-
-
-
+                
+                {/* Rating Row */}
+                <div className="flex items-center gap-1.5 mb-3">
+                    <div className="flex text-amber-500 text-[10px]">
+                        {[...Array(5)].map((_, i) => (
+                            <FaStar key={i} className={i < Math.floor(product.average_rating || 0) ? "text-amber-500" : "text-gray-200"} />
+                        ))}
+                    </div>
+                    <span className="text-[10px] font-bold text-gray-400">
+                        ({product.review_count || 0} reviews)
+                    </span>
+                </div>
                     {/* Price & Add to Cart button */}
                     <div className="flex flex-col gap-4 mt-auto">
                         <div className="flex items-baseline gap-2">

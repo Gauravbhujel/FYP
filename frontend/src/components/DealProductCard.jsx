@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaCheckCircle, FaFire } from 'react-icons/fa';
+import { FaShoppingCart, FaCheckCircle, FaFire, FaStar } from 'react-icons/fa';
 import api from '../api';
 import { useCart } from '../context/CartContext';
 import { Button } from './ui/Button';
@@ -64,6 +64,15 @@ const DealProductCard = ({ product }) => {
                         {product.name}
                     </h3>
                 </Link>
+
+                <div className="flex items-center gap-1.5 mb-2">
+                    <div className="flex text-amber-500 text-[9px]">
+                        {[...Array(5)].map((_, i) => (
+                            <FaStar key={i} size={8} className={i < Math.floor(product.average_rating || 0) ? "text-amber-500" : "text-gray-200"} />
+                        ))}
+                    </div>
+                    <span className="text-[9px] font-bold text-gray-400">({product.review_count || 0})</span>
+                </div>
 
                 <div className="mt-auto pt-4 flex flex-col gap-4">
                     {/* Price Block */}

@@ -149,8 +149,10 @@ export function AdminVendorsPage() {
                         <tr>
                             <th className="px-8 py-5 font-black border-b border-gray-300">Vendor Entity</th>
                             <th className="px-8 py-5 font-black border-b border-gray-300">Contact Vector</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300 text-center">Sales</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300 text-center text-accent">Comm.</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-300 text-center text-emerald-600">Payout</th>
                             <th className="px-8 py-5 font-black border-b border-gray-300">Status</th>
-                            <th className="px-8 py-5 font-black border-b border-gray-300">Registration</th>
                             <th className="px-8 py-5 font-black border-b border-gray-300 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -195,16 +197,20 @@ export function AdminVendorsPage() {
                                             </div>
                                         </div>
                                     </td>
+                                    <td className="px-8 py-6 text-center">
+                                        <p className="text-[10px] font-black text-gray-900 leading-none">Rs. {(vendor.revenue || 0).toLocaleString()}</p>
+                                        <p className="text-[8px] font-black text-gray-400 mt-1 uppercase tracking-tighter">{vendor.products || 0} Products</p>
+                                    </td>
+                                    <td className="px-8 py-6 text-center">
+                                        <span className="text-[10px] font-black text-accent tracking-widest">Rs. {(vendor.commission || 0).toLocaleString()}</span>
+                                    </td>
+                                    <td className="px-8 py-6 text-center">
+                                        <span className="text-[10px] font-black text-emerald-600 tracking-widest">Rs. {(vendor.payout || 0).toLocaleString()}</span>
+                                    </td>
                                     <td className="px-8 py-6">
                                         <span className={`px-3 py-1 bg-white border text-[9px] font-black uppercase tracking-widest shadow-sm rounded ${getStatusBadge(vendor.status)}`}>
                                             {vendor.status}
                                         </span>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2 text-gray-400">
-                                            <CalendarIcon className="w-3.5 h-3.5" />
-                                            <span className="text-[10px] font-black uppercase tracking-tighter">{vendor.joined}</span>
-                                        </div>
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="relative inline-block" ref={openMenuId === vendor.id ? dropdownRef : null}>

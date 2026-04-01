@@ -24,6 +24,7 @@ const AdminDashboard = () => {
     active_vendors: 0,
     pending_approvals: 0,
     total_revenue: 0,
+    total_commission: 0,
     total_orders: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -92,11 +93,16 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <MetricCard
             title="Total Revenue"
             value={`Rs. ${stats.total_revenue.toLocaleString()}`}
             icon={TrendingUpIcon}
+          />
+          <MetricCard
+            title="Platform Commission"
+            value={`Rs. ${(stats.total_commission || 0).toLocaleString()}`}
+            icon={CheckCircle2Icon}
           />
           <MetricCard
             title="Vendors"
@@ -179,9 +185,9 @@ const AdminDashboard = () => {
                             <thead className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-left">
                                 <tr>
                                     <th className="pb-4 border-b border-gray-300">Vendor Store</th>
-                                    <th className="pb-4 border-b border-gray-300">Gross Revenue</th>
-                                    <th className="pb-4 border-b border-gray-300 text-center">Volume</th>
-                                    <th className="pb-4 border-b border-gray-300 text-right">Performance</th>
+                                    <th className="pb-4 border-b border-gray-300">Gross Sales</th>
+                                    <th className="pb-4 border-b border-gray-300 text-center text-accent">Comm.</th>
+                                    <th className="pb-4 border-b border-gray-300 text-right text-emerald-600">Payout</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-300">
@@ -189,19 +195,16 @@ const AdminDashboard = () => {
                                     <tr key={index} className="group transition-colors">
                                         <td className="py-5">
                                             <p className="text-xs font-black text-gray-900 tracking-tight leading-none uppercase">{vendor.name}</p>
-                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-wider">Approved Vendor</p>
+                                            <p className="text-[8px] font-black text-gray-400 mt-2 uppercase tracking-wider">{vendor.orders} total orders</p>
                                         </td>
                                         <td className="py-5">
                                             <span className="text-xs font-black text-gray-900 tracking-tight">Rs. {vendor.revenue.toLocaleString()}</span>
                                         </td>
                                         <td className="py-5 text-center">
-                                            <span className="text-[9px] font-black text-gray-600 px-3 py-1 bg-[#F5F5F5] border border-gray-300 rounded uppercase">{vendor.orders} Orders</span>
+                                            <span className="text-[10px] font-black text-accent tracking-widest">Rs. {(vendor.commission || 0).toLocaleString()}</span>
                                         </td>
                                         <td className="py-5 text-right">
-                                            <div className="flex items-center justify-end gap-1">
-                                                <span className="text-xs font-black text-gray-900">{vendor.rating}</span>
-                                                <span className="text-accent text-xs">★</span>
-                                            </div>
+                                            <span className="text-[10px] font-black text-emerald-600 tracking-widest">Rs. {(vendor.payout || 0).toLocaleString()}</span>
                                         </td>
                                     </tr>
                                 ))}

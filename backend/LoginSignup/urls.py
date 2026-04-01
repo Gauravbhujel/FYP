@@ -48,6 +48,8 @@ urlpatterns = [
     path('user/delete-account/', views.delete_account, name='delete_account'),
     path('products/<int:product_id>/review/submit/', views.submit_review, name='submit_review'),
     path('products/<int:product_id>/review/check-eligibility/', views.check_review_eligibility, name='check_review_eligibility'),
+    path('vendors/<int:vendor_id>/review/submit/<int:order_id>/', views.submit_vendor_review, name='submit_vendor_review'),
+    path('vendors/<int:vendor_id>/review/check-eligibility/<int:order_id>/', views.check_vendor_review_eligibility, name='check_vendor_review_eligibility'),
     
     # Admin Orders Management
     path('admin/orders/list/', views.admin_orders_list, name='admin_orders_list'),

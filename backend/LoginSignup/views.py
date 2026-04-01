@@ -12,13 +12,14 @@ from django.conf import settings
 from django.db.models import Sum, Count, Q
 from datetime import date
 from rest_framework.authtoken.models import Token
-from .models import CustomUser, Vendor, Product, Order, CartItem, WishlistItem, ProductReview
+from .models import CustomUser, Vendor, Product, Order, CartItem, WishlistItem, ProductReview, VendorReview
 from .serializers import (
     ProductSerializer, UserProfileSerializer, VendorSerializer, 
-    CartItemSerializer, WishlistItemSerializer, ProductReviewSerializer
+    CartItemSerializer, WishlistItemSerializer, ProductReviewSerializer, VendorReviewSerializer
 )
 import uuid
 import base64
+from decimal import Decimal
 from .esewa_utils import generate_esewa_signature, verify_esewa_payment
 
 def generate_otp():
@@ -419,15 +420,22 @@ def admin_dashboard_stats(request):
             active_vendors = Vendor.objects.filter(status='approved').count()
             pending_approvals = Vendor.objects.filter(status='pending').count()
             
-            # Calculate real revenue and orders
-            total_revenue = Order.objects.aggregate(total=Sum('total_amount'))['total'] or 0
-            total_orders = Order.objects.count()
+            # Calculate real revenue, commission and orders
+            stats_agg = Order.objects.aggregate(
+                total_rev=Sum('total_amount'),
+                total_comm=Sum('commission_amount'),
+                count=Count('id')
+            )
+            total_revenue = stats_agg['total_rev'] or 0
+            total_commission = stats_agg['total_comm'] or 0
+            total_orders = stats_agg['count'] or 0
 
             return JsonResponse({
                 "total_users": total_users,
                 "active_vendors": active_vendors,
                 "pending_approvals": pending_approvals,
                 "total_revenue": float(total_revenue),
+                "total_commission": float(total_commission),
                 "total_orders": total_orders
             }, status=200)
 
@@ -454,6 +462,8 @@ def admin_top_vendors(request):
             # Get top 4 vendors by revenue
             top_vendors = Vendor.objects.filter(status='approved').annotate(
                 total_revenue=Sum('vendor_orders__total_amount'),
+                total_commission=Sum('vendor_orders__commission_amount'),
+                total_payout=Sum('vendor_orders__vendor_earning'),
                 order_count=Count('vendor_orders')
             ).order_by('-total_revenue')[:4]
 
@@ -461,9 +471,9 @@ def admin_top_vendors(request):
             for v in top_vendors:
                 vendors_data.append({
                     "name": v.store_name,
-                    "revenue": float(v.total_revenue or 0),
+                    "payout": float(v.total_payout or 0),
                     "orders": v.order_count or 0,
-                    "rating": 4.8  # Rating system not yet implemented
+                    "rating": float(v.average_rating)
                 })
             
             return JsonResponse(vendors_data, safe=False, status=200)
@@ -574,7 +584,12 @@ def admin_reports_stats(request):
             
             # Period filtering logic (simplified for baseline)
             # 1. Platform Totals
-            total_revenue = Order.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+            totals = Order.objects.aggregate(
+                total_rev=Sum('total_amount'),
+                total_comm=Sum('commission_amount')
+            )
+            total_revenue = totals['total_rev'] or 0
+            total_commission = totals['total_comm'] or 0
             total_orders = Order.objects.count()
             identity_base = User.objects.filter(role='customer').count()
             
@@ -591,21 +606,25 @@ def admin_reports_stats(request):
             history = Order.objects.filter(created_at__gte=start_date)\
                 .annotate(month=TruncMonth('created_at'))\
                 .values('month')\
-                .annotate(revenue=Sum('total_amount'), count=Count('id'))\
+                .annotate(
+                    revenue=Sum('total_amount'), 
+                    commission=Sum('commission_amount'),
+                    count=Count('id')
+                )\
                 .order_by('month')
             
             # Fill gaps and format
             month_map = {h['month'].strftime('%b').upper(): h for h in history}
-            for i in range(7):
+            for i in range(6, -1, -1):
                 m_date = (now - timedelta(days=30*i))
                 m_name = m_date.strftime('%b').upper()
-                m_data = month_map.get(m_name, {'revenue': 0, 'count': 0})
+                m_data = month_map.get(m_name, {'revenue': 0, 'commission': 0, 'count': 0})
                 monthly_data.append({
                     "month": m_name,
                     "revenue": float(m_data['revenue']),
+                    "commission": float(m_data['commission']),
                     "orders": m_data['count']
                 })
-            monthly_data.reverse()
             
             # 3. Categorical Distribution (Segment Share)
             category_stats = Order.objects.values('product__category')\
@@ -624,12 +643,12 @@ def admin_reports_stats(request):
                     "percentage": round((rev / total_cat_rev) * 100) if total_cat_rev > 0 else 0,
                 })
             
-            # Add "Other" if categories are missing or to ensure UI consistency
             if not category_breakdown:
                 category_breakdown = [{"category": "Other", "revenue": 0, "percentage": 0}]
 
             return JsonResponse({
-                "platform_yield": {"total": float(total_revenue), "growth": 14.2}, # Growth hardcoded for now or calculated later
+                "platform_yield": {"total": float(total_revenue), "growth": 14.2}, 
+                "platform_commission": {"total": float(total_commission), "growth": 12.5},
                 "total_orders": {"total": total_orders, "growth": 8.7},
                 "identity_base": {"total": identity_base, "growth": 22.4},
                 "monthly_revenue": monthly_data,
@@ -786,14 +805,20 @@ def vendor_dashboard_stats(request):
         if error:
             return error
         
-        total_revenue = Order.objects.filter(vendor=vendor).aggregate(
-            total=Sum('total_amount'))['total'] or 0
+        # Calculate revenue, earnings and counts
+        stats_agg = Order.objects.filter(vendor=vendor).aggregate(
+            total_rev=Sum('total_amount'),
+            total_earn=Sum('vendor_earning')
+        )
+        total_revenue = stats_agg['total_rev'] or 0
+        total_earnings = stats_agg['total_earn'] or 0
         total_orders = Order.objects.filter(vendor=vendor).count()
         products_listed = Product.objects.filter(vendor=vendor, is_active=True).count()
         pending_orders = Order.objects.filter(vendor=vendor, status='pending').count()
 
         return JsonResponse({
             "total_revenue": float(total_revenue),
+            "total_earnings": float(total_earnings),
             "total_orders": total_orders,
             "products_listed": products_listed,
             "pending_orders": pending_orders,
@@ -1078,6 +1103,10 @@ def public_vendor_detail(request, vendor_id):
                     "category": product.get_category_display(),
                 })
             
+            # Get vendor specific reviews
+            vendor_reviews = VendorReview.objects.filter(vendor=vendor).order_by('-created_at')
+            reviews_serializer = VendorReviewSerializer(vendor_reviews, many=True)
+            
             data = {
                 "id": vendor.id,
                 "store_name": vendor.store_name,
@@ -1088,7 +1117,11 @@ def public_vendor_detail(request, vendor_id):
                 "city": vendor.city,
                 "status": vendor.status,
                 "products": products_data,
-                "products_count": len(products_data)
+                "products_count": len(products_data),
+                "average_rating": vendor.average_rating,
+                "review_count": vendor.review_count,
+                "vendor_reviews": reviews_serializer.data,
+                "service_rating": vendor.service_rating
             }
             return JsonResponse(data, status=200)
         except Vendor.DoesNotExist:
@@ -1491,8 +1524,10 @@ def admin_vendors_list(request):
                  return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
             
             vendors = Vendor.objects.all().annotate(
-                product_count=Count('products'),
-                total_revenue=Sum('vendor_orders__total_amount')
+                product_count=Count('products', distinct=True),
+                total_revenue=Sum('vendor_orders__total_amount'),
+                total_commission=Sum('vendor_orders__commission_amount'),
+                total_payout=Sum('vendor_orders__vendor_earning')
             ).order_by('-created_at')
 
             vendors_data = []
@@ -1506,6 +1541,8 @@ def admin_vendors_list(request):
                     "address": v.address,
                     "products": v.product_count or 0,
                     "revenue": float(v.total_revenue or 0),
+                    "commission": float(v.total_commission or 0),
+                    "payout": float(v.total_payout or 0),
                     "status": v.status,
                     "joined": v.created_at.strftime("%Y-%m-%d"),
                 })
@@ -1562,8 +1599,10 @@ def customer_orders(request):
         for order in orders:
             orders_data.append({
                 "id": f"#ORD-{order.id:04d}",
+                "order_id_raw": order.id,
                 "product": order.product.id,
                 "product_name": order.product.name,
+                "vendor": order.vendor.id,
                 "vendor_name": order.vendor.store_name,
                 "amount": float(order.total_amount),
                 "status": order.status,
@@ -1699,6 +1738,83 @@ def check_review_eligibility(request, product_id):
 
         except Product.DoesNotExist:
             return JsonResponse({"error": "Product not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def submit_vendor_review(request, vendor_id, order_id):
+    if request.method == "POST":
+        user, error_resp = _get_user_from_token(request)
+        if error_resp:
+            return error_resp
+        
+        try:
+            vendor = Vendor.objects.get(id=vendor_id)
+            order = Order.objects.get(id=order_id, customer=user, vendor=vendor)
+            
+            if order.status != 'delivered':
+                return JsonResponse({"error": "You can only rate the vendor after the order has been delivered."}, status=403)
+            
+            data = json.loads(request.body)
+            rating = data.get('rating')
+            comment = data.get('comment', '')
+
+            if not rating:
+                return JsonResponse({"error": "Rating is required"}, status=400)
+
+            # Create or update vendor review (one per order)
+            review, created = VendorReview.objects.update_or_create(
+                customer=user,
+                vendor=vendor,
+                order=order,
+                defaults={'rating': rating, 'comment': comment}
+            )
+
+            return JsonResponse({
+                "message": "Vendor review submitted successfully",
+                "review": {
+                    "id": review.id,
+                    "rating": review.rating,
+                    "comment": review.comment,
+                    "created_at": review.created_at
+                }
+            }, status=201 if created else 200)
+
+        except (Vendor.DoesNotExist, Order.DoesNotExist):
+            return JsonResponse({"error": "Vendor or Order not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+@csrf_exempt
+def check_vendor_review_eligibility(request, vendor_id, order_id):
+    if request.method == "GET":
+        user, error_resp = _get_user_from_token(request)
+        if error_resp:
+            return JsonResponse({"can_review": False, "reason": "login_required"}, status=200)
+        
+        try:
+            vendor = Vendor.objects.get(id=vendor_id)
+            order = Order.objects.get(id=order_id, customer=user, vendor=vendor)
+            
+            can_review = order.status == 'delivered'
+            existing_review = VendorReview.objects.filter(customer=user, vendor=vendor, order=order).first()
+            
+            return JsonResponse({
+                "can_review": can_review,
+                "existing_review": {
+                    "rating": existing_review.rating,
+                    "comment": existing_review.comment
+                } if existing_review else None
+            }, status=200)
+
+        except (Vendor.DoesNotExist, Order.DoesNotExist):
+            return JsonResponse({"error": "Vendor or Order not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
@@ -1994,12 +2110,18 @@ def initiate_payment(request):
                     amount = product.price * quantity
                     total_amount += amount
                     
+                    # PLATFORM COMMISSION: 5% of total product price
+                    commission = amount * Decimal('0.05')
+                    vendor_earning = amount - commission
+
                     order = Order.objects.create(
                         product=product,
                         customer=user,
                         vendor=product.vendor,
                         quantity=quantity,
                         total_amount=amount,
+                        commission_amount=commission,
+                        vendor_earning=vendor_earning,
                         status='pending',
                         shipping_address=shipping_address,
                         transaction_uuid=transaction_uuid

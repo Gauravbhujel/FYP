@@ -91,12 +91,12 @@ export default function AdminReportsPage() {
         </div>
 
         {/* Global KPI Array */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 group cursor-default">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-3 mb-4">
                         <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center">
-                            <TrendingUpIcon className="w-5 h-5 text-accent" />
+                            <GlobeIcon className="w-5 h-5 text-gray-400" />
                         </div>
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Platform Yield</p>
                     </div>
@@ -104,6 +104,23 @@ export default function AdminReportsPage() {
                         <span className="text-3xl font-black text-gray-900 tracking-tight">Rs. {formatLargeNumber(reportData.platform_yield.total)}</span>
                         <div className="flex items-center text-[9px] font-black text-emerald-600 uppercase tracking-tight bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
                              +{reportData.platform_yield.growth}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm transition-all hover:shadow-md hover:border-gray-300 group cursor-default">
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 bg-gray-50 rounded flex items-center justify-center">
+                            <TrendingUpIcon className="w-5 h-5 text-accent" />
+                        </div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">Net Commission</p>
+                    </div>
+                    <div className="flex items-baseline gap-3">
+                        <span className="text-3xl font-black text-gray-900 tracking-tight">Rs. {formatLargeNumber(reportData.platform_commission?.total || 0)}</span>
+                        <div className="flex items-center text-[9px] font-black text-accent uppercase tracking-tight bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                             +{reportData.platform_commission?.growth || 0}%
                         </div>
                     </div>
                 </div>
@@ -165,12 +182,22 @@ export default function AdminReportsPage() {
                         const height = (data.revenue / maxRevenue) * 100;
                         return (
                             <div key={i} className="relative flex flex-col items-center group w-full">
-                                <div 
-                                    className="w-8 md:w-12 bg-[#F5F5F5] hover:bg-accent transition-all duration-300 relative rounded-t"
-                                    style={{ height: `${height}%` }}
-                                >
-                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-gray-900 text-white text-[8px] font-black px-2 py-1 rounded uppercase tracking-widest shadow-xl">
-                                        Rs. {(data.revenue/1000).toFixed(1)}K
+                                <div className="flex items-end gap-1 w-full justify-center">
+                                    <div 
+                                        className="w-4 md:w-6 bg-[#F5F5F5] hover:bg-emerald-500 transition-all duration-300 relative rounded-t group/rev"
+                                        style={{ height: `${height}%` }}
+                                    >
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover/rev:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-gray-900 text-white text-[8px] font-black px-2 py-1 rounded uppercase tracking-widest shadow-xl z-10">
+                                            Rev: Rs. {(data.revenue/1000).toFixed(1)}K
+                                        </div>
+                                    </div>
+                                    <div 
+                                        className="w-4 md:w-6 bg-accent/20 hover:bg-accent transition-all duration-300 relative rounded-t group/comm"
+                                        style={{ height: `${(data.commission / maxRevenue) * 100}%` }}
+                                    >
+                                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover/comm:opacity-100 transition-opacity pointer-events-none whitespace-nowrap bg-accent text-white text-[8px] font-black px-2 py-1 rounded uppercase tracking-widest shadow-xl z-10">
+                                            Comm: Rs. {(data.commission/1000).toFixed(1)}K
+                                        </div>
                                     </div>
                                 </div>
                                 <span className="absolute -bottom-10 text-[8px] font-black text-gray-400 group-hover:text-accent transition-colors uppercase tracking-widest">{data.month}</span>

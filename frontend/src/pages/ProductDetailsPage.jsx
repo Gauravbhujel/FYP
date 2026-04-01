@@ -280,12 +280,10 @@ const ProductDetailsPage = () => {
                             {/* Ratings & Stock */}
                             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6">
                                 <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100">
-                                    <div className="flex items-center text-amber-500 text-xs gap-0.5">
-                                        <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
-                                    </div>
-                                    <span className="text-amber-800 font-black text-xs">{product.average_rating?.toFixed(1) || '4.8'}</span>
+                                    {renderStars(product.average_rating || 0)}
+                                    <span className="text-amber-800 font-black text-xs">{(product.average_rating || 0).toFixed(1)}</span>
                                 </div>
-                                <span className="text-gray-400 font-semibold text-xs transition-colors cursor-pointer underline decoration-dashed underline-offset-4">{reviews.length || '128'} Reviews</span>
+                                <span className="text-gray-400 font-semibold text-xs transition-colors cursor-pointer underline decoration-dashed underline-offset-4">{reviews.length || 0} Reviews</span>
                                 {product.quantity > 0 ? (
                                     <div className="flex items-center gap-1.5">
                                         <span className="relative flex h-2 w-2">

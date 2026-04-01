@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/ui/Button";
+import VendorReviewModal from "../components/VendorReviewModal";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -38,6 +39,10 @@ const ProfilePage = () => {
 
   // Delete Confirm State
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Vendor Review State
+  const [isVendorReviewOpen, setIsVendorReviewOpen] = useState(false);
+  const [vendorReviewData, setVendorReviewData] = useState(null);
 
   useEffect(() => {
     fetchProfile();
@@ -524,9 +529,24 @@ const ProfilePage = () => {
                             </span>
                             
                             {order.status === 'delivered' ? (
-                                <Link to={`/product/${order.product}?tab=reviews`} className="mt-1 w-full text-center py-2.5 px-4 bg-primary text-white text-[10px] font-black rounded hover:bg-primary-dark transition-all no-underline uppercase tracking-widest shadow-sm">
-                                  Write Review
-                                </Link>
+                                <div className="flex flex-col gap-2 w-full mt-2">
+                                  <Link to={`/product/${order.product}?tab=reviews`} className="w-full text-center py-2.5 px-4 bg-primary text-white text-[10px] font-black rounded hover:bg-primary-dark transition-all no-underline uppercase tracking-widest shadow-sm">
+                                    Write Product Review
+                                  </Link>
+                                  <button 
+                                    onClick={() => {
+                                      setVendorReviewData({
+                                        vendorId: order.vendor, 
+                                        orderId: order.order_id_raw, 
+                                        vendorName: order.vendor_name 
+                                      });
+                                      setIsVendorReviewOpen(true);
+                                    }}
+                                    className="w-full text-center py-2.5 px-4 bg-white text-gray-700 border-2 border-gray-200 text-[10px] font-black rounded hover:bg-gray-50 transition-all uppercase tracking-widest shadow-sm"
+                                  >
+                                    Rate Vendor
+                                  </button>
+                                </div>
                             ) : (
                                 <button disabled className="mt-1 w-full text-center py-2.5 px-4 bg-gray-100 text-gray-400 text-[10px] font-black rounded cursor-not-allowed uppercase tracking-widest shadow-sm border border-gray-200" title="You can review this product after delivery">
                                   Write Review
@@ -668,6 +688,15 @@ const ProfilePage = () => {
       </main>
 
       <Footer />
+
+      <VendorReviewModal 
+        isOpen={isVendorReviewOpen}
+        onClose={() => setIsVendorReviewOpen(false)}
+        vendorId={vendorReviewData?.vendorId}
+        orderId={vendorReviewData?.orderId}
+        vendorName={vendorReviewData?.vendorName}
+        onSuccess={(msg) => showMessage(msg, "success")}
+      />
     </div>
   );
 };
