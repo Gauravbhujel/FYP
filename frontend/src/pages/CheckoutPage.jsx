@@ -127,6 +127,7 @@ const CheckoutPage = () => {
                                     <div className="flex-grow">
                                         <p className="font-bold text-primary">eSewa Mobile Wallet</p>
                                         <p className="text-xs text-gray-500">Pay securely using your eSewa account</p>
+                                        <p className="text-[10px] text-gray-400 mt-1">Test Creds: 9806800001 / Nepal@123</p>
                                     </div>
                                     <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" className="h-8" />
                                 </div>

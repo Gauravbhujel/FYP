@@ -6,7 +6,7 @@ from decimal import Decimal
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from LoginSignup.models import Order
+from orders.models import Order
 
 def backfill_order_financials():
     print("Starting backfill of order financials...")

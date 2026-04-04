@@ -40,7 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'LoginSignup',
+    'users',
+    'vendors',
+    'products',
+    'orders',
+    'payments',
     'rest_framework',
     'rest_framework.authtoken',
 ]
@@ -146,7 +150,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-AUTH_USER_MODEL = 'LoginSignup.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'

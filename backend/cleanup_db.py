@@ -4,7 +4,8 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from LoginSignup.models import Product, Order
+from products.models import Product
+from orders.models import Order
 
 def delete_orders(order_ids):
     for oid in order_ids:
