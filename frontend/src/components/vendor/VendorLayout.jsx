@@ -13,9 +13,11 @@ import {
   LogOutIcon,
   MenuIcon,
   XIcon,
+  MessageSquareIcon,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api";
+import { useChatNotifications } from "../../hooks/useChatNotifications";
 
 export function VendorLayout({ children, currentPage }) {
   const [vendor, setVendor] = useState(null);
@@ -24,6 +26,7 @@ export function VendorLayout({ children, currentPage }) {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { unreadCount } = useChatNotifications();
 
   useEffect(() => {
     const fetchVendorProfile = async () => {
@@ -71,6 +74,7 @@ export function VendorLayout({ children, currentPage }) {
     { icon: ShoppingBagIcon, label: "Orders", href: "/vendor/orders", id: "orders", restrict: true },
     { icon: BarChart3Icon, label: "Analytics", href: "/vendor/dashboard", id: "analytics", restrict: true },
     { icon: TrendingUpIcon, label: "Earnings", href: "/vendor/dashboard", id: "earnings", restrict: true },
+    { icon: MessageSquareIcon, label: "Messages", href: "/chat", id: "chat", restrict: false, badge: unreadCount },
     { icon: SettingsIcon, label: "Store Profile", href: "/vendor/settings", id: "settings", restrict: false },
   ].filter(item => {
     if (!item.restrict) return true;
@@ -105,7 +109,7 @@ export function VendorLayout({ children, currentPage }) {
               <Link
                 key={item.id}
                 to={item.href}
-                className={`flex items-center h-12 px-4 rounded-lg transition-all group ${
+                className={`flex items-center h-12 px-4 rounded-lg transition-all group relative ${
                   currentPage === item.id
                     ? "bg-[#F5F5F5] text-accent"
                     : "text-gray-400 hover:bg-[#F5F5F5]/80 hover:text-gray-900"
@@ -115,7 +119,17 @@ export function VendorLayout({ children, currentPage }) {
                 <span className={`ml-4 transition-all duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible w-0"}`}>
                   {item.label}
                 </span>
-                {currentPage === item.id && isSidebarOpen && (
+                
+                {item.badge > 0 && isSidebarOpen ? (
+                  <div className="ml-auto bg-red-500 text-white text-[8px] px-2 py-0.5 rounded-full flex-shrink-0">
+                    {item.badge}
+                  </div>
+                ) : null}
+                {item.badge > 0 && !isSidebarOpen ? (
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
+                ) : null}
+                
+                {currentPage === item.id && isSidebarOpen && !item.badge && (
                   <div className="ml-auto w-1 h-1 rounded-full bg-accent"></div>
                 )}
               </Link>

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from users import views as user_views
 from vendors import views as vendor_views
 from products import views as product_views
@@ -72,4 +72,7 @@ urlpatterns = [
     path('checkout/initiate/', payment_views.initiate_payment, name='initiate_payment'),
     path('payment/success/', payment_views.payment_success, name='payment_success'),
     path('payment/failure/', payment_views.payment_failure, name='payment_failure'),
+
+    # Chat
+    path('chat/', include('chat.urls')),
 ]

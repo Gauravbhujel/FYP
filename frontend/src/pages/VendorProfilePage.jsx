@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import api from '../api';
+import { useAuth } from '../context/AuthContext';
+import { MessageSquare } from 'lucide-react';
 import { 
     FaStore, 
     FaEnvelope, 
@@ -21,7 +23,9 @@ const VendorProfilePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('products'); // 'products' or 'reviews'
-
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
         const fetchVendorDetail = async () => {
@@ -36,7 +40,24 @@ const VendorProfilePage = () => {
             }
         };
         fetchVendorDetail();
-    }, [vendorId]);
+    }, [vendorId, navigate]);
+
+    const handleStartChat = async () => {
+        if (!isAuthenticated) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        try {
+            const response = await api.post('chat/get_or_create/', {
+                vendor_profile_id: vendor.id
+            });
+            navigate(`/chat/${response.data.id}`);
+        } catch (err) {
+            console.error('Error starting chat:', err);
+            alert('Failed to start chat with vendor.');
+        }
+    };
 
     if (loading) {
         return (
@@ -112,11 +133,18 @@ const VendorProfilePage = () => {
                                 {vendor.store_name} is a trusted vendor at GearUp Nepal, providing high-quality sports gear and equipment.
                             </p>
                             
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-y-3 gap-x-8 text-sm font-bold text-gray-400">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-y-3 gap-x-8 text-sm font-bold text-gray-400 mb-6">
                                 <div className="flex items-center gap-2"><FaEnvelope className="text-primary" /> {vendor.email}</div>
                                 <div className="flex items-center gap-2"><FaPhone className="text-primary" /> {vendor.phone}</div>
                                 <div className="flex items-center gap-2"><FaMapMarkerAlt className="text-primary" /> {vendor.city}, {vendor.address}</div>
                             </div>
+
+                            <button 
+                                onClick={handleStartChat}
+                                className="bg-blue-600 text-white font-black text-sm px-8 py-3.5 rounded-2xl transition-all flex items-center gap-2.5 hover:bg-blue-700 shadow-xl shadow-blue-500/20 active:scale-95"
+                            >
+                                <MessageSquare size={18} /> Start Real-time Chat
+                            </button>
                         </div>
                         
                         {/* Stats Boxes */}

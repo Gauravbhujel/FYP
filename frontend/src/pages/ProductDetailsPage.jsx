@@ -23,6 +23,7 @@ import {
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
+import { MessageSquare } from 'lucide-react';
 
 const ProductDetailsPage = () => {
     const { productId } = useParams();
@@ -127,6 +128,23 @@ const ProductDetailsPage = () => {
             alert(err.response?.data?.error || 'Failed to submit review');
         } finally {
             setIsSubmittingReview(false);
+        }
+    };
+
+    const handleStartChat = async () => {
+        if (!isAuthenticated) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        try {
+            const response = await api.post('chat/get_or_create/', {
+                vendor_profile_id: product.vendor_id
+            });
+            navigate(`/chat/${response.data.id}`);
+        } catch (err) {
+            console.error('Error starting chat:', err);
+            alert('Failed to start chat with vendor.');
         }
     };
 
@@ -394,14 +412,29 @@ const ProductDetailsPage = () => {
                                             <FaCheckCircle className="text-blue-500 text-xs" title="Verified Vendor" />
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <div className="flex text-amber-500 text-[9px] gap-0.5"><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></div>
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Top Rated</span>
+                                            <div className="flex text-amber-500 text-[9px] gap-0.5">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    star <= Math.round(product.vendor_rating || 0) ? <FaStar key={star} /> : <FaRegStar key={star} className="text-gray-300" />
+                                                ))}
+                                            </div>
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                                {product.vendor_rating >= 4.5 ? 'Top Rated' : product.vendor_rating >= 3.0 ? 'Trusted Vendor' : 'Verified Vendor'}
+                                                {product.vendor_review_count > 0 && ` • ${product.vendor_review_count} Reviews`}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
-                                <Link to={`/vendor/${product.vendor_id || ''}`} className="bg-gray-50 border border-gray-200 text-gray-700 font-bold text-xs px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 no-underline hover:bg-gray-100 hover:border-gray-300">
-                                    <FaStore /> Visit
-                                </Link>
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={handleStartChat}
+                                        className="bg-blue-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 hover:bg-blue-700 shadow-sm"
+                                    >
+                                        <MessageSquare size={14} /> Chat
+                                    </button>
+                                    <Link to={`/vendor/${product.vendor_id || ''}`} className="bg-gray-50 border border-gray-200 text-gray-700 font-bold text-xs px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 no-underline hover:bg-gray-100 hover:border-gray-300">
+                                        <FaStore /> Visit
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>

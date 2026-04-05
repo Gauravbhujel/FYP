@@ -42,7 +42,9 @@ def public_product_detail(request, product_id):
                 "image3": request.build_absolute_uri(p.image3.url) if p.image3 else "",
                 "sku": p.sku, "quantity": p.quantity, "is_new": (timezone.now() - p.created_at).days < 7,
                 "discount": int(((p.compare_price - p.price) / p.compare_price) * 100) if p.compare_price and p.compare_price > p.price else None,
-                "vendor_name": p.vendor.store_name, "vendor_id": p.vendor.id, "average_rating": p.average_rating,
+                "vendor_name": p.vendor.store_name, "vendor_id": p.vendor.id, 
+                "vendor_rating": p.vendor.average_rating, "vendor_review_count": p.vendor.review_count,
+                "average_rating": p.average_rating,
                 "reviews": ProductReviewSerializer(p.reviews.all(), many=True).data
             }, status=200)
         except Product.DoesNotExist: return JsonResponse({"error": "Not found"}, status=404)

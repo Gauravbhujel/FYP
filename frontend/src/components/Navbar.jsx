@@ -7,12 +7,15 @@ import {
   FaUser,
   FaTimes,
   FaBars,
+  FaRegCommentDots,
 } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
+import { useChatNotifications } from "../hooks/useChatNotifications";
 import api from "../api";
 
 const Navbar = () => {
   const { unreadCartCount, unreadWishlistCount } = useCart();
+  const { unreadCount } = useChatNotifications();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -244,6 +247,22 @@ const Navbar = () => {
 
         {/* Right Icons */}
         <div className="flex items-center gap-5">
+          {/* Messages */}
+          {isLoggedIn && (
+            <Link
+              to="/chat"
+              className="relative inline-flex items-center justify-center w-10 h-10 rounded-full text-gray-500 hover:text-accent hover:bg-accent/10 transition-all duration-200"
+              title="Messages"
+            >
+              <FaRegCommentDots className="text-lg" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-white shadow-sm">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {/* Wishlist */}
           <Link
             to="/wishlist"

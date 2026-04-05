@@ -31,11 +31,16 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import VerifyOTP from "./pages/Auth/VerifyOTP";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import CheckoutPage from "./pages/CheckoutPage";
+import ChatWindow from "./components/Chat/ChatWindow";
+import ChatList from "./components/Chat/ChatList";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { useEffect, useState } from "react";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import { VendorLayout } from "./components/vendor/VendorLayout";
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { isAuthenticated, role: userRole } = useAuth();
@@ -76,6 +81,25 @@ const CustomerOrPublicRoute = ({ children }) => {
   return children;
 };
 
+const ChatLayoutWrapper = ({ children, currentPage }) => {
+  const { role } = useAuth();
+  
+  if (role === 'vendor') {
+    return <VendorLayout currentPage={currentPage}>{children}</VendorLayout>;
+  }
+  
+  return (
+    <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
+      <Navbar />
+      <div className="flex-grow flex items-start justify-center py-6 px-4 md:py-10">
+        {children}
+      </div>
+      <Footer />
+    </div>
+  );
+};
+
+
 function App() {
   return (
     <BrowserRouter>
@@ -100,6 +124,26 @@ function App() {
           <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/payment-failure" element={<ProtectedRoute><PaymentFailure /></ProtectedRoute>} />
+          <Route 
+            path="/chat" 
+            element={
+              <ProtectedRoute>
+                <ChatLayoutWrapper currentPage="chat">
+                  <ChatList />
+                </ChatLayoutWrapper>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/chat/:conversationId" 
+            element={
+              <ProtectedRoute>
+                <ChatLayoutWrapper currentPage="chat">
+                  <ChatWindow />
+                </ChatLayoutWrapper>
+              </ProtectedRoute>
+            } 
+          />
           <Route
             path="/vendor/dashboard"
             element={
