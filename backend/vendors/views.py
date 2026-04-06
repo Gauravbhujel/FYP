@@ -133,9 +133,18 @@ def vendor_dashboard_stats(request):
     vendor, error = _get_vendor_from_token(request)
     if error: return error
     if request.method == "GET":
+        now = timezone.now()
+        month_start = now.replace(day=1)
         stats = Order.objects.filter(vendor=vendor).aggregate(total_rev=Sum('total_amount'), total_earn=Sum('vendor_earning'))
+        this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).aggregate(earn=Sum('vendor_earning'))
+        pending = Order.objects.filter(vendor=vendor).exclude(status='delivered').aggregate(earn=Sum('vendor_earning'))
+        available = Order.objects.filter(vendor=vendor, status='delivered').aggregate(earn=Sum('vendor_earning'))
+        
         return JsonResponse({
             "total_revenue": float(stats['total_rev'] or 0), "total_earnings": float(stats['total_earn'] or 0),
+            "this_month_earnings": float(this_month['earn'] or 0),
+            "pending_earnings": float(pending['earn'] or 0),
+            "available_balance": float(available['earn'] or 0),
             "total_orders": Order.objects.filter(vendor=vendor).count(),
             "products_listed": Product.objects.filter(vendor=vendor, is_active=True).count(),
             "pending_orders": Order.objects.filter(vendor=vendor, status='pending').count(),
@@ -164,6 +173,7 @@ def vendor_orders_list(request):
         data = [{
             "id": f"#ORD-{o.id:04d}", "raw_id": o.id, "customer": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
             "product": o.product.name, "quantity": o.quantity, "amount": float(o.total_amount),
+            "commission": float(o.commission_amount), "vendor_earning": float(o.vendor_earning),
             "status": o.status, "date": o.created_at.strftime("%Y-%m-%d"), "address": o.shipping_address,
         } for o in orders]
         return JsonResponse(data, safe=False, status=200)
@@ -199,8 +209,8 @@ def vendor_sales_chart(request):
         chart_data = []
         for i in range(6, -1, -1):
             day = today - timedelta(days=i)
-            rev = Order.objects.filter(vendor=vendor, created_at__date=day).aggregate(total=Sum('total_amount'))['total'] or 0
-            chart_data.append({"day": days[day.weekday()], "sales": float(rev)})
+            aggr = Order.objects.filter(vendor=vendor, created_at__date=day).aggregate(total=Sum('total_amount'), earn=Sum('vendor_earning'))
+            chart_data.append({"day": days[day.weekday()], "sales": float(aggr['total'] or 0), "earnings": float(aggr['earn'] or 0)})
         return JsonResponse(chart_data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 

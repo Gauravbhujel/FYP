@@ -73,7 +73,7 @@ export function VendorLayout({ children, currentPage }) {
     { icon: PackageIcon, label: "Products", href: "/vendor/products", id: "products", restrict: true },
     { icon: ShoppingBagIcon, label: "Orders", href: "/vendor/orders", id: "orders", restrict: true },
     { icon: BarChart3Icon, label: "Analytics", href: "/vendor/dashboard", id: "analytics", restrict: true },
-    { icon: TrendingUpIcon, label: "Earnings", href: "/vendor/dashboard", id: "earnings", restrict: true },
+    { icon: TrendingUpIcon, label: "Earnings", href: "/vendor/earnings", id: "earnings", restrict: true },
     { icon: MessageSquareIcon, label: "Messages", href: "/chat", id: "chat", restrict: false, badge: unreadCount },
     { icon: SettingsIcon, label: "Store Profile", href: "/vendor/settings", id: "settings", restrict: false },
   ].filter(item => {

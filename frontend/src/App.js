@@ -12,6 +12,7 @@ import { VendorDashboard } from "./pages/Vendor/VendorDashboard";
 import { AddProductPage } from "./pages/Vendor/AddProduct";
 import { ManageProductsPage } from "./pages/Vendor/ManageProducts";
 import { EditProductPage } from "./pages/Vendor/EditProduct";
+import VendorEarningsPage from "./pages/Vendor/VendorEarnings";
 import { ManageOrdersPage } from "./pages/Vendor/ManageOrder";
 import { StoreSettingsPage } from "./pages/Vendor/StoreSettings";
 import { VendorSignupPage } from "./components/VendorSignup";
@@ -24,6 +25,7 @@ import { AdminOrdersPage } from "./pages/Admin/AdminOrders";
 import AdminReportsPage from "./pages/Admin/AdminReport";
 import AdminSettingsPage from "./pages/Admin/AdminSetting";
 import { AdminActivityLogsPage } from "./pages/Admin/AdminActivityLogs";
+import AdminEarningsPage from "./pages/Admin/AdminEarnings";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import VendorProfilePage from "./pages/VendorProfilePage";
@@ -186,6 +188,14 @@ function App() {
             }
           />
           <Route
+            path="/vendor/earnings"
+            element={
+              <ProtectedRoute allowedRole="vendor">
+                <VendorEarningsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/vendor/settings"
             element={
               <ProtectedRoute allowedRole="vendor">
@@ -231,6 +241,14 @@ function App() {
             element={
               <ProtectedRoute allowedRole="admin">
                 <AdminOrdersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/earnings"
+            element={
+              <ProtectedRoute allowedRole="admin">
+                <AdminEarningsPage />
               </ProtectedRoute>
             }
           />

@@ -14,7 +14,8 @@ import {
   ChevronRightIcon,
   MenuIcon,
   XIcon,
-  GlobeIcon
+  GlobeIcon,
+  CoinsIcon
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -33,6 +34,7 @@ export function AdminLayout({ children, currentPage }) {
     { name: "Vendors", href: "/admin/vendors", icon: StoreIcon, id: "vendors" },
     { name: "Products", href: "/admin/products", icon: PackageIcon, id: "products" },
     { name: "Orders", href: "/admin/orders", icon: ShoppingBagIcon, id: "orders" },
+    { name: "Earnings", href: "/admin/earnings", icon: CoinsIcon, id: "earnings" },
     { name: "Analytics", href: "/admin/reports", icon: BarChart3Icon, id: "reports" },
     { name: "Settings", href: "/admin/settings", icon: SettingsIcon, id: "settings" },
   ];

@@ -35,7 +35,8 @@ def admin_orders_list(request):
             "vendor": {"id": o.vendor.id, "store_name": o.vendor.store_name},
             "customer": {"id": o.customer.id, "name": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username, "email": o.customer.email},
             "amount": float(o.total_amount), "status": o.status, "is_paid": o.is_paid, "esewa_ref_id": o.esewa_ref_id,
-            "date": o.created_at.strftime("%Y-%m-%d %H:%M"), "shipping_address": o.shipping_address
+            "date": o.created_at.strftime("%Y-%m-%d %H:%M"), "shipping_address": o.shipping_address,
+            "commission": float(o.commission_amount), "vendor_earning": float(o.vendor_earning)
         } for o in orders]
         return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
