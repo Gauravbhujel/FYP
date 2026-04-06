@@ -20,6 +20,8 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     shipping_address = models.TextField(blank=True)
     transaction_uuid = models.CharField(max_length=100, unique=False, null=True, blank=True)
+    payment_method = models.CharField(max_length=20, choices=(('EPAY', 'ePay'), ('COD', 'Cash on Delivery')), default='EPAY')
+    payment_status = models.CharField(max_length=20, choices=(('pending', 'Pending'), ('paid', 'Paid'), ('failed', 'Failed')), default='pending')
     is_paid = models.BooleanField(default=False)
     esewa_ref_id = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

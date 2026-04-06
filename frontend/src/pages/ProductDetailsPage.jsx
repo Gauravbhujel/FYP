@@ -24,6 +24,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
 import { MessageSquare } from 'lucide-react';
+import ProductCard from '../components/ProductCard';
 
 const ProductDetailsPage = () => {
     const { productId } = useParams();
@@ -43,6 +44,8 @@ const ProductDetailsPage = () => {
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [addedToCart, setAddedToCart] = useState(false);
+    const [similarProducts, setSimilarProducts] = useState([]);
+    const [loadingSimilar, setLoadingSimilar] = useState(true);
     const { isAuthenticated, token } = useAuth();
 
     useEffect(() => {
@@ -75,8 +78,20 @@ const ProductDetailsPage = () => {
             }
         };
 
+        const fetchSimilar = async () => {
+            try {
+                const response = await api.get(`products/${productId}/similar/`);
+                setSimilarProducts(response.data);
+            } catch (err) {
+                console.error('Error fetching similar products:', err);
+            } finally {
+                setLoadingSimilar(false);
+            }
+        };
+
         fetchProduct();
         fetchEligibility();
+        fetchSimilar();
     }, [productId, isAuthenticated]);
 
     const handleAction = async (actionType) => {
@@ -635,6 +650,37 @@ const ProductDetailsPage = () => {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* ═══════════ SIMILAR PRODUCTS ═══════════ */}
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-16 w-full">
+                <div className="flex justify-between items-end mb-10">
+                    <div>
+                        <p className="text-accent font-bold uppercase tracking-widest text-xs mb-2">You May Also Like</p>
+                        <h2 className="text-3xl font-black text-gray-900">Similar Products</h2>
+                    </div>
+                    <Link to={`/products?category=${product.category_slug}`} className="text-primary font-bold text-sm border-b-2 border-primary/20 pb-1 hover:border-primary transition-all">
+                        View All
+                    </Link>
+                </div>
+
+                {loadingSimilar ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="aspect-[3/4] bg-gray-100 animate-pulse rounded-2xl"></div>
+                        ))}
+                    </div>
+                ) : similarProducts.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+                        {similarProducts.slice(0, 4).map(p => (
+                            <ProductCard key={p.id} product={p} />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12 bg-white rounded-3xl border border-gray-100 text-gray-400 font-medium">
+                        No similar products found in this category.
+                    </div>
+                )}
             </div>
 
             <Footer />

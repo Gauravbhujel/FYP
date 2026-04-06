@@ -11,6 +11,9 @@ import {
 } from "react-icons/fa";
 import { CategoryCard } from "../components/CategoryCard";
 import { Button } from "../components/ui/Button";
+import ProductCard from "../components/ProductCard";
+import api from "../api";
+import { useAuth } from "../context/AuthContext";
 
 /* ─── Hero slides data ─────────────────────────────────────────────── */
 const heroSlides = [
@@ -49,6 +52,9 @@ const heroSlides = [
 const HomePage = () => {
   const navigate = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [loadingRecommended, setLoadingRecommended] = useState(true);
+  const { isAuthenticated } = useAuth();
   const slideTimer = useRef(null);
 
   /* Auto-advance hero slider */
@@ -61,8 +67,26 @@ const HomePage = () => {
 
   useEffect(() => {
     startTimer();
+    
+    const fetchRecommendations = async () => {
+      if (isAuthenticated) {
+        try {
+          const response = await api.get("recommendations/");
+          setRecommendedProducts(response.data.recommended_products || []);
+        } catch (err) {
+          console.error("Error fetching recommended products:", err);
+        } finally {
+          setLoadingRecommended(false);
+        }
+      } else {
+        setLoadingRecommended(false);
+      }
+    };
+
+    fetchRecommendations();
+    
     return () => clearInterval(slideTimer.current);
-  }, []);
+  }, [isAuthenticated]);
 
   const goToSlide = (idx) => {
     setSlideIndex(idx);
@@ -221,6 +245,34 @@ const HomePage = () => {
           ))}
         </div>
       </section>
+
+      {/* ─── RECOMMENDED FOR YOU ───────────────────────────────────── */}
+      {isAuthenticated && recommendedProducts.length > 0 && (
+        <section className="max-w-6xl mx-auto px-5 py-12">
+          <div className="flex justify-between items-end mb-10">
+            <div>
+              <p className="text-accent font-semibold text-sm uppercase tracking-widest mb-1">
+                Personalized for you
+              </p>
+              <h2 className="text-3xl font-extrabold text-primary">
+                Recommended for You
+              </h2>
+            </div>
+            <button
+              onClick={() => navigate("/products")}
+              className="flex items-center gap-2 text-primary font-semibold text-sm border-b border-primary pb-0.5 transition-all duration-200 group"
+            >
+              Discover More <FaArrowRight className="text-xs" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 tracking-tight">
+            {recommendedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
 
 
       <Footer />

@@ -9,6 +9,7 @@ const CheckoutPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [shippingAddress, setShippingAddress] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState(''); // 'EPAY' or 'COD'
     const [processing, setProcessing] = useState(false);
     const navigate = useNavigate();
 
@@ -49,8 +50,14 @@ const CheckoutPage = () => {
                     product_id: item.product.id,
                     quantity: item.quantity
                 })),
-                shipping_address: shippingAddress
+                shipping_address: shippingAddress,
+                payment_method: paymentMethod
             });
+            
+            if (paymentMethod === 'COD') {
+                navigate(`/payment-success?oid=${response.data.transaction_uuid}&method=COD`);
+                return;
+            }
 
             const paymentData = response.data;
             
@@ -122,14 +129,40 @@ const CheckoutPage = () => {
                                 </div>
                                 
                                 <h2 className="text-xl font-bold mb-6 text-text-dark mt-10">Payment Method</h2>
-                                <div className="p-4 border-2 border-primary rounded-xl bg-primary/5 flex items-center gap-4 mb-10">
-                                    <div className="w-6 h-6 rounded-full border-4 border-primary bg-white"></div>
-                                    <div className="flex-grow">
-                                        <p className="font-bold text-primary">eSewa Mobile Wallet</p>
-                                        <p className="text-xs text-gray-500">Pay securely using your eSewa account</p>
-                                        <p className="text-[10px] text-gray-400 mt-1">Test Creds: 9806800001 / Nepal@123</p>
+                                <div className="space-y-4 mb-10">
+                                    {/* eSewa Option */}
+                                    <div 
+                                        onClick={() => setPaymentMethod('EPAY')}
+                                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all flex items-center gap-4 ${paymentMethod === 'EPAY' ? 'border-primary bg-primary/5' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                                    >
+                                        <div className={`w-6 h-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === 'EPAY' ? 'border-primary bg-white' : 'border-gray-200 bg-white'}`}>
+                                            {paymentMethod === 'EPAY' && <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <p className={`font-bold ${paymentMethod === 'EPAY' ? 'text-primary' : 'text-gray-700'}`}>eSewa Mobile Wallet</p>
+                                            <p className="text-xs text-gray-500">Pay securely via eSewa Portal</p>
+                                        </div>
+                                        <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" className="h-8" />
                                     </div>
-                                    <img src="https://esewa.com.np/common/images/esewa_logo.png" alt="eSewa" className="h-8" />
+
+                                    {/* COD Option */}
+                                    <div 
+                                        onClick={() => setPaymentMethod('COD')}
+                                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all flex items-center gap-4 ${paymentMethod === 'COD' ? 'border-primary bg-primary/5' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                                    >
+                                        <div className={`w-6 h-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === 'COD' ? 'border-primary bg-white' : 'border-gray-200 bg-white'}`}>
+                                            {paymentMethod === 'COD' && <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <p className={`font-bold ${paymentMethod === 'COD' ? 'text-primary' : 'text-gray-700'}`}>Cash on Delivery (COD)</p>
+                                            <p className="text-xs text-gray-500">Pay in cash upon receiving your order</p>
+                                        </div>
+                                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <Button 
@@ -138,7 +171,7 @@ const CheckoutPage = () => {
                                     disabled={processing}
                                     className="w-full py-5 text-xl rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                                 >
-                                    {processing ? 'Processing...' : `Pay Rs. ${calculateTotal().toLocaleString()}`}
+                                    {processing ? 'Processing...' : paymentMethod === 'COD' ? 'Place Order (COD)' : `Pay Rs. ${calculateTotal().toLocaleString()}`}
                                 </Button>
                             </form>
                         </div>

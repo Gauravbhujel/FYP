@@ -318,3 +318,65 @@ def admin_delete_product(request, product_id):
             return JsonResponse({"message": "Deleted"}, status=200)
         except Product.DoesNotExist: return JsonResponse({"error": "Not found"}, status=404)
     return JsonResponse({"error": "Invalid method"}, status=405)
+
+
+@csrf_exempt
+def similar_products(request, product_id):
+    """
+    Returns products in the same category as the current product.
+    """
+    if request.method == "GET":
+        try:
+            product = Product.objects.get(id=product_id, is_active=True)
+            similar = Product.objects.filter(
+                category=product.category, 
+                is_active=True
+            ).exclude(id=product_id).order_by('-created_at')[:8]
+            
+            data = ProductSerializer(similar, many=True, context={'request': request}).data
+            return JsonResponse(data, safe=False, status=200)
+        except Product.DoesNotExist:
+            return JsonResponse({"error": "Product not found"}, status=404)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+
+@csrf_exempt
+def recommended_products(request):
+    """
+    Returns personalized recommendations based on the user's purchase history.
+    """
+    if request.method == "GET":
+        from users.views import _get_user_from_token
+        user, error = _get_user_from_token(request)
+        
+        # Fallback for unauthenticated users or those with no history
+        if error:
+            return JsonResponse({"recommended_products": []}, status=200)
+
+        # 1. Get all orders for the user
+        user_orders = Order.objects.filter(customer=user)
+        
+        if not user_orders.exists():
+            # Optionally return trending products if no history
+            return JsonResponse({"recommended_products": []}, status=200)
+
+        # 2. Extract purchased product categories and IDs
+        purchased_product_ids = user_orders.values_list('product_id', flat=True)
+        
+        # 3. Find most frequently purchased categories
+        category_counts = user_orders.values('product__category').annotate(
+            count=Count('product__category')
+        ).order_by('-count')
+        
+        top_categories = [item['product__category'] for item in category_counts[:3]]
+        
+        # 4. Recommend products from those categories, excluding already purchased ones
+        recommendations = Product.objects.filter(
+            category__in=top_categories,
+            is_active=True
+        ).exclude(id__in=purchased_product_ids).order_by('?')[:8]
+        
+        data = ProductSerializer(recommendations, many=True, context={'request': request}).data
+        return JsonResponse({"recommended_products": data}, status=200)
+
+    return JsonResponse({"error": "Invalid method"}, status=405)

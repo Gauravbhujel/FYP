@@ -135,6 +135,7 @@ export function AdminOrdersPage() {
                             <th className="px-8 py-5 font-black border-b border-gray-100">Order & Asset</th>
                             <th className="px-8 py-5 font-black border-b border-gray-100">Parties</th>
                             <th className="px-8 py-5 font-black border-b border-gray-100">Transaction Details</th>
+                            <th className="px-8 py-5 font-black border-b border-gray-100">Payment</th>
                             <th className="px-8 py-5 font-black border-b border-gray-100">status</th>
                             <th className="px-8 py-5 font-black border-b border-gray-100 text-right">Actions</th>
                         </tr>
@@ -236,6 +237,20 @@ export function AdminOrdersPage() {
                                                     </div>
                                                     <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest truncate max-w-[120px]">{order.shipping_address}</p>
                                                 </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-black text-gray-900 uppercase tracking-tight leading-none">{order.payment_method}</p>
+                                            <div className="flex items-center gap-1.5 mt-1">
+                                                <span className={`w-1.5 h-1.5 rounded-full ${order.payment_status === 'Paid' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                                <p className={`text-[8px] font-black uppercase tracking-widest ${order.payment_status === 'Paid' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                    {order.payment_status}
+                                                </p>
+                                            </div>
+                                            {order.esewa_ref_id && (
+                                                <p className="text-[7px] font-black text-gray-300 uppercase tracking-widest mt-1">Ref: {order.esewa_ref_id}</p>
                                             )}
                                         </div>
                                     </td>

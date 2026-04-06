@@ -44,6 +44,8 @@ urlpatterns = [
     path('products/<int:product_id>/', product_views.public_product_detail, name='public_product_detail'),
     path('products/<int:product_id>/review/submit/', product_views.submit_review, name='submit_review'),
     path('products/<int:product_id>/review/check-eligibility/', product_views.check_review_eligibility, name='check_review_eligibility'),
+    path('products/<int:product_id>/similar/', product_views.similar_products, name='similar_products'),
+    path('recommendations/', product_views.recommended_products, name='recommended_products'),
     
     # Cart and Wishlist
     path('cart/', product_views.cart_list, name='cart_list'),

@@ -518,6 +518,18 @@ const ProfilePage = () => {
                             <p className="text-xs text-gray-400 font-bold flex items-center justify-center md:justify-start gap-2">
                               <FaStore className="text-primary" /> SOLD BY {order.vendor_name}
                             </p>
+                            <div className="flex flex-wrap items-center gap-2 mt-2 justify-center md:justify-start">
+                              <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                                {order.payment_method}
+                              </span>
+                              <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
+                                order.payment_status === 'Paid' 
+                                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                                  : 'bg-amber-50 text-amber-600 border-amber-100'
+                              }`}>
+                                {order.payment_status}
+                              </span>
+                            </div>
                           </div>
                           <div className="flex flex-col items-center md:items-end gap-3 min-w-[150px]">
                             <div className="text-2xl font-black text-gray-900">Rs. {Number(order.amount).toLocaleString()}</div>

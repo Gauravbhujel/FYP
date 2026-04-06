@@ -126,6 +126,7 @@ export function ManageOrdersPage() {
                             <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transaction</th>
                             <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Customer</th>
                             <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Item Details</th>
+                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Payment</th>
                             <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Value</th>
                             <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">State</th>
                             <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Actions</th>
@@ -162,6 +163,12 @@ export function ManageOrdersPage() {
                                     </td>
                                     <td className="px-8 py-7">
                                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{order.product} <span className="text-gray-300 ml-1">×{order.quantity}</span></span>
+                                    </td>
+                                    <td className="px-8 py-7">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{order.payment_method}</span>
+                                            <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${order.payment_status === 'Paid' ? 'text-emerald-500' : 'text-amber-500'}`}>{order.payment_status}</span>
+                                        </div>
                                     </td>
                                     <td className="px-8 py-7">
                                         <span className="text-[10px] font-black text-accent uppercase tracking-widest">Rs. {order.amount.toLocaleString()}</span>

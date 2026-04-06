@@ -22,6 +22,7 @@ def initiate_payment(request):
             if not cart_data: return JsonResponse({"error": "Empty cart"}, status=400)
             
             total_amount, transaction_uuid = 0, str(uuid.uuid4())
+            payment_method = data.get('payment_method', 'EPAY')
             with transaction.atomic():
                 for item in cart_data:
                     p = Product.objects.get(id=item.get('product_id'))
@@ -33,8 +34,24 @@ def initiate_payment(request):
                     Order.objects.create(
                         product=p, customer=user, vendor=p.vendor, quantity=qty,
                         total_amount=amt, commission_amount=comm, vendor_earning=amt-comm,
-                        status='pending', shipping_address=address, transaction_uuid=transaction_uuid
+                        status='pending', shipping_address=address, transaction_uuid=transaction_uuid,
+                        payment_method=payment_method
                     )
+
+            if payment_method == 'COD':
+                # For COD, the order is confirmed immediately. Stock is reduced and cart cleared.
+                with transaction.atomic():
+                    items = Order.objects.filter(transaction_uuid=transaction_uuid)
+                    for o in items:
+                        o.product.quantity = max(0, o.product.quantity - o.quantity)
+                        o.product.save()
+                    CartItem.objects.filter(customer=user).delete()
+                
+                return JsonResponse({
+                    "message": "Order placed successfully (COD)",
+                    "transaction_uuid": transaction_uuid,
+                    "payment_method": "COD"
+                }, status=200)
             
             # Use a consistent formatting for all numeric strings sent to eSewa.
             def format_amt(val):
@@ -82,7 +99,7 @@ def payment_success(request):
                     for o in items:
                         o.product.quantity = max(0, o.product.quantity - o.quantity)
                         o.product.save()
-                    items.update(is_paid=True, esewa_ref_id=ref_id, status='processing')
+                    items.update(is_paid=True, payment_status='paid', esewa_ref_id=ref_id, status='processing')
                     first = items.first()
                     if first: CartItem.objects.filter(customer=first.customer).delete()
                 from django.shortcuts import redirect
