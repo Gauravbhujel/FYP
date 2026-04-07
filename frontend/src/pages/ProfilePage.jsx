@@ -40,9 +40,38 @@ const ProfilePage = () => {
   // Delete Confirm State
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Cancellation State
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const CANCELLATION_REASONS = [
+    "Ordered by mistake",
+    "Found better price",
+    "Delivery taking too long",
+    "Decided to buy something else",
+    "Change of heart",
+    "Other"
+  ];
+
   // Vendor Review State
   const [isVendorReviewOpen, setIsVendorReviewOpen] = useState(false);
   const [vendorReviewData, setVendorReviewData] = useState(null);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!cancelReason) {
+      showMessage("Please select a reason for cancellation.", "error");
+      return;
+    }
+
+    try {
+      await api.post(`user/orders/cancel/${orderId}/`, { reason: cancelReason });
+      showMessage("Order cancelled successfully.", "success");
+      setCancellingOrderId(null);
+      setCancelReason("");
+      fetchOrders();
+    } catch (err) {
+      showMessage(err.response?.data?.error || "Failed to cancel order.", "error");
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -511,7 +540,7 @@ const ProfilePage = () => {
                           </div>
                           <div className="flex-1 text-center md:text-left">
                             <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                              <span className="bg-gray-900 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest">#{order.id}</span>
+                              <span className="bg-gray-900 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest">{order.id}</span>
                               <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">{order.date}</span>
                             </div>
                             <h4 className="font-black text-gray-900 text-xl tracking-tight mb-1">{order.product_name}</h4>
@@ -559,8 +588,44 @@ const ProfilePage = () => {
                                     Rate Vendor
                                   </button>
                                 </div>
+                            ) : (order.status === 'pending' || order.status === 'processing') ? (
+                                <div className="w-full mt-2 space-y-2">
+                                  {cancellingOrderId === order.order_id_raw ? (
+                                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                                      <select 
+                                        value={cancelReason}
+                                        onChange={(e) => setCancelReason(e.target.value)}
+                                        className="w-full text-[10px] font-black uppercase p-2 border-2 border-red-100 rounded bg-red-50/50 outline-none"
+                                      >
+                                        <option value="">Select Reason</option>
+                                        {CANCELLATION_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+                                      </select>
+                                      <div className="flex gap-2">
+                                        <button 
+                                          onClick={() => handleCancelOrder(order.order_id_raw)}
+                                          className="flex-1 py-2 bg-red-600 text-white text-[9px] font-black rounded uppercase"
+                                        >
+                                          Confirm
+                                        </button>
+                                        <button 
+                                          onClick={() => {setCancellingOrderId(null); setCancelReason("");}}
+                                          className="px-3 py-2 bg-gray-100 text-gray-500 text-[9px] font-black rounded uppercase"
+                                        >
+                                          ✕
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <button 
+                                      onClick={() => setCancellingOrderId(order.order_id_raw)}
+                                      className="w-full text-center py-2.5 px-4 bg-white text-red-500 border-2 border-red-100 text-[10px] font-black rounded hover:bg-red-50 transition-all uppercase tracking-widest shadow-sm"
+                                    >
+                                      Cancel Order
+                                    </button>
+                                  )}
+                                </div>
                             ) : (
-                                <button disabled className="mt-1 w-full text-center py-2.5 px-4 bg-gray-100 text-gray-400 text-[10px] font-black rounded cursor-not-allowed uppercase tracking-widest shadow-sm border border-gray-200" title="You can review this product after delivery">
+                                <button disabled className="mt-1 w-full text-center py-2.5 px-4 bg-gray-100 text-gray-400 text-[10px] font-black rounded cursor-not-allowed uppercase tracking-widest shadow-sm border border-gray-200" title="Review is only available after delivery">
                                   Write Review
                                 </button>
                             )}

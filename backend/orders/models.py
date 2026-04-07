@@ -24,6 +24,13 @@ class Order(models.Model):
     payment_status = models.CharField(max_length=20, choices=(('pending', 'Pending'), ('paid', 'Paid'), ('failed', 'Failed')), default='pending')
     is_paid = models.BooleanField(default=False)
     esewa_ref_id = models.CharField(max_length=100, null=True, blank=True)
+    
+    # Cancellation tracking
+    cancelled_by = models.CharField(max_length=10, choices=(('customer', 'Customer'), ('vendor', 'Vendor'), ('admin', 'Admin')), null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancel_reason = models.TextField(null=True, blank=True)
+    refund_status = models.CharField(max_length=20, choices=(('not_required', 'Not Required'), ('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')), default='not_required')
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

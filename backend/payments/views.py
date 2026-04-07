@@ -6,9 +6,38 @@ from decimal import Decimal
 import json
 import uuid
 import base64
+from django.core.mail import send_mail
 from orders.models import Order
 from products.models import Product, CartItem
 from .esewa_utils import generate_esewa_signature, verify_esewa_payment
+
+def _notify_vendors_of_order(order_items):
+    for order in order_items:
+        try:
+            subject = f"New Order Received - #ORD-{order.id:04d}"
+            message = (
+                f"Hello {order.vendor.store_name},\n\n"
+                f"Great news! You have received a new order for '{order.product.name}'.\n\n"
+                f"--- Order Details ---\n"
+                f"Order ID: #ORD-{order.id:04d}\n"
+                f"Quantity: {order.quantity}\n"
+                f"Total Amount: Rs. {order.total_amount}\n"
+                f"Payment Method: {order.get_payment_method_display()}\n\n"
+                f"--- Shipping Address ---\n"
+                f"{order.shipping_address}\n\n"
+                f"Please log in to your dashboard to manage this order.\n\n"
+                f"Thank you,\n"
+                f"GearUpNepal Team"
+            )
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [order.vendor.user.email],
+                fail_silently=True,
+            )
+        except Exception:
+            pass
 
 @csrf_exempt
 def initiate_payment(request):
@@ -46,6 +75,9 @@ def initiate_payment(request):
                         o.product.quantity = max(0, o.product.quantity - o.quantity)
                         o.product.save()
                     CartItem.objects.filter(customer=user).delete()
+                
+                # Notify vendors for COD
+                _notify_vendors_of_order(items)
                 
                 return JsonResponse({
                     "message": "Order placed successfully (COD)",
@@ -102,6 +134,9 @@ def payment_success(request):
                     items.update(is_paid=True, payment_status='paid', esewa_ref_id=ref_id, status='processing')
                     first = items.first()
                     if first: CartItem.objects.filter(customer=first.customer).delete()
+                    
+                    # Notify vendors for eSewa success
+                    _notify_vendors_of_order(items)
                 from django.shortcuts import redirect
                 return redirect(f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')}/payment-success?oid={t_uuid}")
             return JsonResponse({"error": "Verification failed"}, status=400)

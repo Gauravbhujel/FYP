@@ -135,9 +135,9 @@ def vendor_dashboard_stats(request):
     if request.method == "GET":
         now = timezone.now()
         month_start = now.replace(day=1)
-        stats = Order.objects.filter(vendor=vendor).aggregate(total_rev=Sum('total_amount'), total_earn=Sum('vendor_earning'))
-        this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).aggregate(earn=Sum('vendor_earning'))
-        pending = Order.objects.filter(vendor=vendor).exclude(status='delivered').aggregate(earn=Sum('vendor_earning'))
+        stats = Order.objects.filter(vendor=vendor).exclude(status='canceled').aggregate(total_rev=Sum('total_amount'), total_earn=Sum('vendor_earning'))
+        this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
+        pending = Order.objects.filter(vendor=vendor).exclude(status__in=['delivered', 'canceled']).aggregate(earn=Sum('vendor_earning'))
         available = Order.objects.filter(vendor=vendor, status='delivered').aggregate(earn=Sum('vendor_earning'))
         
         return JsonResponse({
@@ -145,7 +145,7 @@ def vendor_dashboard_stats(request):
             "this_month_earnings": float(this_month['earn'] or 0),
             "pending_earnings": float(pending['earn'] or 0),
             "available_balance": float(available['earn'] or 0),
-            "total_orders": Order.objects.filter(vendor=vendor).count(),
+            "total_orders": Order.objects.filter(vendor=vendor).exclude(status='canceled').count(),
             "products_listed": Product.objects.filter(vendor=vendor, is_active=True).count(),
             "pending_orders": Order.objects.filter(vendor=vendor, status='pending').count(),
         }, status=200)
@@ -192,6 +192,9 @@ def vendor_update_order_status(request):
             order_id = int(order_id.replace("#ORD-", ""))
         try:
             order = Order.objects.get(id=order_id, vendor=vendor)
+            if order.status == 'canceled':
+                return JsonResponse({"error": "Cannot update a cancelled order."}, status=400)
+            
             new_status = data.get("status")
             if new_status in [c[0] for c in Order.STATUS_CHOICES]:
                 order.status = new_status
@@ -306,7 +309,7 @@ def admin_dashboard_stats(request):
         if error: return error
         if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
         User = get_user_model()
-        stats = Order.objects.aggregate(total_rev=Sum('total_amount'), total_comm=Sum('commission_amount'), count=Count('id'))
+        stats = Order.objects.exclude(status='canceled').aggregate(total_rev=Sum('total_amount'), total_comm=Sum('commission_amount'), count=Count('id'))
         return JsonResponse({
             "total_users": User.objects.count(), "active_vendors": Vendor.objects.filter(status='approved').count(),
             "pending_approvals": Vendor.objects.filter(status='pending').count(),
@@ -323,10 +326,10 @@ def admin_top_vendors(request):
         if error: return error
         if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
         top = Vendor.objects.filter(status='approved').annotate(
-            revenue=Sum('vendor_orders__total_amount'),
-            commission=Sum('vendor_orders__commission_amount'),
-            payout=Sum('vendor_orders__vendor_earning'),
-            count=Count('vendor_orders')
+            revenue=Sum('vendor_orders__total_amount', filter=~Q(vendor_orders__status='canceled')),
+            commission=Sum('vendor_orders__commission_amount', filter=~Q(vendor_orders__status='canceled')),
+            payout=Sum('vendor_orders__vendor_earning', filter=~Q(vendor_orders__status='canceled')),
+            count=Count('vendor_orders', filter=~Q(vendor_orders__status='canceled'))
         ).order_by('-revenue')[:4]
         return JsonResponse([
             {

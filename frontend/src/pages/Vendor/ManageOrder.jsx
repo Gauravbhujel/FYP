@@ -51,6 +51,8 @@ export function ManageOrdersPage() {
         return "bg-gray-100 text-gray-900";
       case "processing":
         return "bg-accent/10 text-accent";
+      case "canceled":
+        return "bg-red-50 text-red-600";
       case "pending":
       default:
         return "bg-gray-50 text-gray-400";
@@ -111,6 +113,7 @@ export function ManageOrdersPage() {
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
+                        <option value="canceled">Cancelled</option>
                     </select>
                     <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-300 pointer-events-none" />
                 </div>
@@ -181,26 +184,27 @@ export function ManageOrdersPage() {
                                     <td className="px-8 py-7 text-right">
                                         <div className="relative inline-block group/actions">
                                             <button 
-                                                disabled={updatingId === order.id}
+                                                disabled={updatingId === order.id || order.status === 'canceled'}
                                                 className="py-2.5 px-6 bg-accent text-white rounded text-[8px] font-black uppercase tracking-[0.2em] transition-all border-none cursor-pointer flex items-center gap-2 disabled:opacity-50 hover:bg-[#EA580C] hover:scale-[1.05] active:scale-95"
                                             >
-                                                {updatingId === order.id ? <Loader2Icon className="w-3 h-3 animate-spin" /> : "Manage Order"}
+                                                {updatingId === order.id ? <Loader2Icon className="w-3 h-3 animate-spin" /> : order.status === 'canceled' ? "Order Cancelled" : "Manage Order"}
                                             </button>
                                             
-                                            {/* Status Update Popover */}
-                                            <div className="absolute right-0 bottom-full pb-2 hidden group-hover/actions:block z-50 min-w-[150px]">
-                                                <div className="bg-white border border-gray-100 shadow-2xl rounded-lg p-2">
-                                                    {["processing", "shipped", "delivered"].map(status => (
-                                                        <button 
-                                                            key={status}
-                                                            onClick={() => handleStatusUpdate(order.id, status)}
-                                                            className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500'} border-none cursor-pointer bg-white mb-1 last:mb-0 hover:bg-gray-50`}
-                                                        >
-                                                            Set to {status}
-                                                        </button>
-                                                    ))}
+                                            {order.status !== 'canceled' && (
+                                                <div className="absolute right-0 bottom-full pb-2 hidden group-hover/actions:block z-50 min-w-[150px]">
+                                                    <div className="bg-white border border-gray-100 shadow-2xl rounded-lg p-2">
+                                                        {["processing", "shipped", "delivered"].map(status => (
+                                                            <button 
+                                                                key={status}
+                                                                onClick={() => handleStatusUpdate(order.id, status)}
+                                                                className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500'} border-none cursor-pointer bg-white mb-1 last:mb-0 hover:bg-gray-50`}
+                                                            >
+                                                                Set to {status}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

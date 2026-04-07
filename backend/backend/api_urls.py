@@ -12,6 +12,7 @@ urlpatterns = [
     path('login/', user_views.login_user, name='login'),
     path('user/profile/', user_views.user_profile, name='user_profile'),
     path('user/orders/', order_views.customer_orders, name='customer_orders'),
+    path('user/orders/cancel/<str:order_id>/', order_views.cancel_order, name='cancel_order'),
     path('user/change-password/', user_views.change_password, name='change_password'),
     path('user/delete-account/', user_views.delete_account, name='delete_account'),
     path('forgot-password/', user_views.forgot_password, name='forgot_password'),

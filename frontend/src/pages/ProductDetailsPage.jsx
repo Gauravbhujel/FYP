@@ -123,6 +123,26 @@ const ProductDetailsPage = () => {
             alert(`Failed to add to ${actionType}. Please try again.`);
         }
     };
+    
+    const handleBuyNow = async () => {
+        if (!token) {
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        try {
+            await api.post('cart/add/', {
+                product_id: product.id,
+                quantity: quantity
+            });
+            incrementCart(quantity);
+            navigate('/checkout');
+        } catch (error) {
+            console.error('Error in Buy It Now:', error);
+            alert('Failed to process Buy It Now. Please try again.');
+        }
+    };
+
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
@@ -402,7 +422,7 @@ const ProductDetailsPage = () => {
                                 {/* Buy Now */}
                                 <Button 
                                     variant="primary"
-                                    onClick={() => product.quantity > 0 ? navigate('/checkout', { state: { product, quantity } }) : null}
+                                    onClick={handleBuyNow}
                                     disabled={product.quantity <= 0}
                                     className={`w-full h-11 gap-2 shadow-sm transition-all flex items-center justify-center font-bold ${product.quantity <= 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                                 >
