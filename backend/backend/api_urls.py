@@ -38,6 +38,11 @@ urlpatterns = [
     path('vendors/<int:vendor_id>/review/submit/<int:order_id>/', vendor_views.submit_vendor_review, name='submit_vendor_review'),
     path('vendors/<int:vendor_id>/review/check-eligibility/<int:order_id>/', vendor_views.check_vendor_review_eligibility, name='check_vendor_review_eligibility'),
     
+    # Vendor Reports
+    path('vendor/reports/sales/', vendor_views.vendor_report_sales, name='vendor_report_sales'),
+    path('vendor/reports/orders/', vendor_views.vendor_report_orders, name='vendor_report_orders'),
+    path('vendor/reports/products/', vendor_views.vendor_report_products, name='vendor_report_products'),
+    
     # Products
     path('categories/stats/', product_views.public_category_stats, name='public_category_stats'),
     path('products/all/', product_views.public_product_list, name='public_product_list'),

@@ -15,6 +15,7 @@ import { EditProductPage } from "./pages/Vendor/EditProduct";
 import VendorEarningsPage from "./pages/Vendor/VendorEarnings";
 import { ManageOrdersPage } from "./pages/Vendor/ManageOrder";
 import { StoreSettingsPage } from "./pages/Vendor/StoreSettings";
+import { VendorReportsPage } from "./pages/Vendor/VendorReports";
 import { VendorSignupPage } from "./components/VendorSignup";
 import VerifyEmailPage from "./components/VerifyEmail";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -200,6 +201,14 @@ function App() {
             element={
               <ProtectedRoute allowedRole="vendor">
                 <StoreSettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vendor/reports"
+            element={
+              <ProtectedRoute allowedRole="vendor">
+                <VendorReportsPage />
               </ProtectedRoute>
             }
           />

@@ -402,3 +402,90 @@ def admin_reports_stats(request):
             "monthly_revenue": monthly_data, "category_breakdown": cat_breakdown or [{"category": "Other", "revenue": 0, "percentage": 0}]
         }, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def vendor_report_sales(request):
+    vendor, error = _get_vendor_from_token(request)
+    if error: return error
+    if request.method == "GET":
+        from_date = request.GET.get('from_subscription_date') # Consistent with some other filter name or just use 'from_date'
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q(vendor=vendor)
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+            
+        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
+            total_orders=Count('id'),
+            total_revenue=Sum('total_amount'),
+            total_earnings=Sum('vendor_earning'),
+            total_commission=Sum('commission_amount')
+        )
+        
+        return JsonResponse({
+            "total_orders": stats['total_orders'] or 0,
+            "total_revenue": float(stats['total_revenue'] or 0),
+            "total_earnings": float(stats['total_earnings'] or 0),
+            "total_commission": float(stats['total_commission'] or 0)
+        }, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def vendor_report_orders(request):
+    vendor, error = _get_vendor_from_token(request)
+    if error: return error
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q(vendor=vendor)
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+            
+        orders = Order.objects.filter(query).select_related('customer', 'product').order_by('-created_at')
+        data = [{
+            "order_id": f"#ORD-{o.id:04d}",
+            "customer": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
+            "items_count": o.quantity,
+            "total_price": float(o.total_amount),
+            "status": o.status,
+            "payment_method": o.get_payment_method_display(),
+            "date": o.created_at.strftime("%Y-%m-%d")
+        } for o in orders]
+        
+        return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def vendor_report_products(request):
+    vendor, error = _get_vendor_from_token(request)
+    if error: return error
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q(vendor=vendor)
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+            
+        # Group by product
+        products = Order.objects.filter(query).exclude(status='canceled').values('product__name').annotate(
+            units_sold=Sum('quantity'),
+            total_revenue=Sum('total_amount')
+        ).order_by('-units_sold')
+        
+        data = [{
+            "product_name": p['product__name'],
+            "units_sold": p['units_sold'],
+            "total_revenue": float(p['total_revenue'])
+        } for p in products]
+        
+        return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
