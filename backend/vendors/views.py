@@ -489,3 +489,151 @@ def vendor_report_products(request):
         
         return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def admin_report_sales(request):
+    from users.views import _get_user_from_token
+    user, error = _get_user_from_token(request)
+    if error: return error
+    if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
+    
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q()
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+            
+        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
+            total_orders=Count('id'),
+            total_revenue=Sum('total_amount'),
+            total_commission=Sum('commission_amount'),
+            total_vendor_earnings=Sum('vendor_earning')
+        )
+        
+        # Fetch Top Vendors within the date range
+        top_vendors = Vendor.objects.filter(status='approved').annotate(
+            revenue=Sum('vendor_orders__total_amount', filter=query & ~Q(vendor_orders__status='canceled')),
+            orders=Count('vendor_orders', filter=query & ~Q(vendor_orders__status='canceled'))
+        ).filter(revenue__gt=0).order_by('-revenue')[:5]
+        
+        vendors_data = [{
+            "name": v.store_name,
+            "revenue": float(v.revenue or 0),
+            "orders": v.orders or 0
+        } for v in top_vendors]
+        
+        return JsonResponse({
+            "total_orders": stats['total_orders'] or 0,
+            "total_revenue": float(stats['total_revenue'] or 0),
+            "total_admin_commission": float(stats['total_commission'] or 0),
+            "total_vendor_earnings": float(stats['total_vendor_earnings'] or 0),
+            "top_vendors": vendors_data
+        }, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def admin_report_orders(request):
+    from users.views import _get_user_from_token
+    user, error = _get_user_from_token(request)
+    if error: return error
+    if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
+    
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q()
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+            
+        orders = Order.objects.filter(query).select_related('customer', 'product').order_by('-created_at')
+        data = [{
+            "order_id": f"#ORD-{o.id:04d}",
+            "customer_name": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
+            "customer_email": o.customer.email,
+            "items_count": o.quantity,
+            "total_amount": float(o.total_amount),
+            "status": o.status,
+            "payment_method": o.get_payment_method_display(),
+            "date": o.created_at.strftime("%Y-%m-%d")
+        } for o in orders]
+        
+        return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def admin_report_products(request):
+    from users.views import _get_user_from_token
+    user, error = _get_user_from_token(request)
+    if error: return error
+    if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
+    
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q()
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+            
+        products = Order.objects.filter(query).exclude(status='canceled').values(
+            'product__name', 'vendor__store_name'
+        ).annotate(
+            units_sold=Sum('quantity'),
+            total_revenue=Sum('total_amount')
+        ).order_by('-units_sold')
+        
+        data = [{
+            "product_name": p['product__name'],
+            "vendor_name": p['vendor__store_name'],
+            "units_sold": p['units_sold'],
+            "total_revenue": float(p['total_revenue'])
+        } for p in products]
+        
+        return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def admin_report_customers(request):
+    from users.views import _get_user_from_token
+    from django.contrib.auth import get_user_model
+    user, error = _get_user_from_token(request)
+    if error: return error
+    if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
+    
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        User = get_user_model()
+        
+        # Filtering orders for aggregation
+        order_query = Q()
+        if from_date:
+            order_query &= Q(customer_orders__created_at__date__gte=from_date)
+        if to_date:
+            order_query &= Q(customer_orders__created_at__date__lte=to_date)
+            
+        # We want all customers who have placed orders in the range
+        customers = User.objects.filter(role='customer').annotate(
+            total_orders=Count('customer_orders', filter=order_query),
+            total_spending=Sum('customer_orders__total_amount', filter=order_query)
+        ).filter(total_orders__gt=0).order_by('-total_spending')
+        
+        data = [{
+            "customer_name": f"{c.first_name} {c.last_name}".strip() or c.username,
+            "total_orders": c.total_orders,
+            "total_spending": float(c.total_spending or 0)
+        } for c in customers]
+        
+        return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+

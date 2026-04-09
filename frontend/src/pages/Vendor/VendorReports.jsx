@@ -11,6 +11,7 @@ import {
   IndianRupeeIcon,
   SearchIcon,
   ArrowRightIcon,
+  DownloadIcon,
 } from "lucide-react";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
 import api from "../../api";
@@ -55,6 +56,44 @@ export function VendorReportsPage() {
     }
   };
 
+  const handleExport = () => {
+    let dataToExport = [];
+    let filename = `vendor_report_${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
+    
+    if (activeTab === "sales" && salesData) {
+      dataToExport = [
+        ["Metric", "Value"],
+        ["Total Orders", salesData.total_orders],
+        ["Total Revenue", salesData.total_revenue],
+        ["Your Earnings", salesData.total_earnings],
+        ["Admin Commission", salesData.total_commission]
+      ];
+    } else if (activeTab === "orders") {
+      dataToExport = [
+        ["Order ID", "Customer", "Items", "Amount", "Status", "Payment", "Date"],
+        ...ordersData.map(o => [o.order_id, o.customer, o.items_count, o.total_price, o.status, o.payment_method, o.date])
+      ];
+    } else if (activeTab === "products") {
+      dataToExport = [
+        ["Product Name", "Units Sold", "Total Revenue"],
+        ...productsData.map(p => [p.product_name, p.units_sold, p.total_revenue])
+      ];
+    }
+    
+    if (dataToExport.length === 0) return;
+    
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + dataToExport.map(e => e.join(",")).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const tabs = [
     { id: "sales", label: "Sales Report", icon: TrendingUpIcon },
     { id: "orders", label: "Order Details", icon: ShoppingBagIcon },
@@ -90,6 +129,14 @@ export function VendorReportsPage() {
                     />
                 </div>
             </div>
+
+            <button 
+                onClick={handleExport}
+                className="h-11 px-6 bg-white border border-gray-200 text-gray-900 text-[10px] font-black uppercase tracking-widest rounded transition-all hover:bg-gray-50 active:scale-95 flex items-center gap-2 shadow-sm"
+            >
+                <DownloadIcon className="w-4 h-4" />
+                Export CSV
+            </button>
           </div>
         </div>
 
@@ -273,10 +320,10 @@ function ProgressBar({ label, value, color }) {
 }
 
 const getStatusStyle = (status) => {
-  const s = status.toLowerCase();
+  const s = (status || "").toLowerCase();
   if (s === 'delivered') return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
   if (s === 'pending') return 'bg-amber-50 text-amber-600 border border-amber-100';
-  if (s === 'canceled') return 'bg-red-50 text-red-600 border border-red-100';
+  if (s === 'canceled' || s === 'cancelled') return 'bg-red-50 text-red-600 border border-red-100';
   if (s === 'processing') return 'bg-blue-50 text-blue-600 border border-blue-100';
   return 'bg-gray-50 text-gray-600 border border-gray-100';
 };

@@ -76,6 +76,12 @@ urlpatterns = [
     path('admin/products/list/', product_views.admin_products_list, name='admin_products_list'),
     path('admin/products/delete/<int:product_id>/', product_views.admin_delete_product, name='admin_delete_product'),
     
+    # Admin Reports
+    path('admin/reports/sales/', vendor_views.admin_report_sales, name='admin_report_sales'),
+    path('admin/reports/orders/', vendor_views.admin_report_orders, name='admin_report_orders'),
+    path('admin/reports/products/', vendor_views.admin_report_products, name='admin_report_products'),
+    path('admin/reports/customers/', vendor_views.admin_report_customers, name='admin_report_customers'),
+    
     # Payments
     path('checkout/initiate/', payment_views.initiate_payment, name='initiate_payment'),
     path('payment/success/', payment_views.payment_success, name='payment_success'),
