@@ -13,7 +13,7 @@ import {
 import { AdminLayout } from "../../components/admin/AdminLayout";
 
 const RsIcon = ({ className }) => (
-  <span className={`font-black tracking-tighter ${className}`}>Rs</span>
+  <span className={`font-bold ${className}`}>Rs</span>
 );
 
 export default function AdminSettingsPage() {
@@ -55,179 +55,179 @@ export default function AdminSettingsPage() {
 
   return (
     <AdminLayout currentPage="settings">
-      <div className="w-full space-y-8 animate-fade-in pb-12">
+      <div className="w-full space-y-6 animate-fade-in pb-12 max-w-7xl mx-auto">
         {/* Header Block */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-200 pb-5">
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">System Console</h1>
-            <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-[3px] leading-none">Global platform configuration and security parameters</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">System Console</h1>
+            <p className="text-sm text-gray-500 mt-1">Global platform configuration and security parameters</p>
           </div>
           <button 
             onClick={handleSave}
-            className="h-11 px-8 flex items-center gap-3 bg-accent text-white rounded font-black text-[10px] uppercase tracking-widest shadow-sm cursor-pointer border-none transition-all hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95"
+            className="h-10 px-6 flex items-center gap-2 bg-accent text-white rounded-lg font-semibold text-sm shadow-sm cursor-pointer hover:bg-opacity-90 hover:scale-[1.02] active:scale-95 transition-all border-none"
           >
-            <SaveIcon className="w-4 h-4" /> Commit Changes
+            <SaveIcon className="w-4 h-4" /> Save Changes
           </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Navigation / Sidebar */}
             <div className="lg:col-span-1 space-y-6">
-                <div className="bg-white border border-gray-300 rounded-lg p-2 shadow-sm">
-                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-[#F5F5F5] text-accent rounded transition-all border-none cursor-pointer">
-                        <GlobeIcon className="w-5 h-5" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Platform Core</span>
+                <div className="bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
+                    <button className="w-full flex items-center gap-3 px-4 py-3 bg-accent/5 text-accent rounded-lg transition-all border-none cursor-pointer font-semibold shadow-sm">
+                        <GlobeIcon className="w-5 h-5 flex-shrink-0" />
+                        <span className="text-sm">Platform Core</span>
                     </button>
-                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 rounded transition-all border-none cursor-pointer">
-                        <CreditCardIcon className="w-5 h-5" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Economic Logic</span>
+                    <button className="w-full flex items-center gap-3 px-4 py-3 bg-transparent text-gray-600 rounded-lg transition-all border-none cursor-pointer hover:bg-gray-50 font-medium">
+                        <CreditCardIcon className="w-5 h-5 flex-shrink-0" />
+                        <span className="text-sm">Economic Logic</span>
                     </button>
-                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 rounded transition-all border-none cursor-pointer">
-                        <BellIcon className="w-5 h-5" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Alert Protocols</span>
+                    <button className="w-full flex items-center gap-3 px-4 py-3 bg-transparent text-gray-600 rounded-lg transition-all border-none cursor-pointer hover:bg-gray-50 font-medium">
+                        <BellIcon className="w-5 h-5 flex-shrink-0" />
+                        <span className="text-sm">Alert Protocols</span>
                     </button>
-                    <button className="w-full flex items-center gap-4 px-5 py-4 bg-transparent text-gray-400 rounded transition-all border-none cursor-pointer">
-                        <ShieldCheckIcon className="w-5 h-5" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Security Layer</span>
+                    <button className="w-full flex items-center gap-3 px-4 py-3 bg-transparent text-gray-600 rounded-lg transition-all border-none cursor-pointer hover:bg-gray-50 font-medium">
+                        <ShieldCheckIcon className="w-5 h-5 flex-shrink-0" />
+                        <span className="text-sm">Security Layer</span>
                     </button>
                 </div>
 
-                <div className="bg-gray-900 rounded-lg p-6 border-none shadow-xl">
+                <div className="bg-gray-900 rounded-xl p-6 border-none shadow-lg">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center">
-                            <CpuIcon className="w-4 h-4 text-emerald-400" />
+                        <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
+                            <CpuIcon className="w-5 h-5 text-emerald-400" />
                         </div>
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">System Health</span>
+                        <span className="text-sm font-bold text-gray-100">System Health</span>
                     </div>
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Uptime Velocity</span>
-                            <span className="text-[10px] font-black text-emerald-400 tracking-widest">99.98%</span>
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-center text-sm">
+                            <span className="font-medium text-gray-400">Uptime Velocity</span>
+                            <span className="font-bold text-emerald-400">99.98%</span>
                         </div>
-                        <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden">
-                            <div className="h-full w-[99%] bg-emerald-500" />
+                        <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div className="h-full w-[99%] bg-emerald-500 rounded-full" />
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Config Panels */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-6">
                 {/* General Panel */}
-                <div className="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
-                    <div className="flex items-center gap-4 mb-10">
-                        <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center">
+                <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
+                    <div className="flex items-start md:items-center gap-4 mb-8">
+                        <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
                             <GlobeIcon className="w-6 h-6 text-accent" />
                         </div>
                         <div>
-                            <p className="text-sm font-black text-gray-900 uppercase">Platform Identity</p>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Foundational platform persona</p>
+                            <p className="text-lg font-bold text-gray-900">Platform Identity</p>
+                            <p className="text-sm text-gray-500 mt-1">Foundational platform persona and contact details</p>
                         </div>
                     </div>
 
-                    <div className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] ml-1">Platform ID</label>
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Platform ID</label>
                                 <input 
                                     type="text" 
                                     name="siteName"
                                     value={platformSettings.siteName}
                                     onChange={handlePlatformChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder-gray-400"
                                 />
                             </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] ml-1">Official Tagline</label>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Official Tagline</label>
                                 <input 
                                     type="text" 
                                     name="tagline"
                                     value={platformSettings.tagline}
                                     onChange={handlePlatformChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder-gray-400"
                                 />
                             </div>
                         </div>
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] ml-1">Security Response Email</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700">Security Response Email</label>
                             <input 
                                 type="email" 
                                 name="supportEmail"
                                 value={platformSettings.supportEmail}
                                 onChange={handlePlatformChange}
-                                className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-900 outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder-gray-400"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Financial Panel */}
-                <div className="bg-white border border-gray-300 rounded-lg p-8 shadow-sm">
-                    <div className="flex items-center gap-4 mb-10">
-                        <div className="w-12 h-12 bg-gray-50 rounded flex items-center justify-center">
+                <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
+                    <div className="flex items-start md:items-center gap-4 mb-8">
+                        <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
                             <CreditCardIcon className="w-6 h-6 text-accent" />
                         </div>
                         <div>
-                            <p className="text-sm font-black text-gray-900 uppercase">Economic Logic</p>
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Commission and payout protocols</p>
+                            <p className="text-lg font-bold text-gray-900">Economic Logic</p>
+                            <p className="text-sm text-gray-500 mt-1">Commission rates and vendor payout protocols</p>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] ml-1">Platform Fee (%)</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700">Platform Fee (%)</label>
                             <div className="relative">
                                 <input 
                                     type="number" 
                                     name="defaultRate"
                                     value={commissionSettings.defaultRate}
                                     onChange={handleCommissionChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:bg-white focus:border-accent transition-all"
+                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-900 outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder-gray-400"
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 uppercase tracking-widest">%</span>
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400 pointer-events-none">%</span>
                             </div>
                         </div>
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] ml-1">Payout Floor (Rs)</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-700">Payout Floor Limit</label>
                             <div className="relative">
                                 <input 
                                     type="number" 
                                     name="minimumPayout"
                                     value={commissionSettings.minimumPayout}
                                     onChange={handleCommissionChange}
-                                    className="w-full h-11 px-5 bg-[#F5F5F5] border border-gray-300 rounded text-[10px] font-black tracking-widest text-gray-900 outline-none focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all"
+                                    className="w-full h-10 pl-10 pr-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-900 outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder-gray-400"
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400 uppercase tracking-widest">NPR</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-400 pointer-events-none">Rs.</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Danger Zone */}
-                <div className="bg-white border text-rose-600 border-rose-100 rounded-lg p-8 shadow-sm">
-                    <div className="flex items-center gap-4 mb-10">
-                        <div className="w-12 h-12 bg-rose-50 rounded flex items-center justify-center">
+                <div className="bg-white border border-rose-200 rounded-xl p-6 md:p-8 shadow-sm">
+                    <div className="flex items-start md:items-center gap-4 mb-8">
+                        <div className="w-12 h-12 bg-rose-50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <AlertTriangleIcon className="w-6 h-6 text-rose-500" />
                         </div>
                         <div>
-                            <p className="text-sm font-black text-rose-600 uppercase">Restricted Directives</p>
-                            <p className="text-[10px] font-black text-rose-400 uppercase tracking-widest mt-1">High-impact administrative actions</p>
+                            <p className="text-lg font-bold text-rose-600">Restricted Directives</p>
+                            <p className="text-sm text-rose-400 mt-1">High-impact administrative actions</p>
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-6 bg-rose-50/30 rounded border border-rose-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-rose-50/50 rounded-xl border border-rose-100">
                         <div className="max-w-md">
-                            <p className="text-[10px] font-black text-gray-900 uppercase tracking-widest mb-2">Ecosystem Suspension</p>
-                            <p className="text-[9px] font-black text-rose-500/60 leading-relaxed uppercase tracking-widest">Instantly toggle maintenance state. All public-facing nodes will redirect to the lock screen.</p>
+                            <p className="text-sm font-bold text-rose-900 mb-1">Ecosystem Suspension (Maintenance)</p>
+                            <p className="text-xs font-medium text-rose-600/80 leading-relaxed">Instantly toggle maintenance state. All public-facing nodes will redirect to the lock screen.</p>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
                             <input 
                                 type="checkbox" 
                                 checked={maintenanceMode}
                                 onChange={() => setMaintenanceMode(!maintenanceMode)}
                                 className="sr-only peer" 
                             />
-                            <div className="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+                            <div className="w-14 h-7 bg-rose-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-rose-500 shadow-inner"></div>
                         </label>
                     </div>
                 </div>

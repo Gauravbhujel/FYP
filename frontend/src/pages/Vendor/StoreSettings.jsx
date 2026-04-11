@@ -4,17 +4,18 @@ import {
   MapPinIcon,
   PhoneIcon,
   MailIcon,
-  GlobeIcon,
   CheckCircle2Icon,
   AlertCircleIcon,
   SaveIcon,
-  Building2Icon
+  Loader2Icon,
+  GlobeIcon
 } from "lucide-react";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
 import api from "../../api";
 
 export function StoreSettingsPage() {
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
@@ -49,6 +50,8 @@ export function StoreSettingsPage() {
         });
       } catch (err) {
         console.error("Error fetching settings:", err);
+      } finally {
+        setFetching(false);
       }
     };
     fetchSettings();
@@ -65,7 +68,6 @@ export function StoreSettingsPage() {
     setSuccess("");
 
     try {
-      // Map frontend fields to backend expected fields if necessary
       const payload = {
           store_name: formData.storeName,
           tagline: formData.tagline,
@@ -79,139 +81,152 @@ export function StoreSettingsPage() {
       };
 
       await api.post("vendor/profile/update/", payload);
-      setSuccess("Store profile updated successfully!");
+      setSuccess("Your store configuration has been successfully updated.");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error("Error saving settings:", err);
-      setError("Failed to sync store settings. Please try again.");
+      setError("Failed to synchronize settings with the server.");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching) {
+    return (
+      <VendorLayout currentPage="settings">
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <Loader2Icon className="w-10 h-10 text-accent animate-spin mb-4" />
+          <p className="text-sm text-gray-500 font-medium">Retrieving store profile...</p>
+        </div>
+      </VendorLayout>
+    );
+  }
+
   return (
     <VendorLayout currentPage="settings">
-      <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pb-20">
-        <div>
-          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Store Configuration</h1>
-          <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">Manage your brand identity and contact details</p>
+      <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-20">
+        {/* Modern Header */}
+        <div className="pb-2">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Store Settings</h1>
+            <p className="text-sm text-gray-500 font-medium">Edit your store details, address, and contact info</p>
         </div>
 
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-center gap-3">
+          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl flex items-center gap-3 animate-shake">
             <AlertCircleIcon className="w-5 h-5 flex-shrink-0" />
-            <p className="text-sm font-bold">{error}</p>
+            <p className="text-sm font-semibold">{error}</p>
           </div>
         )}
         {success && (
-          <div className="p-4 bg-accent/5 border border-accent/10 text-accent rounded-2xl flex items-center gap-3">
+          <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl flex items-center gap-3 animate-slide-up">
             <CheckCircle2Icon className="w-5 h-5 flex-shrink-0" />
-            <p className="text-sm font-bold">{success}</p>
+            <p className="text-sm font-semibold">{success}</p>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-8">
-            {/* Identity */}
-            <div className="dashboard-card p-8">
-              <div className="flex items-center gap-3 mb-8">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-8 space-y-6">
+            {/* Brand Section */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
                  <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
                     <StoreIcon className="w-5 h-5" />
                  </div>
-                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Public Identity</h2>
+                 <h2 className="text-base font-bold text-gray-900">Store Details</h2>
               </div>
 
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Store Display Name</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Store Name</label>
                   <input
                     type="text"
                     name="storeName"
                     value={formData.storeName}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Slogan or Tagline</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Tagline</label>
                   <input
                     type="text"
                     name="tagline"
                     value={formData.tagline}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
-                    placeholder="e.g., Best Gear for Every Athlete"
+                    className="w-full h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
+                    placeholder="Short mission statement..."
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Business Autobiography</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">About Store</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
                     rows="4"
-                    className="w-full p-4 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none resize-none placeholder:text-gray-300"
-                    placeholder="Describe your store history..."
+                    className="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none resize-none"
+                    placeholder="Tell customers about your business..."
                   />
                 </div>
               </div>
             </div>
 
-            {/* Address */}
-            <div className="dashboard-card p-8">
-              <div className="flex items-center gap-3 mb-8">
+            {/* Logistics Base */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
                  <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
                     <MapPinIcon className="w-5 h-5" />
                  </div>
-                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Business Address</h2>
+                 <h2 className="text-base font-bold text-gray-900">Store Address</h2>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Street Address</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Warehouse Address</label>
                   <input
                     type="text"
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                     required
                   />
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">City</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">City</label>
                     <input
                         type="text"
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                        className="w-full h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                         required
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Province/State</label>
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Province</label>
                     <input
                         type="text"
                         name="state"
                         value={formData.state}
                         onChange={handleChange}
-                        className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                        className="w-full h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                         required
                     />
                   </div>
-                  <div className="space-y-2 lg:col-span-1 col-span-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">ZIP / Postal</label>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Postal Code</label>
                     <input
                         type="text"
                         name="zipCode"
                         value={formData.zipCode}
                         onChange={handleChange}
-                        className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-black text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                        className="w-full h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                         required
                     />
                   </div>
@@ -220,62 +235,77 @@ export function StoreSettingsPage() {
             </div>
           </div>
 
-          <div className="lg:col-span-4 space-y-8">
-            {/* Contact */}
-            <div className="dashboard-card p-8">
-              <div className="flex items-center gap-3 mb-8">
+          <div className="lg:col-span-4 space-y-6">
+            {/* Support Info */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
                     <PhoneIcon className="w-5 h-5" />
                  </div>
-                 <h2 className="text-lg font-black text-slate-800 tracking-tight">Support</h2>
+                 <h2 className="text-base font-bold text-gray-900">Communication</h2>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Public Email</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Public Email</label>
                   <div className="relative">
-                    <MailIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    <MailIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full h-12 pl-11 pr-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                        className="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                         required
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Phone Line</label>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Business Phone</label>
                   <div className="relative">
-                    <PhoneIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    <PhoneIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full h-12 pl-11 pr-4 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                        className="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
                         required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Website URL</label>
+                  <div className="relative">
+                    <GlobeIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="url"
+                        name="website"
+                        value={formData.website}
+                        onChange={handleChange}
+                        className="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
+                        placeholder="https://yourstore.com"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Save Block */}
-            <div className="dashboard-card p-2 bg-accent/5 sticky top-24">
+            {/* Save Card */}
+            <div className="bg-gray-50 p-2 rounded-2xl border border-gray-200 sticky top-24">
                 <button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full h-12 bg-accent text-white font-black rounded-2xl transition-all shadow-xl shadow-accent/20 flex items-center justify-center gap-3 border-none cursor-pointer uppercase tracking-[2px] text-xs hover:scale-[1.02] active:scale-95 hover:bg-[#EA580C]"
+                    className="w-full h-12 bg-accent text-white font-bold rounded-xl transition-all shadow-md shadow-accent/10 flex items-center justify-center gap-2 border-none cursor-pointer text-sm hover:scale-[1.02] active:scale-95 hover:bg-[#EA580C] disabled:opacity-50"
                 >
                     {loading ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                        <Loader2Icon className="w-4 h-4 animate-spin" />
                     ) : (
                         <>
                             <SaveIcon className="w-4 h-4" />
-                            Edit Profile
+                            Update Configuration
                         </>
                     )}
                 </button>

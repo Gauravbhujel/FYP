@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SearchIcon, FilterIcon, CalendarIcon, ChevronDownIcon, PackageIcon, AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { SearchIcon, FilterIcon, ChevronDownIcon, PackageIcon, AlertCircleIcon, Loader2Icon, MoreVerticalIcon } from "lucide-react";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
 import api from "../../api";
 
@@ -33,7 +33,6 @@ export function ManageOrdersPage() {
         order_id: orderId,
         status: newStatus,
       });
-      // Update local state instead of refetching for better UX
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     } catch (error) {
       console.error("Error updating status:", error);
@@ -44,18 +43,19 @@ export function ManageOrdersPage() {
   };
 
   const getStatusStyle = (status) => {
-    switch (status) {
+    const s = (status || "").toLowerCase();
+    switch (s) {
       case "delivered":
-        return "bg-gray-900 text-white";
+        return "bg-emerald-50 text-emerald-600 border-emerald-100";
       case "shipped":
-        return "bg-gray-100 text-gray-900";
+        return "bg-indigo-50 text-indigo-600 border-indigo-100";
       case "processing":
-        return "bg-accent/10 text-accent";
+        return "bg-blue-50 text-blue-600 border-blue-100";
       case "canceled":
-        return "bg-red-50 text-red-600";
+        return "bg-rose-50 text-rose-600 border-rose-100";
       case "pending":
       default:
-        return "bg-gray-50 text-gray-400";
+        return "bg-amber-50 text-amber-600 border-amber-100";
     }
   };
 
@@ -72,138 +72,132 @@ export function ManageOrdersPage() {
 
   return (
     <VendorLayout currentPage="orders">
-      <div className="max-w-7xl mx-auto space-y-12 animate-fade-in pb-20">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+      <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-20">
+        {/* Modern Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase mb-3">Order Management</h1>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">
-              Operational Fulfillment & Logistics Control ({filteredOrders.length} active)
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Orders</h1>
+            <p className="text-sm text-gray-500 font-medium">Manage and track your customer orders ({filteredOrders.length} active)</p>
           </div>
-          <div className="flex items-center gap-3">
-               <button className="h-12 px-8 bg-white border border-gray-300 rounded text-[10px] font-black uppercase tracking-widest text-gray-500 transition-all cursor-pointer hover:bg-gray-50 hover:scale-[1.02] active:scale-95">
-                   Export Data
-               </button>
-          </div>
+          
         </div>
 
-        {/* Filters/Search Bar */}
-        <div className="flex flex-col lg:flex-row gap-6">
-            <div className="relative flex-1 group">
-                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
+        {/* Improved Filters/Search Bar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-8 relative group">
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-accent transition-colors" />
                 <input 
                     type="text" 
-                    placeholder="Search by ID or Customer..." 
-                    className="w-full h-14 pl-12 pr-4 bg-white border border-gray-300 rounded-lg text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    placeholder="Search by ID or customer name..." 
+                    className="w-full h-12 pl-12 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none shadow-sm"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
             </div>
-            <div className="flex gap-4">
-                <div className="relative group">
-                    <FilterIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-accent transition-colors" />
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="h-14 pl-12 pr-12 bg-white border border-gray-300 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-900 appearance-none focus:ring-4 focus:ring-accent/5 focus:border-accent outline-none cursor-pointer min-w-[200px]"
-                    >
-                        <option value="all">Global Filter</option>
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="canceled">Cancelled</option>
-                    </select>
-                    <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-300 pointer-events-none" />
-                </div>
+            <div className="lg:col-span-4 relative group">
+                <FilterIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-accent transition-colors" />
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full h-12 pl-12 pr-12 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-900 appearance-none focus:ring-4 focus:ring-accent/5 focus:border-accent outline-none cursor-pointer shadow-sm"
+                >
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="canceled">Cancelled</option>
+                </select>
+                <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
         </div>
 
-        {/* Orders Table */}
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+        {/* Orders Data Grid */}
+        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-gray-50/50 border-b border-gray-100">
-                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transaction</th>
-                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Customer</th>
-                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Item Details</th>
-                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Payment</th>
-                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Value</th>
-                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">State</th>
-                            <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Actions</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Status</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 font-sans">
+                    <tbody className="divide-y divide-gray-50 font-sans">
                         {loading ? (
                             <tr>
-                                <td colSpan="6" className="px-8 py-20 text-center">
+                                <td colSpan="5" className="px-6 py-20 text-center">
                                     <Loader2Icon className="w-10 h-10 text-accent animate-spin mx-auto mb-4" />
-                                    <p className="uppercase tracking-widest text-[10px] font-black text-gray-300">Synchronizing registry data...</p>
+                                    <p className="text-sm font-medium text-gray-400">Loading order records...</p>
                                 </td>
                             </tr>
                         ) : filteredOrders.length === 0 ? (
                             <tr>
-                                <td colSpan="6" className="px-8 py-20 text-center uppercase tracking-widest text-[10px] font-black text-gray-300">
-                                    No transaction records match criteria
+                                <td colSpan="5" className="px-6 py-20 text-center text-sm font-medium text-gray-400">
+                                    {searchQuery || statusFilter !== "all" ? "No orders match your filter criteria." : "You haven't received any orders yet."}
                                 </td>
                             </tr>
                         ) : (
                             filteredOrders.map((order) => (
-                                <tr key={order.id} className="transition-colors group">
-                                    <td className="px-8 py-7">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{order.id}</span>
-                                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">{order.date}</span>
+                                <tr key={order.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <td className="px-6 py-6">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-gray-900 group-hover:text-accent transition-colors">{order.id}</span>
+                                            <span className="text-[11px] font-medium text-gray-400 mt-1 uppercase tracking-tight">{order.date}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-7">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{order.customer}</span>
-                                            <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] truncate max-w-[150px]">{order.address}</span>
+                                    <td className="px-6 py-6">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-gray-900">{order.customer}</span>
+                                            <span className="text-xs font-medium text-gray-500 mt-0.5 truncate max-w-[180px]">{order.address}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-7">
-                                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{order.product} <span className="text-gray-300 ml-1">×{order.quantity}</span></span>
-                                    </td>
-                                    <td className="px-8 py-7">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{order.payment_method}</span>
-                                            <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${order.payment_status === 'Paid' ? 'text-emerald-500' : 'text-amber-500'}`}>{order.payment_status}</span>
+                                    <td className="px-6 py-6 font-medium">
+                                        <div className="flex flex-col">
+                                          <span className="text-sm text-gray-700">{order.product}</span>
+                                          <span className="text-xs text-gray-400 mt-0.5">Quantity: {order.quantity} units</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-7">
-                                        <span className="text-[10px] font-black text-accent uppercase tracking-widest">Rs. {order.amount.toLocaleString()}</span>
+                                    <td className="px-6 py-6">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-sm font-bold text-gray-900">Rs. {order.amount.toLocaleString()}</span>
+                                            <span className={`text-[10px] font-bold uppercase tracking-tight flex items-center gap-1 ${order.payment_status === 'Paid' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                              <div className={`w-1.5 h-1.5 rounded-full ${order.payment_status === 'Paid' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                              {order.payment_status} ({order.payment_method})
+                                            </span>
+                                        </div>
                                     </td>
-                                    <td className="px-8 py-7">
-                                        <span className={`px-3 py-1.5 rounded text-[8px] font-black uppercase tracking-widest inline-block ${getStatusStyle(order.status)}`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-7 text-right">
-                                        <div className="relative inline-block group/actions">
-                                            <button 
-                                                disabled={updatingId === order.id || order.status === 'canceled'}
-                                                className="py-2.5 px-6 bg-accent text-white rounded text-[8px] font-black uppercase tracking-[0.2em] transition-all border-none cursor-pointer flex items-center gap-2 disabled:opacity-50 hover:bg-[#EA580C] hover:scale-[1.05] active:scale-95"
-                                            >
-                                                {updatingId === order.id ? <Loader2Icon className="w-3 h-3 animate-spin" /> : order.status === 'canceled' ? "Order Cancelled" : "Manage Order"}
-                                            </button>
+                                    <td className="px-6 py-6 text-right">
+                                        <div className="flex items-center justify-end gap-3">
+                                            <span className={`px-2.5 min-w-[80px] text-center py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusStyle(order.status)} underline-offset-2`}>
+                                                {order.status}
+                                            </span>
                                             
-                                            {order.status !== 'canceled' && (
-                                                <div className="absolute right-0 bottom-full pb-2 hidden group-hover/actions:block z-50 min-w-[150px]">
-                                                    <div className="bg-white border border-gray-100 shadow-2xl rounded-lg p-2">
-                                                        {["processing", "shipped", "delivered"].map(status => (
-                                                            <button 
-                                                                key={status}
-                                                                onClick={() => handleStatusUpdate(order.id, status)}
-                                                                className={`w-full text-left px-4 py-3 text-[8px] font-black uppercase tracking-widest rounded transition-colors ${order.status === status ? 'bg-gray-50 text-accent' : 'text-gray-500'} border-none cursor-pointer bg-white mb-1 last:mb-0 hover:bg-gray-50`}
-                                                            >
-                                                                Set to {status}
-                                                            </button>
-                                                        ))}
-                                                    </div>
+                                            {order.status !== 'canceled' && order.status !== 'delivered' && (
+                                              <div className="relative group/actions inline-block">
+                                                <button 
+                                                  disabled={updatingId === order.id}
+                                                  className="p-1.5 text-gray-400 hover:text-accent hover:bg-accent/5 rounded-lg transition-all"
+                                                >
+                                                  {updatingId === order.id ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <MoreVerticalIcon size={18} />}
+                                                </button>
+                                                
+                                                <div className="absolute right-0 bottom-full mb-2 hidden group-hover/actions:block z-50 min-w-[140px]">
+                                                  <div className="bg-white border border-gray-100 shadow-xl rounded-xl p-2 animate-slide-up">
+                                                    {["processing", "shipped", "delivered"].map(status => (
+                                                      <button 
+                                                        key={status}
+                                                        onClick={() => handleStatusUpdate(order.id, status)}
+                                                        className={`w-full text-left px-3 py-2 text-xs font-bold capitalize rounded-lg transition-colors ${order.status === status ? 'bg-accent/5 text-accent' : 'text-gray-600 hover:bg-gray-50'} border-none cursor-pointer bg-white mb-1 last:mb-0`}
+                                                      >
+                                                        Set {status}
+                                                      </button>
+                                                    ))}
+                                                  </div>
                                                 </div>
+                                              </div>
                                             )}
                                         </div>
                                     </td>
@@ -212,18 +206,6 @@ export function ManageOrdersPage() {
                         )}
                     </tbody>
                 </table>
-            </div>
-        </div>
-
-        {/* Tip Section */}
-        <div className="p-10 bg-gray-900 rounded-xl flex items-center gap-8 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl -mr-32 -mt-32 transition-transform" />
-            <div className="w-14 h-14 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <AlertCircleIcon className="w-6 h-6 text-accent" />
-            </div>
-            <div className="relative z-10">
-                <h4 className="text-[10px] font-black text-accent uppercase tracking-[0.2em] mb-2">Operational Insight</h4>
-                <p className="text-xs text-white/70 font-black uppercase tracking-widest leading-relaxed">Processing orders within 24 hours can catalyze revenue growth by up to 20%.</p>
             </div>
         </div>
       </div>

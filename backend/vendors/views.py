@@ -133,19 +133,35 @@ def vendor_dashboard_stats(request):
     vendor, error = _get_vendor_from_token(request)
     if error: return error
     if request.method == "GET":
-        now = timezone.now()
-        month_start = now.replace(day=1)
-        stats = Order.objects.filter(vendor=vendor).exclude(status='canceled').aggregate(total_rev=Sum('total_amount'), total_earn=Sum('vendor_earning'))
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+
+        query = Q(vendor=vendor)
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+
+        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
+            total_rev=Sum('total_amount'), 
+            total_earn=Sum('vendor_earning'),
+            count=Count('id')
+        )
+        
+        # Monthly benchmarks (relative to current date)
+        month_start = timezone.now().replace(day=1)
         this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
+        
         pending = Order.objects.filter(vendor=vendor).exclude(status__in=['delivered', 'canceled']).aggregate(earn=Sum('vendor_earning'))
         available = Order.objects.filter(vendor=vendor, status='delivered').aggregate(earn=Sum('vendor_earning'))
         
         return JsonResponse({
-            "total_revenue": float(stats['total_rev'] or 0), "total_earnings": float(stats['total_earn'] or 0),
+            "total_revenue": float(stats['total_rev'] or 0), 
+            "total_earnings": float(stats['total_earn'] or 0),
             "this_month_earnings": float(this_month['earn'] or 0),
             "pending_earnings": float(pending['earn'] or 0),
             "available_balance": float(available['earn'] or 0),
-            "total_orders": Order.objects.filter(vendor=vendor).exclude(status='canceled').count(),
+            "total_orders": stats['count'] or 0,
             "products_listed": Product.objects.filter(vendor=vendor, is_active=True).count(),
             "pending_orders": Order.objects.filter(vendor=vendor, status='pending').count(),
         }, status=200)
@@ -209,14 +225,74 @@ def vendor_sales_chart(request):
     vendor, error = _get_vendor_from_token(request)
     if error: return error
     if request.method == "GET":
-        today = date.today()
-        days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
         chart_data = []
-        for i in range(6, -1, -1):
-            day = today - timedelta(days=i)
-            aggr = Order.objects.filter(vendor=vendor, created_at__date=day).aggregate(total=Sum('total_amount'), earn=Sum('vendor_earning'))
-            chart_data.append({"day": days[day.weekday()], "sales": float(aggr['total'] or 0), "earnings": float(aggr['earn'] or 0)})
+        days_labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        
+        if from_date and to_date:
+            start_date = datetime.strptime(from_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+            delta = end_date - start_date
+            
+            # If range is small, show days. If range is large, we could group, but for now just show all days in range.
+            for i in range(delta.days + 1):
+                day = start_date + timedelta(days=i)
+                aggr = Order.objects.filter(vendor=vendor, created_at__date=day).exclude(status='canceled').aggregate(
+                    total=Sum('total_amount'), 
+                    earn=Sum('vendor_earning'),
+                    count=Count('id')
+                )
+                chart_data.append({
+                    "day": day.strftime("%d %b"), 
+                    "sales": float(aggr['total'] or 0), 
+                    "earnings": float(aggr['earn'] or 0),
+                    "orders": aggr['count']
+                })
+        else:
+            # Default to past 7 days
+            today = date.today()
+            for i in range(6, -1, -1):
+                day = today - timedelta(days=i)
+                aggr = Order.objects.filter(vendor=vendor, created_at__date=day).exclude(status='canceled').aggregate(
+                    total=Sum('total_amount'), 
+                    earn=Sum('vendor_earning'),
+                    count=Count('id')
+                )
+                chart_data.append({
+                    "day": day.strftime("%a"), 
+                    "sales": float(aggr['total'] or 0), 
+                    "earnings": float(aggr['earn'] or 0),
+                    "orders": aggr['count']
+                })
         return JsonResponse(chart_data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def vendor_category_chart(request):
+    vendor, error = _get_vendor_from_token(request)
+    if error: return error
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q(vendor=vendor)
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+
+        cats = Order.objects.filter(query).exclude(status='canceled').values('product__category').annotate(
+            value=Sum('total_amount')
+        ).order_by('-value')
+        data = [
+            {
+                "name": c['product__category'].capitalize() if c['product__category'] else "Other", 
+                "value": float(c['value'] or 0)
+            } for c in cats if (c['value'] or 0) > 0
+        ]
+        return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
 @csrf_exempt
@@ -225,12 +301,31 @@ def admin_vendors_list(request):
     user, error = _get_user_from_token(request)
     if error: return error
     if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
+    
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
+    
+    # Financial Query
+    f_query = ~Q(status='canceled')
+    if from_date:
+        f_query &= Q(created_at__date__gte=from_date)
+    if to_date:
+        f_query &= Q(created_at__date__lte=to_date)
+
+    # Use Subqueries to prevent join explosion (Cartesian product)
+    from django.db.models import OuterRef, Subquery
+    
+    vendor_revenues = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('total_amount')).values('total')
+    vendor_commissions = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('commission_amount')).values('total')
+    vendor_payouts = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('vendor_earning')).values('total')
+
     vendors = Vendor.objects.all().annotate(
         product_count=Count('products', distinct=True),
-        total_revenue=Sum('vendor_orders__total_amount'),
-        total_commission=Sum('vendor_orders__commission_amount'),
-        total_payout=Sum('vendor_orders__vendor_earning')
+        total_revenue=Subquery(vendor_revenues[:1]),
+        total_commission=Subquery(vendor_commissions[:1]),
+        total_payout=Subquery(vendor_payouts[:1])
     ).order_by('-created_at')
+    
     data = [{
         "id": v.id, "store_name": v.store_name, "owner_name": f"{v.user.first_name} {v.user.last_name}".strip() or v.user.username,
         "email": v.user.email, "phone": v.phone, "address": v.address, "products": v.product_count or 0,
@@ -309,12 +404,72 @@ def admin_dashboard_stats(request):
         if error: return error
         if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
         User = get_user_model()
-        stats = Order.objects.exclude(status='canceled').aggregate(total_rev=Sum('total_amount'), total_comm=Sum('commission_amount'), count=Count('id'))
+        
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q()
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+
+        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
+            total_rev=Sum('total_amount'), 
+            total_comm=Sum('commission_amount'), 
+            count=Count('id')
+        )
+        
+        # Calculate revenue trend
+        revenue_trend = []
+        if from_date and to_date:
+            start_date = datetime.strptime(from_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+            delta = end_date - start_date
+            
+            # For large ranges, we could truncate by week/month, but for now just show all days
+            for i in range(delta.days + 1):
+                day = start_date + timedelta(days=i)
+                day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                    rev=Sum('total_amount'), 
+                    orders=Count('id')
+                )
+                revenue_trend.append({
+                    "name": day.strftime("%d %b"), 
+                    "revenue": float(day_stats['rev'] or 0), 
+                    "orders": day_stats['orders'] or 0
+                })
+        else:
+            # Default past 7 days
+            today = date.today()
+            for i in range(6, -1, -1):
+                day = today - timedelta(days=i)
+                day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                    rev=Sum('total_amount'), 
+                    orders=Count('id')
+                )
+                revenue_trend.append({
+                    "name": day.strftime("%a"), 
+                    "revenue": float(day_stats['rev'] or 0), 
+                    "orders": day_stats['orders'] or 0
+                })
+
+        # Vendor categories distribution
+        cats = Product.objects.filter(is_active=True).values('category').annotate(count=Count('id')).order_by('-count')[:4]
+        vendor_categories = []
+        for c in cats:
+            vendor_categories.append({
+                "name": c['category'].capitalize() if c['category'] else "Other",
+                "value": c['count'] or 0
+            })
+            
         return JsonResponse({
             "total_users": User.objects.count(), "active_vendors": Vendor.objects.filter(status='approved').count(),
             "pending_approvals": Vendor.objects.filter(status='pending').count(),
             "total_revenue": float(stats['total_rev'] or 0), "total_commission": float(stats['total_comm'] or 0),
-            "total_orders": stats['count'] or 0
+            "total_orders": stats['count'] or 0,
+            "revenue_trend": revenue_trend,
+            "vendor_categories": vendor_categories
         }, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
@@ -408,7 +563,6 @@ def vendor_report_sales(request):
     vendor, error = _get_vendor_from_token(request)
     if error: return error
     if request.method == "GET":
-        from_date = request.GET.get('from_subscription_date') # Consistent with some other filter name or just use 'from_date'
         from_date = request.GET.get('from_date')
         to_date = request.GET.get('to_date')
         
@@ -418,19 +572,47 @@ def vendor_report_sales(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
             
-        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
-            total_orders=Count('id'),
-            total_revenue=Sum('total_amount'),
-            total_earnings=Sum('vendor_earning'),
-            total_commission=Sum('commission_amount')
-        )
+        orders = Order.objects.filter(query).select_related('product', 'customer').order_by('-created_at')
+        data = [{
+            "id": f"#ORD-{o.id:04d}", 
+            "product": o.product.name,
+            "gross_amount": float(o.total_amount),
+            "commission": float(o.commission_amount),
+            "net_earning": float(o.vendor_earning),
+            "status": o.status,
+            "date": o.created_at.strftime("%Y-%m-%d")
+        } for o in orders]
         
-        return JsonResponse({
-            "total_orders": stats['total_orders'] or 0,
-            "total_revenue": float(stats['total_revenue'] or 0),
-            "total_earnings": float(stats['total_earnings'] or 0),
-            "total_commission": float(stats['total_commission'] or 0)
-        }, status=200)
+        return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def vendor_report_customers(request):
+    vendor, error = _get_vendor_from_token(request)
+    if error: return error
+    if request.method == "GET":
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        
+        query = Q(vendor=vendor)
+        if from_date:
+            query &= Q(created_at__date__gte=from_date)
+        if to_date:
+            query &= Q(created_at__date__lte=to_date)
+            
+        customers = Order.objects.filter(query).values('customer__username', 'customer__first_name', 'customer__last_name', 'customer__email').annotate(
+            order_count=Count('id'),
+            total_spend=Sum('total_amount')
+        ).order_by('-total_spend')
+        
+        data = [{
+            "customer": f"{c['customer__first_name']} {c['customer__last_name']}".strip() or c['customer__username'],
+            "email": c['customer__email'],
+            "order_count": c['order_count'],
+            "total_lifetime_value": float(c['total_spend'] or 0)
+        } for c in customers]
+        
+        return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
 @csrf_exempt
@@ -514,6 +696,21 @@ def admin_report_sales(request):
             total_vendor_earnings=Sum('vendor_earning')
         )
         
+        # Calculate Trend
+        from django.db.models.functions import TruncDay
+        trend_qs = Order.objects.filter(query).exclude(status='canceled').annotate(
+            day=TruncDay('created_at')
+        ).values('day').annotate(
+            revenue=Sum('total_amount'),
+            commission=Sum('commission_amount')
+        ).order_by('day')
+        
+        revenue_trend = [{
+            "date": t['day'].strftime("%d %b"),
+            "revenue": float(t['revenue'] or 0),
+            "commission": float(t['commission'] or 0)
+        } for t in trend_qs]
+        
         # Fetch Top Vendors within the date range
         top_vendors = Vendor.objects.filter(status='approved').annotate(
             revenue=Sum('vendor_orders__total_amount', filter=query & ~Q(vendor_orders__status='canceled')),
@@ -531,7 +728,8 @@ def admin_report_sales(request):
             "total_revenue": float(stats['total_revenue'] or 0),
             "total_admin_commission": float(stats['total_commission'] or 0),
             "total_vendor_earnings": float(stats['total_vendor_earnings'] or 0),
-            "top_vendors": vendors_data
+            "top_vendors": vendors_data,
+            "revenue_trend": revenue_trend
         }, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 

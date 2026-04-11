@@ -15,7 +15,9 @@ import {
   MenuIcon,
   XIcon,
   GlobeIcon,
-  CoinsIcon
+  CoinsIcon,
+  SearchIcon,
+  ChevronDownIcon
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -55,71 +57,61 @@ export function AdminLayout({ children, currentPage }) {
   };
 
   return (
-    <div className="flex h-screen bg-[#F5F5F5] font-sans">
-      {/* Light Sidebar */}
+    <div className="flex h-screen bg-[#F5F5F5] font-sans text-gray-900">
+      {/* Light Sidebar - Matching Vendor Central style */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-300 transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? "w-60" : "w-20"
+        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shadow-sm ${
+          isSidebarOpen ? "w-64" : "w-20"
         } flex flex-col lg:static`}
       >
         {/* Header */}
-        <div className="h-20 flex items-center px-6 border-b border-gray-300">
+        <div className="h-20 flex items-center px-6 mb-2">
           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                <ShieldCheckIcon className="w-6 h-6 text-accent" />
+             <div className="w-9 h-9 bg-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <ShieldCheckIcon className="w-5 h-5 text-accent" />
              </div>
-             <div className={`transition-all duration-300 ${isSidebarOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 invisible w-0"}`}>
-                <h1 className="text-gray-900 font-black text-lg tracking-tight leading-none uppercase">GearUp</h1>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Management</p>
+             <div className={`transition-opacity duration-300 flex flex-col justify-center ${isSidebarOpen ? "opacity-100" : "opacity-0 invisible overflow-hidden"}`}>
+                <h1 className="text-gray-900 font-bold text-lg tracking-tight leading-none">GearUp</h1>
+                <p className="text-xs text-gray-500 mt-1">Admin Central</p>
              </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-8 space-y-1.5 overflow-y-auto">
-          <p className={`px-4 text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-4 transition-opacity duration-300 ${isSidebarOpen ? "opacity-100" : "opacity-0"}`}>
-            Main Console
-          </p>
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
-            const isActive = location.pathname === item.href;
+            const isActive = location.pathname.startsWith(item.href) || (location.pathname === '/admin' && item.id === 'dashboard');
             return (
               <Link
                 key={item.id}
                 to={item.href}
-                className={`flex items-center group h-12 px-3 rounded-lg transition-all duration-200 ${
+                className={`flex items-center h-11 px-3 rounded-lg transition-all group relative ${
                   isActive 
-                    ? "bg-[#F5F5F5] text-accent font-black" 
-                    : "text-gray-400 hover:bg-[#F5F5F5]/80 hover:text-gray-900"
+                    ? "bg-accent/10 text-accent font-semibold" 
+                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
-                <div className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all ${
-                    isActive ? "text-accent" : ""
-                }`}>
-                    <item.icon className="w-5 h-5" />
-                </div>
-                <span className={`ml-3 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                    isSidebarOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4 invisible w-0"
+                <item.icon className={`w-5 h-5 flex-shrink-0 transition-colors ${isActive ? "text-accent" : "text-gray-400 group-hover:text-gray-700"}`} />
+                <span className={`ml-3 transition-opacity duration-300 ${
+                    isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible w-0"
                 }`}>
                   {item.name}
                 </span>
-                {isActive && isSidebarOpen && (
-                    <div className="ml-auto w-1 h-1 rounded-full bg-accent" />
-                )}
               </Link>
             );
           })}
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-gray-300 space-y-2">
+        <div className="p-4 border-t border-gray-200">
            <Link 
               to="/" 
-              className={`flex items-center h-12 px-3 rounded-lg text-gray-400 transition-all hover:bg-[#F5F5F5] hover:text-gray-900 ${
-                isSidebarOpen ? "" : "justify-center"
+              className={`flex items-center h-10 px-3 rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800 ${
+                isSidebarOpen ? "mb-2" : "justify-center mb-2"
               }`}
             >
-                <GlobeIcon className="w-5 h-5 flex-shrink-0" />
-                <span className={`ml-3 font-black text-[10px] uppercase tracking-widest transition-all duration-300 ${
+                <GlobeIcon className="w-5 h-5 flex-shrink-0 text-gray-400" />
+                <span className={`ml-3 font-medium text-sm transition-all duration-300 ${
                     isSidebarOpen ? "opacity-100" : "opacity-0 invisible w-0"
                 }`}>
                     Public Store
@@ -127,61 +119,80 @@ export function AdminLayout({ children, currentPage }) {
            </Link>
            <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="w-full flex items-center justify-center h-10 rounded-lg text-gray-400 transition-all border-none cursor-pointer hover:bg-[#F5F5F5] hover:text-gray-900"
+              className="w-full flex items-center justify-center h-10 rounded-lg transition-colors text-gray-500 hover:bg-gray-100 hover:text-gray-800 border-none bg-transparent cursor-pointer"
             >
-              {isSidebarOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+              {isSidebarOpen ? <XIcon size={20} /> : <MenuIcon size={20} />}
            </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${isSidebarOpen ? "ml-60 lg:ml-0" : "ml-20 lg:ml-0"}`}>
+      <div className={`flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50/50 ${isSidebarOpen ? "ml-64 lg:ml-0" : "ml-20 lg:ml-0"}`}>
         {/* Top Navbar */}
-        <header className="h-20 bg-white border-b border-gray-300 sticky top-0 z-40 px-6 flex items-center justify-between">
-           <div className="flex-1" />
+        <header className="h-16 bg-white border-b border-gray-200 sticky top-0 z-40 px-6 lg:px-8 flex items-center justify-between shadow-sm">
+           
+           {/* Search Bar */}
+           <div className="flex-1 max-w-xl">
+             <div className="relative group">
+               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                 <SearchIcon className="w-4 h-4 text-gray-400 group-focus-within:text-accent transition-colors" />
+               </div>
+               <input 
+                 type="text" 
+                 placeholder="Search orders, vendors, users..." 
+                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus:bg-white transition-all shadow-sm"
+               />
+               <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                 <span className="text-[10px] font-medium text-gray-400 border border-gray-200 rounded px-1.5 py-0.5 bg-gray-50">⌘K</span>
+               </div>
+             </div>
+           </div>
 
            {/* Right: Actions & Profile */}
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                  <button className="p-2.5 text-gray-400 rounded-lg transition-all relative group border-none bg-transparent cursor-pointer hover:bg-gray-50 hover:text-gray-900">
-                      <BellIcon className="w-4 h-4" />
-                      <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-accent rounded-full border-2 border-white" />
-                  </button>
-              </div>
+            <div className="flex items-center gap-4 ml-6">
+              <button className="p-2 text-gray-500 rounded-full relative transition-all hover:bg-gray-100 hover:text-gray-700 border-none bg-transparent cursor-pointer">
+                  <BellIcon className="w-5 h-5" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+              </button>
 
-              <div className="h-8 w-px bg-slate-200" />
+              <div className="h-8 w-px bg-gray-200 mx-2" />
 
               <div className="relative" ref={dropdownRef}>
                   <button 
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-3 p-1.5 pl-3 rounded-2xl transition-all border-none cursor-pointer hover:bg-gray-50"
+                    className="flex items-center gap-3 transition-all group hover:bg-gray-50 p-1.5 pr-3 rounded-full border border-transparent hover:border-gray-200 cursor-pointer text-left"
                   >
-                      <div className="flex flex-col items-end text-right hidden sm:flex">
-                         <span className="text-[10px] font-black text-gray-900 uppercase tracking-widest leading-none">System Admin</span>
-                         <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest mt-1">Super User</span>
-                      </div>
-                      <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center text-white font-black text-xs transition-transform">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-accent to-[#ff8c42] flex items-center justify-center text-white font-bold text-sm shadow-sm ring-2 ring-white">
                           AD
                       </div>
+                      <div className="flex flex-col items-start hidden sm:flex">
+                         <span className="text-sm font-semibold text-gray-800 leading-tight">Admin User</span>
+                         <span className="text-[10px] text-gray-500 font-medium">Super Admin</span>
+                      </div>
+                      <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Profile Dropdown */}
                   {isProfileOpen && (
-                    <div className="absolute top-full right-0 mt-4 w-60 bg-white border border-gray-300 rounded-xl shadow-2xl shadow-black/5 overflow-hidden py-2 animate-fade-in z-50">
-                        <div className="px-6 py-4 border-b border-gray-50">
-                            <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest mb-1">Session Account</p>
-                            <p className="text-xs font-black text-gray-900 truncate tracking-tight">{adminData.email}</p>
+                    <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-lg shadow-black/5 overflow-hidden py-1 z-50">
+                        <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+                            <p className="text-sm font-semibold text-gray-900">{adminData.name}</p>
+                            <p className="text-xs text-gray-500 truncate mt-0.5">{adminData.email}</p>
                         </div>
-                        <Link to="/admin/settings" className="flex items-center px-6 py-3 text-[10px] font-black text-gray-500 uppercase tracking-widest transition-all">
-                            <SettingsIcon className="w-3.5 h-3.5 mr-4" /> System Settings
-                        </Link>
-                        <div className="h-px bg-gray-50 my-1 mx-4" />
-                        <button 
-                            onClick={handleLogout}
-                            className="w-full flex items-center px-6 py-3 text-[10px] font-black text-rose-500 transition-all uppercase tracking-widest border-none cursor-pointer"
-                        >
-                            <LogOutIcon className="w-3.5 h-3.5 mr-4" /> Log Out Platform
-                        </button>
+                        <div className="p-2 cursor-pointer">
+                          <Link to="/admin/settings" className="flex items-center px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                              <SettingsIcon className="w-4 h-4 mr-3 text-gray-400" /> Account Settings
+                          </Link>
+                        </div>
+                        <div className="h-px bg-gray-100 mx-2" />
+                        <div className="p-2 cursor-pointer">
+                          <button 
+                              onClick={handleLogout}
+                              className="w-full flex items-center px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors border-none bg-transparent text-left"
+                          >
+                              <LogOutIcon className="w-4 h-4 mr-3 text-red-500" /> Sign out
+                          </button>
+                        </div>
                     </div>
                   )}
               </div>
@@ -189,8 +200,10 @@ export function AdminLayout({ children, currentPage }) {
         </header>
 
         {/* Content Section */}
-        <main className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-          {children}
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-gray-50/50">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

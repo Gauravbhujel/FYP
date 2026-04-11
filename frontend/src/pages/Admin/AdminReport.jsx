@@ -8,25 +8,35 @@ import {
   BarChart3Icon,
   PieChartIcon,
   Loader2Icon,
-  ArrowRightIcon,
   DownloadIcon,
   BoxIcon,
-  UserPlusIcon,
   SearchIcon,
-  FilterIcon
+  FilterIcon,
+  LineChartIcon,
+  MoreHorizontalIcon,
+  ArrowUpDownIcon
 } from "lucide-react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
+import { DateRangePicker } from "../../components/dashboard/DateRangePicker";
 import api from "../../api";
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
+} from 'recharts';
 
 const RsIcon = ({ className }) => (
-  <span className={`font-black tracking-tighter ${className}`}>Rs</span>
+  <span className={`font-semibold tracking-tight ${className}`}>Rs</span>
 );
+
+// Production trend visualization logic
 
 export default function AdminReportsPage() {
   const [activeTab, setActiveTab] = useState("sales");
   const [loading, setLoading] = useState(false);
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [dateRange, setDateRange] = useState({
+    start: "",
+    end: ""
+  });
+  const [searchQuery, setSearchQuery] = useState("");
   
   const [salesData, setSalesData] = useState(null);
   const [ordersData, setOrdersData] = useState([]);
@@ -35,12 +45,12 @@ export default function AdminReportsPage() {
 
   useEffect(() => {
     fetchData();
-  }, [activeTab]);
+  }, [activeTab, dateRange.start, dateRange.end]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const params = { from_date: fromDate, to_date: toDate };
+      const params = { from_date: dateRange.start, to_date: dateRange.end };
       
       if (activeTab === "sales") {
         const response = await api.get("admin/reports/sales/", { params });
@@ -63,53 +73,98 @@ export default function AdminReportsPage() {
   };
 
   const handleExport = () => {
-    let dataToExport = [];
+    let headers = [];
+    let rows = [];
     let filename = `report_${activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
     
-    if (activeTab === "sales" && salesData) {
-      dataToExport = [
-        ["Metric", "Value"],
+    if (activeTab === "sales") {
+      if (!salesData) {
+        alert("No sales data available to export. Please run the report first.");
+        return;
+      }
+      headers = ["Metric", "Value"];
+      rows = [
         ["Total Orders", salesData.total_orders],
         ["Total Revenue", salesData.total_revenue],
         ["Admin Commission", salesData.total_admin_commission],
         ["Vendor Earnings", salesData.total_vendor_earnings]
       ];
     } else if (activeTab === "orders") {
-      dataToExport = [
-        ["Order ID", "Customer", "Email", "Items", "Amount", "Status", "Payment", "Date"],
-        ...ordersData.map(o => [o.order_id, o.customer_name, o.customer_email, o.items_count, o.total_amount, o.status, o.payment_method, o.date])
-      ];
+      if (!ordersData || ordersData.length === 0) {
+        alert("No order records available to export.");
+        return;
+      }
+      headers = ["Order ID", "Customer", "Email", "Items", "Amount", "Status", "Payment", "Date"];
+      rows = ordersData.map(o => [
+        o.order_id, 
+        o.customer_name, 
+        o.customer_email, 
+        o.items_count, 
+        o.total_amount, 
+        o.status, 
+        o.payment_method, 
+        o.date
+      ]);
     } else if (activeTab === "products") {
-      dataToExport = [
-        ["Product Name", "Vendor Name", "Units Sold", "Total Revenue"],
-        ...productsData.map(p => [p.product_name, p.vendor_name, p.units_sold, p.total_revenue])
-      ];
+      if (!productsData || productsData.length === 0) {
+        alert("No product performance data available.");
+        return;
+      }
+      headers = ["Product Name", "Vendor Name", "Units Sold", "Total Revenue"];
+      rows = productsData.map(p => [
+        p.product_name, 
+        p.vendor_name, 
+        p.units_sold, 
+        p.total_revenue
+      ]);
     } else if (activeTab === "customers") {
-      dataToExport = [
-        ["Customer Name", "Total Orders", "Total Spending"],
-        ...customersData.map(c => [c.customer_name, c.total_orders, c.total_spending])
-      ];
+      if (!customersData || customersData.length === 0) {
+        alert("No customer insight data available.");
+        return;
+      }
+      headers = ["Customer Name", "Total Orders", "Total Spending"];
+      rows = customersData.map(c => [
+        c.customer_name, 
+        c.total_orders, 
+        c.total_spending
+      ]);
     }
     
-    if (dataToExport.length === 0) return;
+    if (headers.length === 0) return;
     
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + dataToExport.map(e => e.join(",")).join("\n");
+    // Process rows into CSV format, escaping commas
+    const csvRows = [
+      headers.join(','),
+      ...rows.map(row => 
+        row.map(value => {
+          const stringValue = String(value ?? "");
+          // Escape quotes and wrap in quotes if there's a comma
+          if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+            return `"${stringValue.replace(/"/g, '""')}"`;
+          }
+          return stringValue;
+        }).join(',')
+      )
+    ];
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.href = url;
     link.setAttribute("download", filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const tabs = [
-    { id: "sales", label: "Sales Report", icon: TrendingUpIcon },
-    { id: "orders", label: "Order Details", icon: ShoppingBagIcon },
+    { id: "sales", label: "Financial Overview", icon: LineChartIcon },
+    { id: "orders", label: "Order Records", icon: ShoppingBagIcon },
     { id: "products", label: "Product Performance", icon: BoxIcon },
-    { id: "customers", label: "Customer Report", icon: UsersIcon },
+    { id: "customers", label: "Customer Insights", icon: UsersIcon },
   ];
 
   const formatCurrency = (num) => {
@@ -118,247 +173,268 @@ export default function AdminReportsPage() {
 
   return (
     <AdminLayout currentPage="reports">
-      <div className="w-full space-y-8 animate-fade-in pb-12">
+      <div className="w-full space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
         {/* Header Block */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-200 pb-5">
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Platform Intelligence</h1>
-            <p className="text-[10px] font-black text-gray-400 mt-2 uppercase tracking-[3px] leading-none">Global diagnostic of platform-wide economic vectors</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Platform Analytics</h1>
+            <p className="text-sm text-gray-500 mt-1">Comprehensive reports for platform revenue and performance</p>
           </div>
           
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm">
-                <CalendarIcon className="w-4 h-4 text-gray-400" />
-                <div className="flex items-center gap-2">
-                    <input 
-                        type="date" 
-                        value={fromDate}
-                        onChange={(e) => setFromDate(e.target.value)}
-                        className="text-[10px] font-black uppercase tracking-widest outline-none bg-transparent"
-                    />
-                    <ArrowRightIcon className="w-3 h-3 text-gray-300" />
-                    <input 
-                        type="date" 
-                        value={toDate}
-                        onChange={(e) => setToDate(e.target.value)}
-                        className="text-[10px] font-black uppercase tracking-widest outline-none bg-transparent"
-                    />
-                </div>
-            </div>
-            
-            <button 
-                onClick={fetchData}
-                disabled={loading}
-                className="h-11 px-6 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded transition-all hover:bg-black active:scale-95 disabled:opacity-50 flex items-center gap-2 shadow-lg"
-            >
-                {loading ? <Loader2Icon className="w-4 h-4 animate-spin" /> : "Generate Report"}
-            </button>
-            
+          <div className="flex flex-wrap items-center gap-3">
             <button 
                 onClick={handleExport}
-                className="h-11 px-6 bg-white border border-gray-200 text-gray-900 text-[10px] font-black uppercase tracking-widest rounded transition-all hover:bg-gray-50 active:scale-95 flex items-center gap-2 shadow-sm"
+                className="h-11 px-6 bg-accent text-white font-semibold text-sm rounded-xl flex items-center gap-2 hover:bg-[#EA580C] shadow-md shadow-accent/10 transition-all hover:scale-[1.02] active:scale-95 border-none cursor-pointer outline-none"
             >
-                <DownloadIcon className="w-4 h-4" />
-                Export CSV
+                <DownloadIcon size={18} /> Download Report
             </button>
           </div>
         </div>
 
+        {/* Global Filter Bar */}
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row md:items-center gap-4">
+            <div className="flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 hover:bg-white transition-colors focus-within:ring-2 focus-within:ring-accent/20 focus-within:border-accent flex-1 md:max-w-xs overflow-hidden">
+                <SearchIcon className="w-4 h-4 text-gray-400" />
+                <input 
+                    type="text"
+                    placeholder="Search context..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-transparent border-none outline-none text-sm w-full text-gray-900 placeholder-gray-400"
+                />
+            </div>
+
+            <div className="flex items-center gap-3 w-full md:w-auto overflow-hidden">
+                <DateRangePicker 
+                    start={dateRange.start}
+                    end={dateRange.end}
+                    onStartChange={(val) => setDateRange({...dateRange, start: val})}
+                    onEndChange={(val) => setDateRange({...dateRange, end: val})}
+                    onClear={() => setDateRange({ start: "", end: "" })}
+                />
+            </div>
+        </div>
+
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 p-1 bg-gray-100/50 border border-gray-200 rounded-xl w-fit">
-            {tabs.map((tab) => (
-                <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                        activeTab === tab.id 
-                        ? "bg-white text-gray-900 shadow-sm" 
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
-                >
-                    <tab.icon className={`w-3.5 h-3.5 ${activeTab === tab.id ? "text-accent" : "text-gray-400"}`} />
-                    {tab.label}
-                </button>
-            ))}
+        <div className="border-b border-gray-200">
+            <nav className="flex space-x-8">
+                {tabs.map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium transition-colors cursor-pointer ${
+                            activeTab === tab.id 
+                            ? "border-accent text-accent" 
+                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                        }`}
+                    >
+                        <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-accent" : "text-gray-400"}`} />
+                        {tab.label}
+                    </button>
+                ))}
+            </nav>
         </div>
 
         {/* Dynamic Content */}
         {loading ? (
-             <div className="w-full h-[40vh] flex flex-col items-center justify-center">
-                <Loader2Icon className="w-12 h-12 text-accent animate-spin mb-4" />
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[3px]">Aggregating platform vectors...</p>
+             <div className="w-full h-64 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-xl shadow-sm">
+                <Loader2Icon className="w-8 h-8 text-accent animate-spin mb-4" />
+                <p className="text-sm font-medium text-gray-500">Generating analytical models...</p>
             </div>
         ) : (
-            <div className="animate-fade-in">
+            <div className="animate-fade-in space-y-6">
+                
+                {/* SALES/FINANCIAL REPORT */}
                 {activeTab === "sales" && salesData && (
-                    <div className="space-y-8">
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                            <div className="lg:col-span-8 bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center">
-                                        <PieChartIcon className="w-5 h-5 text-white" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black text-gray-900 tracking-tight uppercase">Economic Distribution</p>
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Platform-wide yield breakdown</p>
-                                    </div>
+                    <div className="space-y-6">
+                        {/* Summary Metrics Row */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Total Revenue</p>
+                                <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(salesData.total_revenue)}</h3>
+                            </div>
+                            <div className="bg-white flex flex-col justify-between border-l-4 border-l-accent border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Net Commission (5%)</p>
+                                <h3 className="text-2xl font-bold text-accent">{formatCurrency(salesData.total_admin_commission)}</h3>
+                            </div>
+                            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Vendor Earnings</p>
+                                <h3 className="text-2xl font-bold text-gray-900">{formatCurrency(salesData.total_vendor_earnings)}</h3>
+                            </div>
+                            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Total Orders</p>
+                                <h3 className="text-2xl font-bold text-gray-900">{salesData.total_orders}</h3>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Revenue Chart */}
+                            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                                <div className="mb-6">
+                                    <h3 className="text-base font-bold text-gray-900">Revenue Trajectory</h3>
+                                    <p className="text-xs text-gray-500 mt-1">Platform gross merchandise value vs standard commission trend</p>
                                 </div>
-                                
-                                <div className="space-y-6 max-w-2xl">
-                                    <ProgressBar label="Vendor Share (95%)" value={95} color="bg-accent" />
-                                    <ProgressBar label="Platform Fee (5%)" value={5} color="bg-gray-200" />
-                                </div>
-                                
-                                <div className="mt-12 p-6 bg-gray-50 rounded-xl border border-gray-100 flex items-start gap-4">
-                                    <div className="w-2 h-2 rounded-full bg-accent mt-1 flex-shrink-0 animate-pulse" />
-                                    <p className="text-[10px] font-black text-gray-600 leading-relaxed uppercase tracking-tight">
-                                        Intelligence Insight: The platform is currently yielding a 5% net commission on all successful transactions. This logic is strictly enforced for all vendors across the ecosystem.
-                                    </p>
+                                <div className="h-72 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={salesData.revenue_trend || []} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#ea580c" stopOpacity={0.1}/>
+                                                <stop offset="95%" stopColor="#ea580c" stopOpacity={0}/>
+                                                </linearGradient>
+                                                <linearGradient id="colorCommission" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
+                                                <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} tickFormatter={(val) => `Rs${val/1000}k`} />
+                                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                            <Legend verticalAlign="top" height={36} iconType="circle"/>
+                                            <Area type="monotone" dataKey="revenue" name="Total Revenue" stroke="#ea580c" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
+                                            <Area type="monotone" dataKey="commission" name="Commission Yield" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorCommission)" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </div>
 
-                            <div className="lg:col-span-4 bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
-                                <div className="flex items-center gap-3 mb-8">
+                            {/* Top Vendors Table */}
+                            <div className="lg:col-span-1 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col">
+                                <div className="p-5 border-b border-gray-100 flex items-center gap-3">
                                     <TrendingUpIcon className="w-5 h-5 text-accent" />
-                                    <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-[2px]">Top Vendors</h3>
+                                    <h3 className="text-base font-bold text-gray-900">Top Vendors</h3>
                                 </div>
-                                <div className="space-y-6">
-                                    {salesData.top_vendors?.map((vendor, i) => (
-                                        <div key={i} className="flex items-center justify-between group">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{vendor.name}</span>
-                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest mt-1">{vendor.orders} Orders</span>
-                                            </div>
-                                            <span className="text-[10px] font-black text-gray-900 uppercase tracking-tighter">{formatCurrency(vendor.revenue)}</span>
-                                        </div>
-                                    ))}
-                                    {(!salesData.top_vendors || salesData.top_vendors.length === 0) && (
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center py-8">No vendor data found</p>
-                                    )}
+                                <div className="p-0 flex-1 overflow-y-auto max-h-[320px] custom-scrollbar">
+                                    <table className="w-full text-left border-collapse">
+                                        <tbody>
+                                            {salesData.top_vendors?.map((vendor, i) => (
+                                                <tr key={i} className="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
+                                                    <td className="px-5 py-4">
+                                                        <span className="text-sm font-semibold text-gray-900 block">{vendor.name}</span>
+                                                        <span className="text-xs text-gray-500 font-medium">{vendor.orders} Orders processed</span>
+                                                    </td>
+                                                    <td className="px-5 py-4 text-right">
+                                                        <span className="text-sm font-bold text-gray-900">{formatCurrency(vendor.revenue)}</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {(!salesData.top_vendors || salesData.top_vendors.length === 0) && (
+                                                <tr>
+                                                    <td colSpan="2" className="px-5 py-8 text-center text-sm text-gray-500">No vendor performance data.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {activeTab === "orders" && (
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                {/* DETAILED TABLES (Orders, Products, Customers) */}
+                {["orders", "products", "customers"].includes(activeTab) && (
+                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50 border-b border-gray-200">
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Order ID</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Customer</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Items</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Total</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Payment</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date</th>
+                                    <tr className="bg-gray-50/80 border-b border-gray-200">
+                                        {activeTab === "orders" && (
+                                            <>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600 flex items-center gap-1 cursor-pointer hover:bg-gray-100">Order ID <ArrowUpDownIcon className="w-3 h-3 text-gray-400" /></th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600">Customer</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600 text-center">Items</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600">Total</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600">Status</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600">Date</th>
+                                            </>
+                                        )}
+                                        {activeTab === "products" && (
+                                            <>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600">Product Name</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600">Vendor</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600 text-center">Units Sold</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600 text-right">Revenue</th>
+                                            </>
+                                        )}
+                                        {activeTab === "customers" && (
+                                            <>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600">Customer Details</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600 text-center">Total Orders</th>
+                                                <th className="px-5 py-3.5 text-xs font-semibold text-gray-600 text-right">Total Spent</th>
+                                            </>
+                                        )}
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {ordersData.map((order) => (
-                                        <tr key={order.order_id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-900 uppercase tracking-tighter">{order.order_id}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-600 uppercase tracking-tight">{order.customer_name}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-400 lowercase tracking-tight">{order.customer_email}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-600 text-center">{order.items_count}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-900 uppercase tracking-tighter">{formatCurrency(order.total_amount)}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-widest ${getStatusStyle(order.status)}`}>
+                                <tbody className="divide-y divide-gray-100">
+                                    {activeTab === "orders" && ordersData.map((order) => (
+                                        <tr key={order.order_id} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="px-5 py-4 text-sm font-semibold text-gray-900">{order.order_id}</td>
+                                            <td className="px-5 py-4">
+                                                <p className="text-sm font-medium text-gray-900">{order.customer_name}</p>
+                                                <p className="text-xs text-gray-500">{order.customer_email}</p>
+                                            </td>
+                                            <td className="px-5 py-4 text-sm text-gray-600 text-center font-medium">{order.items_count}</td>
+                                            <td className="px-5 py-4 text-sm font-bold text-gray-900">{formatCurrency(order.total_amount)}</td>
+                                            <td className="px-5 py-4">
+                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusStyle(order.status)}`}>
                                                     {order.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-600 uppercase tracking-widest">{order.payment_method}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">{order.date}</td>
+                                            <td className="px-5 py-4 text-sm text-gray-500">{order.date}</td>
                                         </tr>
                                     ))}
-                                    {ordersData.length === 0 && (
-                                        <tr>
-                                            <td colSpan="8" className="px-6 py-20 text-center">
-                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[3px]">No global order vectors found</p>
-                                            </td>
-                                        </tr>
+                                    {activeTab === "orders" && ordersData.length === 0 && (
+                                        <tr><td colSpan="6" className="px-5 py-12 text-center text-sm text-gray-500">No orders found matching filters.</td></tr>
                                     )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
 
-                {activeTab === "products" && (
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-50 border-b border-gray-200">
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Product Entity</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Vendor Context</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Units Sold</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Revenue Generated</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {productsData.map((product, idx) => (
-                                        <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{product.product_name}</span>
-                                                    <span className="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Platform Asset</span>
-                                                </div>
+                                    {activeTab === "products" && productsData.map((product, idx) => (
+                                        <tr key={idx} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="px-5 py-4">
+                                                <p className="text-sm font-medium text-gray-900">{product.product_name}</p>
                                             </td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-accent uppercase tracking-widest">{product.vendor_name}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-600 text-center">{product.units_sold}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-900 text-right uppercase tracking-tighter">{formatCurrency(product.total_revenue)}</td>
+                                            <td className="px-5 py-4">
+                                                <span className="inline-flex items-center px-2 py-1 rounded bg-accent/10 text-accent text-xs font-medium border border-accent/20">
+                                                    {product.vendor_name}
+                                                </span>
+                                            </td>
+                                            <td className="px-5 py-4 text-sm font-bold text-gray-700 text-center">{product.units_sold}</td>
+                                            <td className="px-5 py-4 text-sm font-bold text-gray-900 text-right">{formatCurrency(product.total_revenue)}</td>
                                         </tr>
                                     ))}
-                                    {productsData.length === 0 && (
-                                        <tr>
-                                            <td colSpan="4" className="px-6 py-20 text-center">
-                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[3px]">No performance metrics detectable</p>
-                                            </td>
-                                        </tr>
+                                    {activeTab === "products" && productsData.length === 0 && (
+                                        <tr><td colSpan="4" className="px-5 py-12 text-center text-sm text-gray-500">No product data available.</td></tr>
                                     )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
 
-                {activeTab === "customers" && (
-                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-50 border-b border-gray-200">
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Identity Context</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Active Orders</th>
-                                        <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Aggregate Spending</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {customersData.map((customer, idx) => (
-                                        <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col">
-                                                    <span className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{customer.customer_name}</span>
-                                                    <span className="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Global User</span>
+                                    {activeTab === "customers" && customersData.map((customer, idx) => (
+                                        <tr key={idx} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="px-5 py-4 flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs uppercase">
+                                                    {customer.customer_name?.charAt(0)}
                                                 </div>
+                                                <p className="text-sm font-medium text-gray-900">{customer.customer_name}</p>
                                             </td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-600 text-center">{customer.total_orders}</td>
-                                            <td className="px-6 py-4 text-[10px] font-black text-gray-900 text-right uppercase tracking-tighter">{formatCurrency(customer.total_spending)}</td>
+                                            <td className="px-5 py-4 text-sm font-bold text-gray-700 text-center">{customer.total_orders}</td>
+                                            <td className="px-5 py-4 text-sm font-bold text-gray-900 text-right">{formatCurrency(customer.total_spending)}</td>
                                         </tr>
                                     ))}
-                                    {customersData.length === 0 && (
-                                        <tr>
-                                            <td colSpan="3" className="px-6 py-20 text-center">
-                                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[3px]">No identity behavior records found</p>
-                                            </td>
-                                        </tr>
+                                    {activeTab === "customers" && customersData.length === 0 && (
+                                        <tr><td colSpan="3" className="px-5 py-12 text-center text-sm text-gray-500">No customer records found.</td></tr>
                                     )}
                                 </tbody>
                             </table>
+                            {/* Pagination Mock Area */}
+                            {["orders", "products", "customers"].includes(activeTab) && (
+                                <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between bg-white text-sm">
+                                    <span className="text-gray-500">Showing 1 to 10 of 50 entries</span>
+                                    <div className="flex gap-1">
+                                        <button className="px-3 py-1 border border-gray-200 rounded text-gray-500 hover:bg-gray-50 disabled:opacity-50 cursor-pointer">Prev</button>
+                                        <button className="px-3 py-1 border border-accent bg-accent/10 text-accent rounded font-medium cursor-pointer">1</button>
+                                        <button className="px-3 py-1 border border-gray-200 rounded text-gray-500 hover:bg-gray-50 cursor-pointer">2</button>
+                                        <button className="px-3 py-1 border border-gray-200 rounded text-gray-500 hover:bg-gray-50 cursor-pointer">Next</button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -369,42 +445,12 @@ export default function AdminReportsPage() {
   );
 }
 
-function MetricCard({ title, value, icon: Icon, color = "text-gray-400", highlight = false }) {
-  return (
-    <div className={`bg-white border border-gray-200 rounded-lg p-6 shadow-sm transition-all hover:shadow-md ${highlight ? 'border-accent/30' : ''}`}>
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-8 h-8 bg-gray-50 rounded flex items-center justify-center">
-          <Icon className={`w-4 h-4 ${color}`} />
-        </div>
-        <p className="text-[9px] font-black text-gray-400 uppercase tracking-[2px]">{title}</p>
-      </div>
-      <p className="text-2xl font-black text-gray-900 tracking-tight">{value}</p>
-    </div>
-  );
-}
-
-function ProgressBar({ label, value, color }) {
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-end">
-        <span className="text-[8px] font-black text-gray-400 uppercase tracking-[2px]">{label}</span>
-        <span className="text-[10px] font-black text-gray-900">{value}%</span>
-      </div>
-      <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-        <div 
-          className={`h-full ${color} rounded-full transition-all duration-1000`} 
-          style={{ width: `${value}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
+// Helper badge styles
 const getStatusStyle = (status) => {
   const s = (status || "").toLowerCase();
-  if (s === 'delivered') return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-  if (s === 'pending') return 'bg-amber-50 text-amber-600 border border-amber-100';
-  if (s === 'canceled' || s === 'cancelled') return 'bg-red-50 text-red-600 border border-red-100';
-  if (s === 'processing') return 'bg-blue-50 text-blue-600 border border-blue-100';
-  return 'bg-gray-50 text-gray-600 border border-gray-100';
+  if (s === 'delivered') return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+  if (s === 'pending') return 'bg-amber-100 text-amber-800 border border-amber-200';
+  if (s === 'canceled' || s === 'cancelled') return 'bg-rose-100 text-rose-800 border border-rose-200';
+  if (s === 'processing') return 'bg-blue-100 text-blue-800 border border-blue-200';
+  return 'bg-gray-100 text-gray-800 border border-gray-200';
 };

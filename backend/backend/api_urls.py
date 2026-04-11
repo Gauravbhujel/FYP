@@ -26,6 +26,7 @@ urlpatterns = [
     path('vendor/dashboard/recent-orders/', vendor_views.vendor_recent_orders, name='vendor_recent_orders'),
     path('vendor/dashboard/recent-products/', product_views.vendor_recent_products, name='vendor_recent_products'),
     path('vendor/dashboard/sales-chart/', vendor_views.vendor_sales_chart, name='vendor_sales_chart'),
+    path('vendor/dashboard/category-chart/', vendor_views.vendor_category_chart, name='vendor_category_chart'),
     path('vendor/orders/', vendor_views.vendor_orders_list, name='vendor_orders_list'),
     path('vendor/orders/update-status/', vendor_views.vendor_update_order_status, name='vendor_update_order_status'),
     path('vendor/products/', product_views.vendor_product_list, name='vendor_product_list'),
@@ -42,6 +43,7 @@ urlpatterns = [
     path('vendor/reports/sales/', vendor_views.vendor_report_sales, name='vendor_report_sales'),
     path('vendor/reports/orders/', vendor_views.vendor_report_orders, name='vendor_report_orders'),
     path('vendor/reports/products/', vendor_views.vendor_report_products, name='vendor_report_products'),
+    path('vendor/reports/customers/', vendor_views.vendor_report_customers, name='vendor_report_customers'),
     
     # Products
     path('categories/stats/', product_views.public_category_stats, name='public_category_stats'),
