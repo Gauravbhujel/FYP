@@ -162,11 +162,21 @@ export const VendorDashboard = () => {
             />
           </div>
           
-          <Link to="/vendor/reports">
-            <button className="h-10 px-5 bg-white border border-gray-200 text-gray-700 font-medium text-sm rounded-lg flex items-center gap-2 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer focus:ring-2 focus:ring-accent/20 outline-none">
-              <PieChartIcon size={16} className="text-gray-400" /> View Detailed Reports
-            </button>
-          </Link>
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <Link to="/vendor/reports">
+              <button className="h-10 px-5 bg-white border border-gray-200 text-gray-700 font-medium text-sm rounded-lg flex items-center gap-2 hover:bg-gray-50 shadow-sm transition-colors cursor-pointer focus:ring-2 focus:ring-accent/20 outline-none">
+                <PieChartIcon size={16} className="text-gray-400" /> Reports
+              </button>
+            </Link>
+            {stats.last_payout_date && (
+              <div className="bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-lg flex items-center gap-2">
+                <CheckCircle2Icon className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+                  Last Payout: {stats.last_payout_date}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Core Metrics */}
@@ -178,17 +188,17 @@ export const VendorDashboard = () => {
             change={8.5}
           />
           <MetricCard
-            title="Your Earnings"
-            value={`Rs. ${(stats.total_earnings || 0).toLocaleString()}`}
+            title="Pending Payout"
+            value={`Rs. ${(stats.pending_earnings || 0).toLocaleString()}`}
             icon={CheckCircle2Icon}
             variant="accent"
             change={5.2}
           />
           <MetricCard
-            title="Total Orders"
-            value={String(stats.total_orders)}
-            icon={ShoppingBagIcon}
-            change={-1.4}
+            title="Paid Earnings"
+            value={`Rs. ${(stats.paid_earnings || 0).toLocaleString()}`}
+            icon={TrendingUpIcon}
+            change={stats.paid_earnings > 0 ? 100 : 0}
           />
         </div>
 

@@ -68,6 +68,7 @@ urlpatterns = [
     path('admin/vendors/pending/', vendor_views.admin_pending_vendors, name='admin_pending_vendors'),
     path('admin/vendors/update-status/', vendor_views.admin_update_vendor_status, name='admin_update_vendor_status'),
     path('admin/vendors/list/', vendor_views.admin_vendors_list, name='admin_vendors_list'),
+    path('admin/vendors/release-payouts/', vendor_views.admin_release_weekly_payouts, name='admin_release_weekly_payouts'),
     path('admin/dashboard/stats/', vendor_views.admin_dashboard_stats, name='admin_dashboard_stats'),
     path('admin/dashboard/top-vendors/', vendor_views.admin_top_vendors, name='admin_top_vendors'),
     path('admin/dashboard/activities/', vendor_views.admin_recent_activities, name='admin_recent_activities'),

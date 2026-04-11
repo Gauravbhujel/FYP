@@ -25,6 +25,14 @@ class Order(models.Model):
     is_paid = models.BooleanField(default=False)
     esewa_ref_id = models.CharField(max_length=100, null=True, blank=True)
     
+    # Payout tracking
+    PAYOUT_STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+    )
+    payout_status = models.CharField(max_length=20, choices=PAYOUT_STATUS_CHOICES, default='pending')
+    payout_date = models.DateTimeField(null=True, blank=True)
+    
     # Cancellation tracking
     cancelled_by = models.CharField(max_length=10, choices=(('customer', 'Customer'), ('vendor', 'Vendor'), ('admin', 'Admin')), null=True, blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)

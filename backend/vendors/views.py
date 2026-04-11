@@ -153,17 +153,18 @@ def vendor_dashboard_stats(request):
         this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
         
         pending = Order.objects.filter(vendor=vendor).exclude(status__in=['delivered', 'canceled']).aggregate(earn=Sum('vendor_earning'))
-        available = Order.objects.filter(vendor=vendor, status='delivered').aggregate(earn=Sum('vendor_earning'))
         
         return JsonResponse({
             "total_revenue": float(stats['total_rev'] or 0), 
             "total_earnings": float(stats['total_earn'] or 0),
             "this_month_earnings": float(this_month['earn'] or 0),
-            "pending_earnings": float(pending['earn'] or 0),
-            "available_balance": float(available['earn'] or 0),
+            "pending_earnings": float(vendor.pending_balance),
+            "paid_earnings": float(vendor.paid_balance),
+            "available_balance": float(vendor.pending_balance), # Compatibility
             "total_orders": stats['count'] or 0,
             "products_listed": Product.objects.filter(vendor=vendor, is_active=True).count(),
             "pending_orders": Order.objects.filter(vendor=vendor, status='pending').count(),
+            "last_payout_date": vendor.last_payout_date.strftime("%Y-%m-%d") if vendor.last_payout_date else None,
         }, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
@@ -213,7 +214,20 @@ def vendor_update_order_status(request):
             
             new_status = data.get("status")
             if new_status in [c[0] for c in Order.STATUS_CHOICES]:
+                old_status = order.status
                 order.status = new_status
+                
+                # If newly delivered, add to pending balance
+                if new_status == 'delivered' and old_status != 'delivered':
+                    vendor.pending_balance += order.vendor_earning
+                    vendor.save()
+                # If status changed FROM delivered (shouldn't happen much but for safety)
+                elif old_status == 'delivered' and new_status != 'delivered':
+                    # Only deduct if it hasn't been paid yet
+                    if order.payout_status == 'pending':
+                        vendor.pending_balance -= order.vendor_earning
+                        vendor.save()
+
                 order.save()
                 return JsonResponse({"message": "Updated"}, status=200)
             return JsonResponse({"error": "Invalid status"}, status=400)
@@ -331,6 +345,10 @@ def admin_vendors_list(request):
         "email": v.user.email, "phone": v.phone, "address": v.address, "products": v.product_count or 0,
         "revenue": float(v.total_revenue or 0), "commission": float(v.total_commission or 0),
         "payout": float(v.total_payout or 0), "status": v.status, "joined": v.created_at.strftime("%Y-%m-%d"),
+        "pending_balance": float(v.pending_balance),
+        "paid_balance": float(v.paid_balance),
+        "last_payout_date": v.last_payout_date.strftime("%Y-%m-%d") if v.last_payout_date else None,
+        "is_eligible": (not v.last_payout_date or (timezone.now() - v.last_payout_date).days >= 7) and v.pending_balance > 0
     } for v in vendors]
     return JsonResponse(data, safe=False, status=200)
 
@@ -833,5 +851,47 @@ def admin_report_customers(request):
         } for c in customers]
         
         return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def admin_release_weekly_payouts(request):
+    if request.method == "POST":
+        from users.views import _get_user_from_token
+        user, error = _get_user_from_token(request)
+        if error: return error
+        if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
+        
+        now = timezone.now()
+        vendors = Vendor.objects.all()
+        released_count = 0
+        total_released_amount = 0
+        
+        from django.db import transaction
+        with transaction.atomic():
+            for vendor in vendors:
+                # Check 7-day rule
+                is_eligible = not vendor.last_payout_date or (now - vendor.last_payout_date).days >= 7
+                if is_eligible and vendor.pending_balance > 0:
+                    amount = vendor.pending_balance
+                    # Move balance
+                    vendor.paid_balance += amount
+                    vendor.pending_balance = 0
+                    vendor.last_payout_date = now
+                    vendor.save()
+                    
+                    # Update related orders
+                    Order.objects.filter(
+                        vendor=vendor, 
+                        status='delivered', 
+                        payout_status='pending'
+                    ).update(payout_status='paid', payout_date=now)
+                    
+                    released_count += 1
+                    total_released_amount += amount
+                    
+        return JsonResponse({
+            "message": f"Successfully released payouts for {released_count} vendors.",
+            "total_amount": float(total_released_amount)
+        }, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 

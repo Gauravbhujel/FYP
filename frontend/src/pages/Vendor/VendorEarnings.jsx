@@ -3,7 +3,6 @@ import {
   TrendingUpIcon,
   CheckCircle2Icon,
   ClockIcon,
-  ArrowDownToLineIcon,
   CreditCardIcon,
   WalletIcon,
   BarChart3Icon,
@@ -66,9 +65,6 @@ const VendorEarningsPage = () => {
             <h1 className="text-2xl font-bold text-gray-900 mb-1">Store Earnings</h1>
             <p className="text-sm text-gray-500 font-medium">Track your revenue, earnings, and payouts</p>
           </div>
-          <button className="h-11 px-6 bg-accent hover:bg-[#EA580C] text-white font-semibold text-sm rounded-xl flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95 border-none cursor-pointer shadow-md shadow-accent/10">
-            <ArrowDownToLineIcon size={18} /> Request Payout
-          </button>
         </div>
 
         {/* Primary Stats Grid */}
@@ -102,7 +98,7 @@ const VendorEarningsPage = () => {
 
             <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col justify-between h-48">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pending Transit</h2>
+                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pending Payout</h2>
                     <ClockIcon className="w-5 h-5 text-amber-500" />
                 </div>
                 <div>

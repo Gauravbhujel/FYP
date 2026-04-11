@@ -148,17 +148,7 @@ export function StoreSettingsPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Tagline</label>
-                  <input
-                    type="text"
-                    name="tagline"
-                    value={formData.tagline}
-                    onChange={handleChange}
-                    className="w-full h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
-                    placeholder="Short mission statement..."
-                  />
-                </div>
+
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">About Store</label>
@@ -276,20 +266,7 @@ export function StoreSettingsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-tight ml-1">Website URL</label>
-                  <div className="relative">
-                    <GlobeIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                        type="url"
-                        name="website"
-                        value={formData.website}
-                        onChange={handleChange}
-                        className="w-full h-11 pl-10 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none"
-                        placeholder="https://yourstore.com"
-                    />
-                  </div>
-                </div>
+
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PackageIcon, DollarSignIcon, ImageIcon, CheckIcon, XIcon, AlertCircleIcon, ChevronLeftIcon, Trash2Icon, PlusIcon } from "lucide-react";
+import { PackageIcon, DollarSignIcon, ImageIcon, CheckIcon, XIcon, AlertCircleIcon, ChevronLeftIcon, Trash2Icon, PlusIcon, ChevronDownIcon } from "lucide-react";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
 import api from "../../api";
 
@@ -179,7 +179,7 @@ export function EditProductPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300 uppercase tracking-widest placeholder:normal-case"
                     required
                   />
                 </div>
@@ -191,42 +191,48 @@ export function EditProductPage() {
                     value={formData.description}
                     onChange={handleChange}
                     rows={6}
-                    className="w-full p-4 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-600 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none resize-none placeholder:text-gray-300"
+                    className="w-full p-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-800 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none resize-none placeholder:text-gray-300 uppercase tracking-widest placeholder:normal-case"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Category</label>
-                        <select
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
-                            required
-                        >
-                            <option value="running">Running</option>
-                            <option value="basketball">Basketball</option>
-                            <option value="football">Football</option>
-                            <option value="tennis">Tennis</option>
-                            <option value="swimming">Swimming</option>
-                            <option value="cycling">Cycling</option>
-                        </select>
+                        <div className="relative">
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none uppercase tracking-widest"
+                                required
+                            >
+                                <option value="running">Running</option>
+                                <option value="basketball">Basketball</option>
+                                <option value="football">Football</option>
+                                <option value="tennis">Tennis</option>
+                                <option value="swimming">Swimming</option>
+                                <option value="cycling">Cycling</option>
+                            </select>
+                            <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Variant</label>
-                        <select
-                            name="size"
-                            value={formData.size}
-                            onChange={handleChange}
-                            className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none"
-                        >
-                            <option value="free">Free Size</option>
-                            <option value="s">Small (S)</option>
-                            <option value="m">Medium (M)</option>
-                            <option value="l">Large (L)</option>
-                            <option value="xl">Extra Large (XL)</option>
-                        </select>
+                        <div className="relative">
+                            <select
+                                name="size"
+                                value={formData.size}
+                                onChange={handleChange}
+                                className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none cursor-pointer appearance-none uppercase tracking-widest"
+                            >
+                                <option value="free">Free Size</option>
+                                <option value="s">Small (S)</option>
+                                <option value="m">Medium (M)</option>
+                                <option value="l">Large (L)</option>
+                                <option value="xl">Extra Large (XL)</option>
+                            </select>
+                            <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        </div>
                     </div>
                 </div>
               </div>
@@ -260,7 +266,7 @@ export function EditProductPage() {
                     name="compare_price"
                     value={formData.compare_price}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-400 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-400 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300 uppercase tracking-widest placeholder:normal-case"
                   />
                 </div>
                 <div className="space-y-2 lg:col-span-2">
@@ -270,7 +276,7 @@ export function EditProductPage() {
                     name="quantity"
                     value={formData.quantity}
                     onChange={handleChange}
-                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300"
+                    className="w-full h-12 px-4 bg-white border border-gray-300 rounded-lg text-sm font-black text-gray-700 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300 uppercase tracking-widest placeholder:normal-case"
                     required
                   />
                 </div>

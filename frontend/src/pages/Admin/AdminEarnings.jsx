@@ -8,9 +8,10 @@ import {
   ArrowUpRightIcon,
   SearchIcon,
   FilterIcon,
-  ChevronDownIcon,
-  Loader2Icon,
-  CalendarIcon
+  CalendarIcon,
+  RefreshCwIcon,
+  CheckCircleIcon,
+  Loader2Icon
 } from "lucide-react";
 import { DateRangePicker } from "../../components/dashboard/DateRangePicker";
 
@@ -40,6 +41,21 @@ export default function AdminEarningsPage() {
     }
   };
 
+  const handleReleasePayouts = async () => {
+    if (!window.confirm("Are you sure you want to release payouts for all eligible vendors?")) return;
+    try {
+      setLoading(true);
+      const res = await api.post("admin/vendors/release-payouts/");
+      alert(res.data.message);
+      fetchVendorEarnings();
+    } catch (error) {
+      console.error("Error releasing payouts:", error);
+      alert(error.response?.data?.error || "Error releasing payouts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const activeVendors = vendors.filter(v => 
     (v.status === 'active' || v.status === 'approved' || v.status === 'suspended') &&
     (v.store_name?.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -47,7 +63,9 @@ export default function AdminEarningsPage() {
 
   const totalRevenue = activeVendors.reduce((sum, v) => sum + (v.revenue || 0), 0);
   const totalCommission = activeVendors.reduce((sum, v) => sum + (v.commission || 0), 0);
-  const totalPayouts = activeVendors.reduce((sum, v) => sum + (v.payout || 0), 0);
+  const totalPaid = activeVendors.reduce((sum, v) => sum + (v.paid_balance || 0), 0);
+  const totalPending = activeVendors.reduce((sum, v) => sum + (v.pending_balance || 0), 0);
+  const eligibleVendorsCount = activeVendors.filter(v => v.is_eligible).length;
 
   if (loading && vendors.length === 0) {
     return (
@@ -82,10 +100,14 @@ export default function AdminEarningsPage() {
           </div>
           
           <div className="flex items-center gap-3">
-             <div className="bg-white px-4 py-2 rounded-lg border border-gray-200 shadow-sm flex items-center gap-2">
-                <CoinsIcon className="w-4 h-4 text-accent" />
-                <span className="text-sm font-semibold text-gray-700">Financial Ledger</span>
-             </div>
+             <button 
+                onClick={handleReleasePayouts}
+                disabled={loading || eligibleVendorsCount === 0}
+                className="h-11 px-6 bg-accent text-white font-bold rounded-xl flex items-center gap-2 hover:bg-[#EA580C] hover:scale-[1.02] active:scale-95 transition-all shadow-md shadow-accent/20 disabled:opacity-50 disabled:hover:scale-100"
+             >
+                <RefreshCwIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                Release Weekly Payouts ({eligibleVendorsCount})
+             </button>
           </div>
         </div>
 
@@ -122,9 +144,21 @@ export default function AdminEarningsPage() {
               </div>
               <span className="text-[10px] font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full items-center flex gap-1">Verified</span>
             </div>
-            <p className="text-sm font-medium text-gray-500">Net Payouts</p>
-            <h3 className="text-2xl font-bold text-gray-900 mt-1">Rs. {totalPayouts.toLocaleString()}</h3>
-            <p className="text-xs text-gray-400 mt-2">Total amount owed to active vendors</p>
+            <p className="text-sm font-medium text-gray-500">Paid Earnings</p>
+            <h3 className="text-2xl font-bold text-gray-900 mt-1">Rs. {totalPaid.toLocaleString()}</h3>
+            <p className="text-xs text-gray-400 mt-2">Already released to vendors</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm ring-2 ring-accent/5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-2 bg-orange-50 rounded-lg">
+                <CalendarIcon className="w-5 h-5 text-orange-600" />
+              </div>
+              <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">Pending</span>
+            </div>
+            <p className="text-sm font-medium text-gray-500">Total Pending Payout</p>
+            <h3 className="text-2xl font-bold text-accent mt-1">Rs. {totalPending.toLocaleString()}</h3>
+            <p className="text-xs text-gray-400 mt-2">Waiting for next weekly release</p>
           </div>
         </div>
 
@@ -158,9 +192,10 @@ export default function AdminEarningsPage() {
               <thead className="bg-gray-50/80 border-b border-gray-200 text-xs font-semibold text-gray-600">
                 <tr>
                   <th className="px-6 py-4">Vendor Entity</th>
-                  <th className="px-6 py-4 text-right">Gross Sales</th>
-                  <th className="px-6 py-4 text-right">Commission (5%)</th>
-                  <th className="px-6 py-4 text-right">Net Payout</th>
+                  <th className="px-6 py-4 text-right">Sales</th>
+                  <th className="px-6 py-4 text-right">Paid</th>
+                  <th className="px-6 py-4 text-right">Pending</th>
+                  <th className="px-6 py-4 text-right">Pledge Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 italic-off">
@@ -193,15 +228,22 @@ export default function AdminEarningsPage() {
                         <p className="text-sm font-bold text-gray-900">Rs. {(vendor.revenue || 0).toLocaleString()}</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="text-sm font-semibold text-rose-500">-Rs. {(vendor.commission || 0).toLocaleString()}</p>
+                        <p className="text-sm font-semibold text-emerald-600">Rs. {(vendor.paid_balance || 0).toLocaleString()}</p>
+                        {vendor.last_payout_date && <p className="text-[9px] text-gray-400 mt-0.5">{vendor.last_payout_date}</p>}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="inline-flex flex-col items-end">
-                            <p className="text-sm font-bold text-emerald-600">Rs. {(vendor.payout || 0).toLocaleString()}</p>
-                            <div className="w-full h-1 bg-gray-100 rounded-full mt-1.5 overflow-hidden">
-                                <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }}></div>
-                            </div>
-                        </div>
+                        <p className="text-sm font-bold text-orange-600">Rs. {(vendor.pending_balance || 0).toLocaleString()}</p>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {vendor.is_eligible ? (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600 border border-emerald-100 uppercase tracking-tighter">
+                            <CheckCircleIcon size={10} /> Eligible
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-50 text-[10px] font-bold text-gray-500 border border-gray-100 uppercase tracking-tighter">
+                            Waiting cycle
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -213,10 +255,20 @@ export default function AdminEarningsPage() {
           {/* Table Footer */}
           {!loading && activeVendors.length > 0 && (
             <div className="bg-gray-50/50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                <p className="text-xs text-gray-500">Global Financial Sync Active</p>
-                <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="text-xs font-semibold text-gray-700">Financial Integrity Verified</span>
+                <p className="text-xs text-gray-600 font-medium tracking-tight">
+                  <span className="font-bold text-accent">{eligibleVendorsCount}</span> Vendors eligible for immediate payout
+                </p>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
+                        Liquidity Verified
+                      </span>
+                    </div>
+                    <div className="h-4 w-px bg-gray-200"></div>
+                    <p className="text-xs font-semibold text-gray-900">
+                      Total Pending: <span className="text-accent">Rs. {totalPending.toLocaleString()}</span>
+                    </p>
                 </div>
             </div>
           )}
