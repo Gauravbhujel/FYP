@@ -82,7 +82,11 @@ def customer_orders(request):
             "vendor": o.vendor.id, "vendor_name": o.vendor.store_name, "amount": float(o.total_amount),
             "status": o.status, "date": o.created_at.strftime("%Y-%m-%d"),
             "payment_method": o.get_payment_method_display(), "payment_status": o.get_payment_status_display(),
-            "image": request.build_absolute_uri(o.product.image.url) if o.product.image else ""
+            "image": request.build_absolute_uri(o.product.image.url) if o.product.image else "",
+            "tracking_id": o.tracking_id,
+            "courier_name": o.get_courier_name_display() if o.courier_name else None,
+            "shipped_at": o.shipped_at.strftime("%Y-%m-%d %H:%M") if o.shipped_at else None,
+            "estimated_delivery": o.estimated_delivery.strftime("%Y-%m-%d") if o.estimated_delivery else None
         } for o in orders]
         return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)

@@ -7,7 +7,8 @@ import {
   FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt,
   FaCamera, FaLock, FaTrash, FaBox, FaArrowLeft,
   FaCog, FaExclamationTriangle, FaSignOutAlt,
-  FaRegEdit, FaCheckCircle, FaChevronRight, FaStore
+  FaRegEdit, FaCheckCircle, FaChevronRight, FaStore,
+  FaTruck, FaClock, FaRoute, FaGift
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/ui/Button";
@@ -55,6 +56,9 @@ const ProfilePage = () => {
   // Vendor Review State
   const [isVendorReviewOpen, setIsVendorReviewOpen] = useState(false);
   const [vendorReviewData, setVendorReviewData] = useState(null);
+
+  // Tracking State
+  const [trackingOrderId, setTrackingOrderId] = useState(null);
 
   const handleCancelOrder = async (orderId) => {
     if (!cancelReason) {
@@ -288,18 +292,16 @@ const ProfilePage = () => {
               <div className="absolute top-0 left-0 w-full h-1 bg-accent"></div>
 
               <div className="relative inline-block mb-4">
-                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-primary-dark p-1 shadow-lg shadow-primary/20 rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                  <div className="w-full h-full rounded-[1.25rem] bg-white overflow-hidden flex items-center justify-center -rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                    {user?.profile_picture ? (
-                      <img
-                        src={`http://localhost:8000${user.profile_picture}`}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-3xl font-black text-primary uppercase">{userInitial}</span>
-                    )}
-                  </div>
+                <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-accent to-[#ff8c42] flex items-center justify-center shadow-lg shadow-accent/20 group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+                  {user?.profile_picture ? (
+                    <img
+                      src={`http://localhost:8000${user.profile_picture}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-3xl font-black text-white uppercase">{userInitial}</span>
+                  )}
                 </div>
                 <div className="flex absolute -bottom-1 -right-1 gap-2">
                   <label className="w-10 h-10 bg-white shadow-xl border border-gray-100 rounded-xl flex items-center justify-center cursor-pointer text-primary border-none hover:bg-gray-50 transition-colors">
@@ -530,106 +532,227 @@ const ProfilePage = () => {
                   ) : (
                     <div className="space-y-6">
                       {orders.map(order => (
-                        <div key={order.id} className="group bg-gray-50/30 border border-gray-100 rounded-[2rem] p-6 flex flex-col md:flex-row gap-6 items-center transition-all duration-500">
-                          <div className="h-24 w-24 bg-white rounded-2xl shadow-sm overflow-hidden p-2 transition-transform">
-                            {order.image ? (
-                              <img src={order.image} alt={order.product_name} className="h-full w-full object-cover rounded-xl" />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center text-gray-100 bg-gray-50"><FaBox size={32} /></div>
-                            )}
-                          </div>
-                          <div className="flex-1 text-center md:text-left">
-                            <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                              <span className="bg-gray-900 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest">{order.id}</span>
-                              <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">{order.date}</span>
+                           <div key={order.id} className="group bg-gray-50/30 border border-gray-100 rounded-[2rem] p-6 flex flex-col transition-all duration-500 hover:bg-white hover:shadow-xl hover:shadow-gray-100/50">
+                          <div className="flex flex-col md:flex-row gap-6 items-center">
+                            <div className="h-24 w-24 bg-white rounded-2xl shadow-sm overflow-hidden p-2 transition-transform">
+                              {order.image ? (
+                                <img src={order.image} alt={order.product_name} className="h-full w-full object-cover rounded-xl" />
+                              ) : (
+                                <div className="h-full w-full flex items-center justify-center text-gray-100 bg-gray-50"><FaBox size={32} /></div>
+                              )}
                             </div>
-                            <h4 className="font-black text-gray-900 text-xl tracking-tight mb-1">{order.product_name}</h4>
-                            <p className="text-xs text-gray-400 font-bold flex items-center justify-center md:justify-start gap-2">
-                              <FaStore className="text-primary" /> SOLD BY {order.vendor_name}
-                            </p>
-                            <div className="flex flex-wrap items-center gap-2 mt-2 justify-center md:justify-start">
-                              <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
-                                {order.payment_method}
-                              </span>
-                              <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
-                                order.payment_status === 'Paid' 
-                                  ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
-                                  : 'bg-amber-50 text-amber-600 border-amber-100'
-                              }`}>
-                                {order.payment_status}
-                              </span>
+                            <div className="flex-1 text-center md:text-left">
+                              <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                                <span className="bg-gray-900 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest">{order.id}</span>
+                                <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">{order.date}</span>
+                              </div>
+                              <h4 className="font-black text-gray-900 text-xl tracking-tight mb-1">{order.product_name}</h4>
+                              <p className="text-xs text-gray-400 font-bold flex items-center justify-center md:justify-start gap-2">
+                                <FaStore className="text-primary" /> SOLD BY {order.vendor_name}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-2 mt-2 justify-center md:justify-start">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                                  {order.payment_method}
+                                </span>
+                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
+                                  order.payment_status === 'Paid' 
+                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                                    : 'bg-amber-50 text-amber-600 border-amber-100'
+                                }`}>
+                                  {order.payment_status}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex flex-col items-center md:items-end gap-3 min-w-[150px]">
-                            <div className="text-2xl font-black text-gray-900">Rs. {Number(order.amount).toLocaleString()}</div>
-                            <span className={`px-4 py-1.5 text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm
-                                            ${order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                                order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border border-blue-100' :
-                                  'bg-amber-50 text-amber-600 border border-amber-100'}`}>
-                              {order.status}
-                            </span>
-                            
-                            {order.status === 'delivered' ? (
-                                <div className="flex flex-col gap-2 w-full mt-2">
-                                  <Link to={`/product/${order.product}?tab=reviews`} className="w-full text-center py-2.5 px-4 bg-primary text-white text-[10px] font-black rounded hover:bg-primary-dark transition-all no-underline uppercase tracking-widest shadow-sm">
-                                    Write Product Review
-                                  </Link>
+                            <div className="flex flex-col items-center md:items-end gap-3 min-w-[150px]">
+                              <div className="text-2xl font-black text-gray-900">Rs. {Number(order.amount).toLocaleString()}</div>
+                              <span className={`px-4 py-1.5 text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm
+                                              ${order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
+                                  order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border border-blue-100' :
+                                    order.status === 'canceled' ? 'bg-rose-50 text-rose-600 border border-rose-100' :
+                                    'bg-amber-50 text-amber-600 border border-amber-100'}`}>
+                                {order.status}
+                              </span>
+                              
+                              <div className="flex flex-col gap-2 w-full mt-2">
+                                {(order.status === 'shipped' || order.status === 'delivered') && (
                                   <button 
-                                    onClick={() => {
-                                      setVendorReviewData({
-                                        vendorId: order.vendor, 
-                                        orderId: order.order_id_raw, 
-                                        vendorName: order.vendor_name 
-                                      });
-                                      setIsVendorReviewOpen(true);
-                                    }}
-                                    className="w-full text-center py-2.5 px-4 bg-white text-gray-700 border-2 border-gray-200 text-[10px] font-black rounded hover:bg-gray-50 transition-all uppercase tracking-widest shadow-sm"
+                                    onClick={() => setTrackingOrderId(trackingOrderId === order.id ? null : order.id)}
+                                    className={`w-full text-center py-2.5 px-4 text-[10px] font-black rounded transition-all uppercase tracking-widest shadow-sm flex items-center justify-center gap-2 ${
+                                      trackingOrderId === order.id 
+                                        ? 'bg-gray-900 text-white' 
+                                        : 'bg-white text-primary border-2 border-primary/10 hover:border-primary/30'
+                                    }`}
                                   >
-                                    Rate Vendor
+                                    <FaTruck className={trackingOrderId === order.id ? 'animate-bounce' : ''} />
+                                    {trackingOrderId === order.id ? 'Hide Tracking' : 'Track Package'}
                                   </button>
-                                </div>
-                            ) : (order.status === 'pending' || order.status === 'processing') ? (
-                                <div className="w-full mt-2 space-y-2">
-                                  {cancellingOrderId === order.order_id_raw ? (
-                                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                                      <select 
-                                        value={cancelReason}
-                                        onChange={(e) => setCancelReason(e.target.value)}
-                                        className="w-full text-[10px] font-black uppercase p-2 border-2 border-red-100 rounded bg-red-50/50 outline-none"
+                                )}
+
+                                {order.status === 'delivered' ? (
+                                    <>
+                                      <Link to={`/product/${order.product}?tab=reviews`} className="w-full text-center py-2.5 px-4 bg-primary text-white text-[10px] font-black rounded hover:bg-primary-dark transition-all no-underline uppercase tracking-widest shadow-sm">
+                                        Write Product Review
+                                      </Link>
+                                      <button 
+                                        onClick={() => {
+                                          setVendorReviewData({
+                                            vendorId: order.vendor, 
+                                            orderId: order.order_id_raw, 
+                                            vendorName: order.vendor_name 
+                                          });
+                                          setIsVendorReviewOpen(true);
+                                        }}
+                                        className="w-full text-center py-2.5 px-4 bg-white text-gray-700 border-2 border-gray-200 text-[10px] font-black rounded hover:bg-gray-50 transition-all uppercase tracking-widest shadow-sm"
                                       >
-                                        <option value="">Select Reason</option>
-                                        {CANCELLATION_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
-                                      </select>
-                                      <div className="flex gap-2">
+                                        Rate Vendor
+                                      </button>
+                                    </>
+                                ) : (order.status === 'pending' || order.status === 'processing') ? (
+                                    <div className="w-full space-y-2">
+                                      {cancellingOrderId === order.order_id_raw ? (
+                                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                                          <select 
+                                            value={cancelReason}
+                                            onChange={(e) => setCancelReason(e.target.value)}
+                                            className="w-full text-[10px] font-black uppercase p-2 border-2 border-red-100 rounded bg-red-50/50 outline-none"
+                                          >
+                                            <option value="">Select Reason</option>
+                                            {CANCELLATION_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+                                          </select>
+                                          <div className="flex gap-2">
+                                            <button 
+                                              onClick={() => handleCancelOrder(order.order_id_raw)}
+                                              className="flex-1 py-2 bg-red-600 text-white text-[9px] font-black rounded uppercase"
+                                            >
+                                              Confirm
+                                            </button>
+                                            <button 
+                                              onClick={() => {setCancellingOrderId(null); setCancelReason("");}}
+                                              className="px-3 py-2 bg-gray-100 text-gray-500 text-[9px] font-black rounded uppercase"
+                                            >
+                                              ✕
+                                            </button>
+                                          </div>
+                                        </div>
+                                      ) : (
                                         <button 
-                                          onClick={() => handleCancelOrder(order.order_id_raw)}
-                                          className="flex-1 py-2 bg-red-600 text-white text-[9px] font-black rounded uppercase"
+                                          onClick={() => setCancellingOrderId(order.order_id_raw)}
+                                          className="w-full text-center py-2.5 px-4 bg-white text-red-500 border-2 border-red-100 text-[10px] font-black rounded hover:bg-red-50 transition-all uppercase tracking-widest shadow-sm"
                                         >
-                                          Confirm
+                                          Cancel Order
                                         </button>
-                                        <button 
-                                          onClick={() => {setCancellingOrderId(null); setCancelReason("");}}
-                                          className="px-3 py-2 bg-gray-100 text-gray-500 text-[9px] font-black rounded uppercase"
-                                        >
-                                          ✕
-                                        </button>
+                                      )}
+                                    </div>
+                                ) : order.status === 'canceled' ? (
+                                    <button disabled className="w-full py-2.5 px-4 bg-gray-100 text-gray-400 text-[10px] font-black rounded uppercase border border-gray-200">
+                                      Order Void
+                                    </button>
+                                ) : (
+                                    <button disabled className="w-full py-2.5 px-4 bg-gray-100 text-gray-400 text-[10px] font-black rounded uppercase border border-gray-200">
+                                      No Actions
+                                    </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* ─── TRACKING TIMELINE DRAWER ─── */}
+                          {trackingOrderId === order.id && (
+                            <div className="mt-8 pt-8 border-t border-gray-100 animate-in slide-in-from-top-4 duration-500">
+                              <div className="bg-primary/5 rounded-[2rem] p-8 border border-primary/10">
+                                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                                      <FaRoute size={20} />
+                                    </div>
+                                    <div>
+                                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tracking Status</p>
+                                      <h5 className="text-sm font-black text-gray-900 uppercase">Simulated Courier Network</h5>
+                                    </div>
+                                  </div>
+                                  <div className="px-6 py-3 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center gap-6">
+                                    <div>
+                                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Courier Partner</p>
+                                      <p className="text-xs font-black text-primary uppercase">{order.courier_name || "Assigned by Vendor"}</p>
+                                    </div>
+                                    <div className="w-px h-8 bg-gray-100"></div>
+                                    <div>
+                                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">Tracking ID</p>
+                                      <p className="text-xs font-black text-gray-900 tracking-widest select-all">{order.tracking_id || "GENERATING..."}</p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Visual Timeline */}
+                                <div className="relative px-2">
+                                  {/* Line */}
+                                  <div className="absolute top-5 left-10 right-10 h-0.5 bg-gray-200 hidden md:block">
+                                    <div className={`h-full bg-primary transition-all duration-1000 ${
+                                      order.status === 'delivered' ? 'w-full' : 'w-1/2'
+                                    }`}></div>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                                    {/* Step 1: Placed */}
+                                    <div className="relative flex md:flex-col items-center gap-4 md:text-center text-left">
+                                      <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center z-10 shadow-lg shadow-primary/20">
+                                        <FaClock size={14} />
+                                      </div>
+                                      <div>
+                                        <h6 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">Ordered</h6>
+                                        <p className="text-[9px] text-gray-400 font-bold">{order.date}</p>
                                       </div>
                                     </div>
-                                  ) : (
-                                    <button 
-                                      onClick={() => setCancellingOrderId(order.order_id_raw)}
-                                      className="w-full text-center py-2.5 px-4 bg-white text-red-500 border-2 border-red-100 text-[10px] font-black rounded hover:bg-red-50 transition-all uppercase tracking-widest shadow-sm"
-                                    >
-                                      Cancel Order
-                                    </button>
-                                  )}
+
+                                    {/* Step 2: Shipped */}
+                                    <div className="relative flex md:flex-col items-center gap-4 md:text-center text-left">
+                                      <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 shadow-lg ${
+                                        order.status === 'shipped' || order.status === 'delivered' ? 'bg-primary text-white shadow-primary/20' : 'bg-gray-100 text-gray-300'
+                                      }`}>
+                                        <FaTruck size={14} />
+                                      </div>
+                                      <div>
+                                        <h6 className={`text-[10px] font-black uppercase tracking-widest ${
+                                          order.status === 'shipped' || order.status === 'delivered' ? 'text-gray-900' : 'text-gray-300'
+                                        }`}>Shipped</h6>
+                                        <p className="text-[9px] text-gray-400 font-bold">{order.shipped_at || "In Warehouse"}</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Step 3: Out for Delivery (Simulated as same as shipped or pending delivered) */}
+                                    <div className="relative flex md:flex-col items-center gap-4 md:text-center text-left">
+                                      <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 shadow-lg ${
+                                        order.status === 'delivered' ? 'bg-primary text-white shadow-primary/20' : 'bg-gray-100 text-gray-300'
+                                      }`}>
+                                        <FaRoute size={14} />
+                                      </div>
+                                      <div>
+                                        <h6 className={`text-[10px] font-black uppercase tracking-widest ${
+                                          order.status === 'delivered' ? 'text-gray-900' : 'text-gray-300'
+                                        }`}>In Transit</h6>
+                                        <p className="text-[9px] text-gray-400 font-bold">Estimated {order.estimated_delivery || "Processing"}</p>
+                                      </div>
+                                    </div>
+
+                                    {/* Step 4: Delivered */}
+                                    <div className="relative flex md:flex-col items-center gap-4 md:text-center text-left">
+                                      <div className={`w-10 h-10 rounded-full flex items-center justify-center z-10 shadow-lg ${
+                                        order.status === 'delivered' ? 'bg-emerald-500 text-white shadow-emerald-500/20' : 'bg-gray-100 text-gray-300'
+                                      }`}>
+                                        <FaGift size={14} />
+                                      </div>
+                                      <div>
+                                        <h6 className={`text-[10px] font-black uppercase tracking-widest ${
+                                          order.status === 'delivered' ? 'text-gray-900' : 'text-gray-300'
+                                        }`}>Delivered</h6>
+                                        <p className="text-[9px] text-gray-400 font-bold">{order.status === 'delivered' ? 'Success' : 'Pending'}</p>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                            ) : (
-                                <button disabled className="mt-1 w-full text-center py-2.5 px-4 bg-gray-100 text-gray-400 text-[10px] font-black rounded cursor-not-allowed uppercase tracking-widest shadow-sm border border-gray-200" title="Review is only available after delivery">
-                                  Write Review
-                                </button>
-                            )}
-                          </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

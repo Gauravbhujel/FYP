@@ -9,6 +9,13 @@ export function ManageOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchOrders();
@@ -176,27 +183,40 @@ export function ManageOrdersPage() {
                                             </span>
                                             
                                             {order.status !== 'canceled' && order.status !== 'delivered' && (
-                                              <div className="relative group/actions inline-block">
+                                              <div className="relative inline-block">
                                                 <button 
                                                   disabled={updatingId === order.id}
-                                                  className="p-1.5 text-gray-400 hover:text-accent hover:bg-accent/5 rounded-lg transition-all"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setOpenMenuId(openMenuId === order.id ? null : order.id);
+                                                  }}
+                                                  className={`p-1.5 rounded-lg transition-all ${
+                                                    openMenuId === order.id ? 'bg-accent/10 text-accent' : 'text-gray-400 hover:text-accent hover:bg-accent/5'
+                                                  }`}
                                                 >
                                                   {updatingId === order.id ? <Loader2Icon className="w-4 h-4 animate-spin" /> : <MoreVerticalIcon size={18} />}
                                                 </button>
                                                 
-                                                <div className="absolute right-0 bottom-full mb-2 hidden group-hover/actions:block z-50 min-w-[140px]">
-                                                  <div className="bg-white border border-gray-100 shadow-xl rounded-xl p-2 animate-slide-up">
-                                                    {["processing", "shipped", "delivered"].map(status => (
-                                                      <button 
-                                                        key={status}
-                                                        onClick={() => handleStatusUpdate(order.id, status)}
-                                                        className={`w-full text-left px-3 py-2 text-xs font-bold capitalize rounded-lg transition-colors ${order.status === status ? 'bg-accent/5 text-accent' : 'text-gray-600 hover:bg-gray-50'} border-none cursor-pointer bg-white mb-1 last:mb-0`}
-                                                      >
-                                                        Set {status}
-                                                      </button>
-                                                    ))}
+                                                {openMenuId === order.id && (
+                                                  <div className="absolute right-0 bottom-full mb-2 z-50 min-w-[140px] animate-slide-up">
+                                                    <div className="bg-white border border-gray-100 shadow-xl rounded-xl p-2">
+                                                      {["processing", "shipped", "delivered"]
+                                                        .filter(s => s !== order.status)
+                                                        .map(status => (
+                                                          <button 
+                                                            key={status}
+                                                            onClick={() => {
+                                                              handleStatusUpdate(order.id, status);
+                                                              setOpenMenuId(null);
+                                                            }}
+                                                            className="w-full text-left px-3 py-2 text-xs font-bold capitalize rounded-lg transition-colors text-gray-600 hover:bg-gray-50 border-none cursor-pointer bg-white mb-1 last:mb-0"
+                                                          >
+                                                            Set {status}
+                                                          </button>
+                                                        ))}
+                                                    </div>
                                                   </div>
-                                                </div>
+                                                )}
                                               </div>
                                             )}
                                         </div>

@@ -1,3 +1,5 @@
+import uuid
+import random
 from django.db import models
 from django.conf import settings
 
@@ -39,7 +41,28 @@ class Order(models.Model):
     cancel_reason = models.TextField(null=True, blank=True)
     refund_status = models.CharField(max_length=20, choices=(('not_required', 'Not Required'), ('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed')), default='not_required')
     
+    # Courier tracking (simulated)
+    COURIER_CHOICES = (
+        ('nepal_express', 'Nepal Express Courier'),
+        ('fasttrack', 'FastTrack Logistics'),
+        ('himalayan_post', 'Himalayan Post'),
+        ('everest_delivery', 'Everest Delivery'),
+        ('kathmandu_courier', 'Kathmandu Courier Service'),
+    )
+    tracking_id = models.CharField(max_length=30, null=True, blank=True, unique=True)
+    courier_name = models.CharField(max_length=30, choices=COURIER_CHOICES, null=True, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True)
+    estimated_delivery = models.DateTimeField(null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def generate_tracking(self):
+        """Generate a realistic tracking ID and assign a random courier when shipped."""
+        courier_key = random.choice([c[0] for c in self.COURIER_CHOICES])
+        self.courier_name = courier_key
+        # Format: GUN-XXXXXXXX (GearUp Nepal prefix + 8 hex chars)
+        self.tracking_id = f"GUN-{uuid.uuid4().hex[:8].upper()}"
+        return self.tracking_id
 
     class Meta:
         db_table = "LoginSignup_order"

@@ -149,8 +149,39 @@ def vendor_dashboard_stats(request):
         )
         
         # Monthly benchmarks (relative to current date)
-        month_start = timezone.now().replace(day=1)
-        this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
+        now = timezone.now()
+        month_start = now.replace(day=1)
+        this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(
+            earn=Sum('vendor_earning'),
+            rev=Sum('total_amount'),
+            comm=Sum('commission_amount')
+        )
+        
+        # Previous month earnings for month-over-month comparison
+        prev_month_end = month_start - timedelta(days=1)
+        prev_month_start = prev_month_end.replace(day=1)
+        prev_month = Order.objects.filter(
+            vendor=vendor,
+            created_at__date__gte=prev_month_start,
+            created_at__date__lte=prev_month_end
+        ).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
+        
+        # Calculate month-over-month growth percentage
+        prev_earn = float(prev_month['earn'] or 0)
+        curr_earn = float(this_month['earn'] or 0)
+        if prev_earn > 0:
+            mom_growth = round(((curr_earn - prev_earn) / prev_earn) * 100, 1)
+        else:
+            mom_growth = 100.0 if curr_earn > 0 else 0.0
+        
+        # Calculate effective commission rate from actual data
+        total_rev_all = float(stats['total_rev'] or 0)
+        total_comm = Order.objects.filter(query, vendor=vendor).exclude(status='canceled').aggregate(comm=Sum('commission_amount'))
+        total_comm_val = float(total_comm['comm'] or 0)
+        if total_rev_all > 0:
+            effective_commission_rate = round((total_comm_val / total_rev_all) * 100, 1)
+        else:
+            effective_commission_rate = 5.0  # Default platform rate
         
         pending = Order.objects.filter(vendor=vendor).exclude(status__in=['delivered', 'canceled']).aggregate(earn=Sum('vendor_earning'))
         
@@ -158,6 +189,11 @@ def vendor_dashboard_stats(request):
             "total_revenue": float(stats['total_rev'] or 0), 
             "total_earnings": float(stats['total_earn'] or 0),
             "this_month_earnings": float(this_month['earn'] or 0),
+            "this_month_revenue": float(this_month['rev'] or 0),
+            "this_month_commission": float(this_month['comm'] or 0),
+            "prev_month_earnings": prev_earn,
+            "mom_growth": mom_growth,
+            "commission_rate": effective_commission_rate,
             "pending_earnings": float(vendor.pending_balance),
             "paid_earnings": float(vendor.paid_balance),
             "available_balance": float(vendor.pending_balance), # Compatibility
@@ -216,6 +252,12 @@ def vendor_update_order_status(request):
             if new_status in [c[0] for c in Order.STATUS_CHOICES]:
                 old_status = order.status
                 order.status = new_status
+                
+                # If newly shipped, generate tracking info
+                if new_status == 'shipped' and old_status != 'shipped':
+                    order.generate_tracking()
+                    order.shipped_at = timezone.now()
+                    order.estimated_delivery = timezone.now() + timedelta(days=3)
                 
                 # If newly delivered, add to pending balance
                 if new_status == 'delivered' and old_status != 'delivered':

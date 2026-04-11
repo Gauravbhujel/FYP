@@ -94,6 +94,22 @@ const ProductDetailsPage = () => {
         fetchSimilar();
     }, [productId, isAuthenticated]);
 
+    // Handle tab switching from URL
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tab = queryParams.get('tab');
+        if (tab && ['description', 'specifications', 'reviews', 'shipping'].includes(tab)) {
+            setActiveTab(tab);
+            // Scroll to tabs section after a short delay for content to load
+            setTimeout(() => {
+                const tabsElement = document.getElementById('product-tabs');
+                if (tabsElement) {
+                    tabsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 500);
+        }
+    }, [location.search]);
+
     const handleAction = async (actionType) => {
         if (!token) {
             navigate('/login', { state: { from: location.pathname } });
@@ -476,7 +492,7 @@ const ProductDetailsPage = () => {
                 </div>
 
                 {/* ═══════════ INFORMATION TABS ═══════════ */}
-                <div className="mt-16 sm:mt-20">
+                <div id="product-tabs" className="mt-16 sm:mt-20">
                     <div className="flex items-center justify-center gap-1 sm:gap-2 mb-10 overflow-x-auto scrollbar-hide pb-1">
                         {[
                             { id: 'description', label: 'Description', icon: <FaInfoCircle /> },

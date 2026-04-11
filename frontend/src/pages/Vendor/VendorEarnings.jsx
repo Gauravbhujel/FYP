@@ -3,10 +3,11 @@ import {
   TrendingUpIcon,
   CheckCircle2Icon,
   ClockIcon,
-  CreditCardIcon,
   WalletIcon,
   BarChart3Icon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  ArrowUpIcon,
+  ArrowDownIcon
 } from "lucide-react";
 import { VendorLayout } from "../../components/vendor/VendorLayout";
 import { SalesChart } from "../../components/dashboard/SalesChart";
@@ -90,9 +91,14 @@ const VendorEarningsPage = () => {
                 </div>
                 <div>
                     <p className="text-3xl font-bold text-gray-900 tracking-tight">Rs. {(stats.total_earnings || 0).toLocaleString()}</p>
-                    <p className="text-[11px] font-semibold text-emerald-600 mt-2 bg-emerald-50 w-fit px-2 py-0.5 rounded-full">
-                      +8.4% growth rate
-                    </p>
+                    {stats.mom_growth !== undefined && stats.mom_growth !== 0 ? (
+                      <p className={`text-[11px] font-semibold mt-2 w-fit px-2 py-0.5 rounded-full flex items-center gap-1 ${stats.mom_growth > 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
+                        {stats.mom_growth > 0 ? <ArrowUpIcon size={10} /> : <ArrowDownIcon size={10} />}
+                        {stats.mom_growth > 0 ? '+' : ''}{stats.mom_growth}% vs last month
+                      </p>
+                    ) : (
+                      <p className="text-[11px] font-medium text-gray-400 mt-2 italic">No previous data</p>
+                    )}
                 </div>
             </div>
 
@@ -132,29 +138,21 @@ const VendorEarningsPage = () => {
                     </div>
                     <div>
                         <p className="text-2xl font-bold text-gray-900 tracking-tight">Rs. {(stats.this_month_earnings || 0).toLocaleString()}</p>
-                        <p className="text-xs font-medium text-gray-400 mt-2 italic">Performance against previous cycle</p>
+                        {stats.prev_month_earnings > 0 ? (
+                          <p className={`text-xs font-semibold mt-2 flex items-center gap-1 ${stats.mom_growth >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
+                            {stats.mom_growth >= 0 ? <ArrowUpIcon size={11} /> : <ArrowDownIcon size={11} />}
+                            {stats.mom_growth >= 0 ? '+' : ''}{stats.mom_growth}% vs Rs. {stats.prev_month_earnings.toLocaleString()} last month
+                          </p>
+                        ) : (
+                          <p className="text-xs font-medium text-gray-400 mt-2 italic">First month — no prior data</p>
+                        )}
                     </div>
                     <div className="mt-6 pt-5 border-t border-gray-50 flex items-center justify-between">
                         <span className="text-xs font-bold text-gray-500 uppercase tracking-tight">Platform Fee</span>
-                        <span className="text-xs font-bold text-rose-500 border border-rose-100 bg-rose-50 px-2 py-0.5 rounded-full">5.0% flat cut</span>
+                        <span className="text-xs font-bold text-rose-500 border border-rose-100 bg-rose-50 px-2 py-0.5 rounded-full">{stats.commission_rate || 5.0}% flat cut</span>
                     </div>
                 </div>
 
-                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-indigo-50 rounded-lg">
-                           <CreditCardIcon className="w-4 h-4 text-indigo-600" />
-                        </div>
-                        <h2 className="text-sm font-bold text-gray-900">Settlement Destination</h2>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-between group">
-                        <div className="flex flex-col">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Primary Account</p>
-                            <p className="text-sm font-bold text-gray-900">eSewa Financial API</p>
-                        </div>
-                        <button className="text-xs font-bold text-accent hover:underline border-none bg-transparent cursor-pointer">Configure</button>
-                    </div>
-                </div>
             </div>
         </div>
 
