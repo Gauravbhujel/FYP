@@ -43,12 +43,12 @@ const ProductCard = ({ product }) => {
 
     // Calculate discount percentage if compare_price is available
     const discountPct = product.discount ||
-        (product.compare_price && product.price
+        (product.compare_price && product.price && Number(product.compare_price) > 0
             ? Math.round((1 - product.price / product.compare_price) * 100)
             : null);
 
     return (
-        <div className="bg-white border border-gray-100 rounded-lg p-4 transition-all duration-300 flex flex-col h-full group hover:shadow-md hover:border-gray-200">
+        <div className="bg-white border border-gray-100 rounded-[1.5rem] p-4 transition-all duration-500 flex flex-col h-full group hover:shadow-xl hover:shadow-accent/5 hover:border-accent/20">
 
             {/* Image Container */}
             <div className="relative h-[240px] bg-gray-50 rounded-md overflow-hidden mb-4">
@@ -74,7 +74,7 @@ const ProductCard = ({ product }) => {
 
                 {/* Discount Badge – top left */}
                 {discountPct && (
-                    <span className="absolute top-3 left-3 bg-primary text-white text-[11px] font-bold px-2.5 py-1 rounded shadow-sm z-10">
+                    <span className="absolute top-4 left-4 bg-accent text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-lg z-10 animate-fade-in">
                         -{discountPct}%
                     </span>
                 )}
@@ -117,9 +117,9 @@ const ProductCard = ({ product }) => {
                 
                 {/* Rating Row */}
                 <div className="flex items-center gap-1.5 mb-3">
-                    <div className="flex text-amber-500 text-[10px]">
+                    <div className="flex text-accent text-[9px]">
                         {[...Array(5)].map((_, i) => (
-                            <FaStar key={i} className={i < Math.floor(product.average_rating || 0) ? "text-amber-500" : "text-gray-200"} />
+                            <FaStar key={i} className={i < Math.floor(product.average_rating || 0) ? "text-accent" : "text-gray-200"} />
                         ))}
                     </div>
                     <span className="text-[10px] font-bold text-gray-400">

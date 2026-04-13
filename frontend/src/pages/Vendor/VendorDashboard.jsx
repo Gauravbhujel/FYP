@@ -182,22 +182,22 @@ export const VendorDashboard = () => {
         {/* Core Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <MetricCard
-            title="Total Revenue"
+            title="Total Sales"
             value={`Rs. ${(stats.total_revenue || 0).toLocaleString()}`}
             icon={TrendingUpIcon}
             change={8.5}
           />
           <MetricCard
-            title="Pending Payout"
+            title="Orders in Progress"
             value={`Rs. ${(stats.pending_earnings || 0).toLocaleString()}`}
-            icon={CheckCircle2Icon}
+            icon={ActivityIcon}
             variant="accent"
             change={5.2}
           />
           <MetricCard
-            title="Paid Earnings"
+            title="Money Received"
             value={`Rs. ${(stats.paid_earnings || 0).toLocaleString()}`}
-            icon={TrendingUpIcon}
+            icon={CheckCircle2Icon}
             change={stats.paid_earnings > 0 ? 100 : 0}
           />
         </div>
@@ -221,9 +221,25 @@ export const VendorDashboard = () => {
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                         <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} tickFormatter={(val) => `Rs${val/1000}k`} />
+                        <YAxis 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fontSize: 12, fill: '#6b7280' }} 
+                            tickFormatter={(val) => `Rs. ${val.toLocaleString()}`} 
+                            domain={[0, 'dataMax + 50']}
+                        />
                         <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                        <Area type="monotone" dataKey="sales" name="Gross Sales" stroke="#ea580c" strokeWidth={2} fillOpacity={1} fill="url(#colorSales)" />
+                        <Area 
+                            type="monotone" 
+                            dataKey="sales" 
+                            name="Gross Sales" 
+                            stroke="#ea580c" 
+                            strokeWidth={2} 
+                            fillOpacity={1} 
+                            fill="url(#colorSales)" 
+                            dot={{ r: 4, fill: '#ea580c', strokeWidth: 2, stroke: '#fff' }}
+                            activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
                     </AreaChart>
                 </ResponsiveContainer>
             </div>

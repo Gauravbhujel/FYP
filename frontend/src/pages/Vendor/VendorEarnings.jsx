@@ -68,49 +68,40 @@ const VendorEarningsPage = () => {
           </div>
         </div>
 
-        {/* Primary Stats Grid */}
+        {/* Simple Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-6 bg-gray-900 rounded-2xl relative overflow-hidden group shadow-lg flex flex-col justify-between h-48">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150" />
                 <div className="flex items-center justify-between relative z-10">
-                    <h2 className="text-xs font-bold text-accent uppercase tracking-widest">Available Balance</h2>
-                    <WalletIcon className="w-5 h-5 text-gray-400" />
+                    <h2 className="text-xs font-bold text-accent uppercase tracking-widest">Waiting for Payout</h2>
+                    <ClockIcon className="w-5 h-5 text-gray-400" />
                 </div>
                 <div className="relative z-10">
                     <p className="text-3xl font-bold text-white tracking-tight">Rs. {(stats.available_balance || 0).toLocaleString()}</p>
-                    <p className="text-[11px] font-medium text-gray-400 mt-2 flex items-center gap-1.5 uppercase">
-                      Settled & Ready for Withdrawal <ChevronRightIcon size={12} />
-                    </p>
+                    <p className="text-[10px] text-gray-400 mt-2 font-medium tracking-wide">Money ready to be sent by Admin</p>
                 </div>
             </div>
 
             <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col justify-between h-48">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Lifetime Earnings</h2>
-                    <TrendingUpIcon className="w-5 h-5 text-emerald-500" />
+                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Amount Earned</h2>
+                    <CheckCircle2Icon className="w-5 h-5 text-emerald-500" />
                 </div>
                 <div>
                     <p className="text-3xl font-bold text-gray-900 tracking-tight">Rs. {(stats.total_earnings || 0).toLocaleString()}</p>
-                    {stats.mom_growth !== undefined && stats.mom_growth !== 0 ? (
-                      <p className={`text-[11px] font-semibold mt-2 w-fit px-2 py-0.5 rounded-full flex items-center gap-1 ${stats.mom_growth > 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50'}`}>
-                        {stats.mom_growth > 0 ? <ArrowUpIcon size={10} /> : <ArrowDownIcon size={10} />}
-                        {stats.mom_growth > 0 ? '+' : ''}{stats.mom_growth}% vs last month
-                      </p>
-                    ) : (
-                      <p className="text-[11px] font-medium text-gray-400 mt-2 italic">No previous data</p>
-                    )}
+                    <p className="text-[11px] font-medium text-gray-400 mt-2 italic">Total sales income from the start</p>
                 </div>
             </div>
 
             <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col justify-between h-48">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Pending Payout</h2>
-                    <ClockIcon className="w-5 h-5 text-amber-500" />
+                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Orders in Progress</h2>
+                    <TrendingUpIcon className="w-5 h-5 text-amber-500" />
                 </div>
                 <div>
                     <p className="text-3xl font-bold text-gray-900 tracking-tight">Rs. {(stats.pending_earnings || 0).toLocaleString()}</p>
                     <p className="text-[11px] font-medium text-gray-400 mt-2">
-                       Processing through fulfillment
+                       Money from orders being shipped
                     </p>
                 </div>
             </div>
@@ -156,24 +147,24 @@ const VendorEarningsPage = () => {
             </div>
         </div>
 
-        {/* Ledger Event Grid */}
+        {/* Payment History Section */}
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
                 <div>
-                    <h2 className="text-base font-bold text-gray-900">Earnings History</h2>
-                    <p className="text-xs text-gray-500 mt-1 font-medium">{allOrders.length} transactions found</p>
+                    <h2 className="text-base font-bold text-gray-900">Payment History</h2>
+                    <p className="text-xs text-gray-500 mt-1 font-medium">{allOrders.length} orders found</p>
                 </div>
             </div>
             <div className="overflow-x-auto min-h-[400px]">
                 <table className="w-full text-left">
                     <thead className="bg-gray-50 border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                         <tr>
-                            <th className="px-6 py-4">Transaction Hub</th>
-                            <th className="px-6 py-4">Asset Detail</th>
-                            <th className="px-6 py-4">Gross Inflow</th>
-                            <th className="px-6 py-4 text-rose-500/80">Commission</th>
+                            <th className="px-6 py-4">Order ID</th>
+                            <th className="px-6 py-4">Product Name</th>
+                            <th className="px-6 py-4">Total Amount</th>
+                            <th className="px-6 py-4 text-rose-500/80">Platform Fee</th>
                             <th className="px-6 py-4 text-emerald-600/80">Net Earnings</th>
-                            <th className="px-6 py-4 text-right">State</th>
+                            <th className="px-6 py-4 text-right">Status</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50 font-sans">

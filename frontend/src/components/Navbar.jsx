@@ -117,7 +117,7 @@ const Navbar = () => {
           to="/"
           className="flex items-center gap-2.5 no-underline select-none"
         >
-          <div className="flex items-center justify-center w-9 h-9 bg-primary rounded-lg shadow-sm">
+          <div className="flex items-center justify-center w-9 h-9 bg-accent rounded-lg shadow-sm">
             <span className="text-white font-black text-base leading-none">G</span>
           </div>
           <div className="flex flex-col leading-none">
@@ -296,7 +296,7 @@ const Navbar = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white shadow-sm transition-all duration-200"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-accent text-white shadow-sm hover:bg-accent-dark transition-all duration-200"
                 title="Profile"
               >
                 <FaUser className="text-sm" />

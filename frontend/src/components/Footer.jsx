@@ -20,8 +20,8 @@ const Footer = () => {
           {/* Brand Column */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex items-center justify-center w-9 h-9 bg-white rounded-lg shadow-sm">
-                <span className="text-primary font-black text-base leading-none">G</span>
+              <div className="flex items-center justify-center w-9 h-9 bg-accent rounded-lg shadow-sm">
+                <span className="text-white font-black text-base leading-none">G</span>
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-white font-extrabold text-lg tracking-tight">GearUp</span>

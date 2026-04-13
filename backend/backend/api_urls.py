@@ -76,6 +76,7 @@ urlpatterns = [
     path('admin/users/', user_views.admin_users_list, name='admin_users_list'),
     path('admin/users/suspend/', user_views.admin_suspend_user, name='admin_suspend_user'),
     path('admin/orders/list/', order_views.admin_orders_list, name='admin_orders_list'),
+    path('admin/orders/confirm-payment/<str:order_id>/', order_views.confirm_cod_payment, name='confirm_cod_payment'),
     path('admin/products/list/', product_views.admin_products_list, name='admin_products_list'),
     path('admin/products/delete/<int:product_id>/', product_views.admin_delete_product, name='admin_delete_product'),
     

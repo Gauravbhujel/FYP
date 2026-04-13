@@ -101,7 +101,7 @@ def admin_orders_list(request):
         
         orders = Order.objects.all().select_related('product', 'vendor', 'customer').order_by('-created_at')
         data = [{
-            "id": f"#ORD-{o.id:04d}", "transaction_uuid": o.transaction_uuid,
+            "id": f"#ORD-{o.id:04d}", "id_raw": o.id, "transaction_uuid": o.transaction_uuid,
             "product": {"id": o.product.id, "name": o.product.name, "image": request.build_absolute_uri(o.product.image.url) if o.product.image else ""},
             "vendor": {"id": o.vendor.id, "store_name": o.vendor.store_name},
             "customer": {"id": o.customer.id, "name": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username, "email": o.customer.email},
@@ -112,4 +112,51 @@ def admin_orders_list(request):
             "commission": float(o.commission_amount), "vendor_earning": float(o.vendor_earning)
         } for o in orders]
         return JsonResponse(data, safe=False, status=200)
+    return JsonResponse({"error": "Invalid method"}, status=405)
+
+@csrf_exempt
+def confirm_cod_payment(request, order_id):
+    if request.method == "POST":
+        from users.views import _get_user_from_token
+        user, error = _get_user_from_token(request)
+        if error: return error
+        if not (user.is_superuser or user.is_staff):
+            return JsonResponse({"error": "Forbidden: Admin access required"}, status=403)
+        
+        try:
+            processed_id = order_id
+            if isinstance(order_id, str) and order_id.startswith("#ORD-"):
+                processed_id = int(order_id.replace("#ORD-", ""))
+            
+            order = Order.objects.get(id=processed_id)
+            
+            if order.payment_method != 'COD':
+                return JsonResponse({"error": "This action is only for Cash on Delivery orders."}, status=400)
+            
+            if order.status != 'delivered':
+                return JsonResponse({"error": "Payment can only be confirmed for delivered orders."}, status=400)
+            
+            if order.is_paid:
+                return JsonResponse({"error": "This order is already marked as paid."}, status=400)
+
+            order.is_paid = True
+            order.payment_status = 'paid'
+            order.save()
+            
+            # Now that it's paid, if it was already delivered, we should update the vendor's balance
+            if order.status == 'delivered':
+                vendor = order.vendor
+                vendor.pending_balance += order.vendor_earning
+                vendor.save()
+            
+            return JsonResponse({
+                "message": "COD payment confirmed successfully",
+                "payment_status": order.get_payment_status_display(),
+                "is_paid": order.is_paid
+            }, status=200)
+            
+        except Order.DoesNotExist:
+            return JsonResponse({"error": "Order not found"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Invalid method"}, status=405)

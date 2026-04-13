@@ -11,7 +11,8 @@ import {
   StoreIcon,
   CreditCardIcon,
   MapPinIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  CheckCircleIcon
 } from "lucide-react";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import api from "../../api";
@@ -38,6 +39,20 @@ export function AdminOrdersPage() {
       setError("Failed to synchronize with global transaction stream.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleConfirmPayment = async (orderId) => {
+    if (!window.confirm(`Are you sure you want to mark Order ${orderId} as PAID? Only do this if you have physically received the cash.`)) {
+      return;
+    }
+
+    try {
+      await api.post(`admin/orders/confirm-payment/${orderId}/`);
+      fetchOrders(); // Refresh the list
+    } catch (err) {
+      console.error("Error confirming payment:", err);
+      alert(err.response?.data?.error || "Failed to confirm payment.");
     }
   };
 
@@ -250,13 +265,23 @@ export function AdminOrdersPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button 
-                                            disabled
-                                            className="inline-flex w-8 h-8 items-center justify-center bg-white border border-gray-200 rounded-lg shadow-sm text-gray-400 opacity-50 cursor-not-allowed"
-                                            title="View Details (Upcoming Feature)"
-                                        >
-                                            <ExternalLinkIcon className="w-4 h-4" />
-                                        </button>
+                                        {order.status === 'delivered' && order.payment_method === 'Cash on Delivery' && !order.is_paid ? (
+                                            <button 
+                                                onClick={() => handleConfirmPayment(order.id_raw)}
+                                                className="inline-flex h-9 px-3 items-center gap-2 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-lg shadow-sm hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all cursor-pointer font-bold text-xs"
+                                                title="Confirm Cash Payment Received"
+                                            >
+                                                <CheckCircleIcon className="w-4 h-4" /> Confirm Payment
+                                            </button>
+                                        ) : (
+                                            <button 
+                                                disabled
+                                                className="inline-flex w-8 h-8 items-center justify-center bg-white border border-gray-200 rounded-lg shadow-sm text-gray-400 opacity-50 cursor-not-allowed"
+                                                title="View Details (Upcoming Feature)"
+                                            >
+                                                <ExternalLinkIcon className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))

@@ -183,7 +183,13 @@ def vendor_dashboard_stats(request):
         else:
             effective_commission_rate = 5.0  # Default platform rate
         
-        pending = Order.objects.filter(vendor=vendor).exclude(status__in=['delivered', 'canceled']).aggregate(earn=Sum('vendor_earning'))
+        # Pending Payout: In-transit orders OR Delivered but Unpaid orders
+        pending_q = Q(vendor=vendor) & (~Q(status__in=['delivered', 'canceled']) | Q(status='delivered', is_paid=False))
+        pending_stats = Order.objects.filter(pending_q).aggregate(earn=Sum('vendor_earning'))
+        
+        # Available Balance: Delivered AND Paid orders pending payout
+        available_q = Q(vendor=vendor, status='delivered', is_paid=True, payout_status='pending')
+        available_stats = Order.objects.filter(available_q).aggregate(earn=Sum('vendor_earning'))
         
         return JsonResponse({
             "total_revenue": float(stats['total_rev'] or 0), 
@@ -194,9 +200,9 @@ def vendor_dashboard_stats(request):
             "prev_month_earnings": prev_earn,
             "mom_growth": mom_growth,
             "commission_rate": effective_commission_rate,
-            "pending_earnings": float(vendor.pending_balance),
+            "pending_earnings": float(pending_stats['earn'] or 0),
             "paid_earnings": float(vendor.paid_balance),
-            "available_balance": float(vendor.pending_balance), # Compatibility
+            "available_balance": float(available_stats['earn'] or 0), # Calculated directly from DB for accuracy
             "total_orders": stats['count'] or 0,
             "products_listed": Product.objects.filter(vendor=vendor, is_active=True).count(),
             "pending_orders": Order.objects.filter(vendor=vendor, status='pending').count(),
@@ -259,15 +265,16 @@ def vendor_update_order_status(request):
                     order.shipped_at = timezone.now()
                     order.estimated_delivery = timezone.now() + timedelta(days=3)
                 
-                # If newly delivered, add to pending balance
+                # If newly delivered, add to pending balance ONLY if paid
                 if new_status == 'delivered' and old_status != 'delivered':
-                    vendor.pending_balance += order.vendor_earning
-                    vendor.save()
-                # If status changed FROM delivered (shouldn't happen much but for safety)
+                    if order.is_paid:
+                        vendor.pending_balance += order.vendor_earning
+                        vendor.save()
+                # If status changed FROM delivered
                 elif old_status == 'delivered' and new_status != 'delivered':
-                    # Only deduct if it hasn't been paid yet
-                    if order.payout_status == 'pending':
-                        vendor.pending_balance -= order.vendor_earning
+                    # Only deduct if it hasn't been paid yet or it was already successfully added to balance
+                    if order.is_paid and order.payout_status == 'pending':
+                        vendor.pending_balance = max(0, vendor.pending_balance - order.vendor_earning)
                         vendor.save()
 
                 order.save()

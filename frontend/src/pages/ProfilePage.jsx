@@ -361,22 +361,26 @@ const ProfilePage = () => {
                 <button
                   key={nav.id}
                   onClick={() => setActiveTab(nav.id)}
-                  className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all ${activeTab === nav.id
-                      ? 'bg-primary/5 text-primary'
-                      : 'text-gray-400'
+                  className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all border-l-4 ${activeTab === nav.id
+                      ? 'bg-accent/5 text-gray-900 border-accent'
+                      : 'text-gray-900 border-transparent hover:bg-gray-50 hover:border-gray-200'
                     }`}
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-xs">{nav.icon}</span>
+                    <span className={`text-xs ${activeTab === nav.id ? 'text-accent' : 'text-gray-400'}`}>{nav.icon}</span>
                     {nav.label}
                   </div>
-                  {activeTab === nav.id && <FaChevronRight size={10} className="animate-in fade-in slide-in-from-left-1" />}
+                  {activeTab === nav.id ? (
+                    <FaChevronRight size={10} className="text-accent animate-in fade-in slide-in-from-left-1" />
+                  ) : (
+                    <FaChevronRight size={10} className="text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
                 </button>
               ))}
               <div className="h-[1px] bg-gray-50 mx-4 my-2"></div>
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-red-400 transition-all"
+                className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] text-red-500 transition-all hover:bg-red-50"
               >
                 <FaSignOutAlt className="text-xs" /> Logout
               </button>

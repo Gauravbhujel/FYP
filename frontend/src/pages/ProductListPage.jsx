@@ -184,7 +184,7 @@ const ProductListPage = () => {
                 </div>
 
                 {/* ─── SIDEBAR FILTERS ─── */}
-                <aside className={`fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-72 flex-shrink-0 transition-transform duration-300 ${isMobileFiltersOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'}`}>
+                <aside className={`fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-64 flex-shrink-0 transition-transform duration-300 ${isMobileFiltersOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'}`}>
                     {/* Backdrop for mobile */}
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setIsMobileFiltersOpen(false)}></div>
                     
@@ -198,31 +198,31 @@ const ProductListPage = () => {
                         <div className="lg:sticky lg:top-32 space-y-10">
                             {/* Global Search inside Sidebar */}
                             <div className="mb-10 pb-8 border-b-2 border-primary/5">
-                                <h3 className="font-black text-gray-900 mb-6 uppercase tracking-widest text-[10px] flex items-center gap-2">
-                                    <div className="w-6 h-6 bg-primary text-white rounded flex items-center justify-center">
+                                <h3 className="font-black text-gray-900 mb-6 uppercase tracking-[0.2em] text-[10px] flex items-center gap-2.5">
+                                    <div className="w-6 h-6 bg-accent text-white rounded shadow-sm shadow-accent/20 flex items-center justify-center">
                                         <FaSearch size={8} />
                                     </div>
-                                    Search Gear
+                                    Discovery Search
                                 </h3>
                                 <div className="relative group">
                                     <input 
                                         type="text" 
                                         placeholder="Keywords..." 
-                                        className="w-full py-4 px-4 bg-gray-50/50 border-2 border-gray-200 focus:border-primary/10 rounded-xl transition-all text-xs font-black placeholder:text-gray-400 focus:outline-none focus:bg-white"
+                                        className="w-full py-4 px-4 bg-gray-50/30 border border-gray-100/50 focus:border-accent/20 rounded-xl transition-all text-xs font-black placeholder:text-gray-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-accent/5 shadow-sm shadow-black/5"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
-                                    <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors cursor-text" />
+                                    <FaSearch size={12} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-accent transition-all duration-300" />
                                 </div>
                             </div>
                                         {/* Section: Categories */}
                              <div className="mb-8 font-sans">
                                 <button 
                                     onClick={() => toggleSection('categories')}
-                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-6"
+                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-[0.2em] text-[10px] mb-6 group"
                                 >
-                                    Category
-                                    {openSections.categories ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
+                                    <span className="group-hover:text-accent transition-colors">By Discipline</span>
+                                    {openSections.categories ? <FaChevronUp size={10} className="text-accent" /> : <FaChevronDown size={10} className="text-gray-300" />}
                                 </button>
                                 {openSections.categories && (
                                     <div className="space-y-3 animate-fade-in pl-1">
@@ -230,9 +230,9 @@ const ProductListPage = () => {
                                             <button
                                                 key={cat.id}
                                                 onClick={() => setSelectedCategory(cat.id)}
-                                                className={`w-full text-left py-3 px-4 transition-all flex items-center justify-between text-[11px] font-black uppercase tracking-widest rounded-sm ${
+                                                className={`w-full text-left py-3 px-4 transition-all flex items-center justify-between text-[11px] font-black uppercase tracking-widest rounded-xl ${
                                                     selectedCategory === cat.id 
-                                                    ? 'text-primary border-2 border-primary bg-gray-50' 
+                                                    ? 'text-accent border-2 border-accent bg-accent/5' 
                                                     : 'text-gray-400 hover:text-gray-600 border border-transparent hover:border-gray-200'
                                                 }`}
                                             >
@@ -244,35 +244,57 @@ const ProductListPage = () => {
                                 )}
                             </div>
 
-                            {/* Section: Price Range */}
+                            {/* Section: Price Range Slider */}
                             <div className="mb-8">
                                 <button 
                                     onClick={() => toggleSection('price')}
-                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-4"
+                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-[0.2em] text-[10px] mb-4 group"
                                 >
-                                    Price Range
-                                    {openSections.price ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
+                                    <span className="group-hover:text-accent transition-colors">Price Range</span>
+                                    {openSections.price ? <FaChevronUp size={10} className="text-accent" /> : <FaChevronDown size={10} className="text-gray-300" />}
                                 </button>
                                 {openSections.price && (
-                                    <div className="grid grid-cols-2 gap-3 animate-fade-in">
-                                        <div className="relative">
+                                    <div className="space-y-6 animate-fade-in px-1">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-[10px] font-black text-accent bg-accent/10 px-2 py-1 rounded">Rs. {priceRange.min || 0}</span>
+                                            <span className="text-[10px] font-black text-accent bg-accent/10 px-2 py-1 rounded">Rs. {priceRange.max || 10000}</span>
+                                        </div>
+                                        
+                                        <div className="range-slider-container">
+                                            <div className="range-slider-track"></div>
+                                            <div 
+                                                className="range-slider-active-track"
+                                                style={{
+                                                    left: `${(Math.min(priceRange.min || 0, priceRange.max || 10000) / 10000) * 100}%`,
+                                                    right: `${100 - (Math.max(priceRange.min || 0, priceRange.max || 10000) / 10000) * 100}%`
+                                                }}
+                                            ></div>
                                             <input 
-                                                type="number" 
-                                                placeholder="MIN"
-                                                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary/20 text-xs font-black placeholder:text-gray-400"
-                                                value={priceRange.min}
-                                                onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
+                                                type="range"
+                                                min="0"
+                                                max="10000"
+                                                step="100"
+                                                value={priceRange.min || 0}
+                                                onChange={(e) => {
+                                                    const value = Math.min(Number(e.target.value), (priceRange.max || 10000) - 100);
+                                                    setPriceRange({ ...priceRange, min: value });
+                                                }}
+                                                className="range-slider-input"
+                                            />
+                                            <input 
+                                                type="range"
+                                                min="0"
+                                                max="10000"
+                                                step="100"
+                                                value={priceRange.max || 10000}
+                                                onChange={(e) => {
+                                                    const value = Math.max(Number(e.target.value), (priceRange.min || 0) + 100);
+                                                    setPriceRange({ ...priceRange, max: value });
+                                                }}
+                                                className="range-slider-input"
                                             />
                                         </div>
-                                        <div className="relative">
-                                            <input 
-                                                type="number" 
-                                                placeholder="MAX"
-                                                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary/20 text-xs font-black placeholder:text-gray-400"
-                                                value={priceRange.max}
-                                                onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
-                                            />
-                                        </div>
+                                        
                                     </div>
                                 )}
                             </div>
@@ -281,10 +303,10 @@ const ProductListPage = () => {
                             <div className="mb-8">
                                 <button 
                                     onClick={() => toggleSection('size')}
-                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-widest text-[10px] mb-4"
+                                    className="w-full flex justify-between items-center font-black text-gray-900 uppercase tracking-[0.2em] text-[10px] mb-4 group"
                                 >
-                                    Size
-                                    {openSections.size ? <FaChevronUp size={10} /> : <FaChevronDown size={10} />}
+                                    <span className="group-hover:text-accent transition-colors">Sizing Options</span>
+                                    {openSections.size ? <FaChevronUp size={10} className="text-accent" /> : <FaChevronDown size={10} className="text-gray-300" />}
                                 </button>
                                 {openSections.size && (
                                     <div className="flex flex-wrap gap-2 animate-fade-in">
@@ -292,10 +314,10 @@ const ProductListPage = () => {
                                             <button 
                                                 key={size.id}
                                                 onClick={() => handleSizeToggle(size.id)}
-                                                className={`px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all border ${
+                                                className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border-2 ${
                                                     selectedSizes.includes(size.id)
-                                                    ? 'bg-primary text-white border-primary border-2'
-                                                    : 'bg-white text-gray-400 border-gray-300'
+                                                    ? 'bg-accent text-white border-accent shadow-sm'
+                                                    : 'bg-white text-gray-400 border-gray-100 hover:border-gray-300'
                                                 }`}
                                             >
                                                 {size.id}

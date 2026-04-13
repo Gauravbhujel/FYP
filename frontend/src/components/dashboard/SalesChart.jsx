@@ -1,62 +1,120 @@
 import React from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell
+} from "recharts";
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-gray-900/95 backdrop-blur-md border border-gray-700 p-4 rounded-xl shadow-2xl">
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">{label} Statistics</p>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-8">
+            <span className="text-xs font-medium text-gray-300">Gross Sales</span>
+            <span className="text-xs font-bold text-white">Rs. {payload[0].value.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between gap-8">
+            <span className="text-xs font-medium text-accent">Net Earning</span>
+            <span className="text-xs font-bold text-white">Rs. {payload[1].value.toLocaleString()}</span>
+          </div>
+        </div>
+        <div className="mt-3 pt-2 border-t border-gray-700/50 flex items-center justify-between">
+            <span className="text-[10px] font-medium text-gray-500 italic">Margin</span>
+            <span className="text-[10px] font-bold text-emerald-400">
+                {payload[0].value > 0 ? ((payload[1].value / payload[0].value) * 100).toFixed(1) : 0}%
+            </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 export function SalesChart({ data }) {
   const chartData = data && data.length > 0 ? data : [];
-  const maxSales = chartData.length > 0 ? Math.max(...chartData.map((d) => d.sales)) : 0;
+  const hasData = chartData.some(d => d.sales > 0 || d.earnings > 0);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-8 h-full flex flex-col shadow-sm">
+    <div className="bg-white border border-gray-100 rounded-2xl p-6 h-full flex flex-col shadow-sm group">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-base font-semibold text-gray-900 mb-1">Earnings Velocity</h3>
-          <p className="text-sm font-medium text-gray-500">7-Day Performance Cycle</p>
+          <h3 className="text-sm font-bold text-gray-900 group-hover:text-accent transition-colors">Earnings Velocity</h3>
+          <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mt-0.5">7-Day Performance Cycle</p>
         </div>
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-gray-200"></span>
-                <span className="text-xs font-semibold text-gray-600">Gross Sales</span>
+            <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-gray-100"></span>
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Gross</span>
             </div>
-            <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-accent"></span>
-                <span className="text-xs font-semibold text-gray-600">Net Earning</span>
+            <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-accent"></span>
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Net</span>
             </div>
         </div>
       </div>
 
-      <div className="flex-1 min-h-[300px]">
-        {chartData.length === 0 || maxSales === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-300">
-              <p className="text-sm font-medium text-gray-400">No activity recorded</p>
+      <div className="flex-1 min-h-[280px] w-full">
+        {!hasData ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-300 gap-2 border-2 border-dashed border-gray-50 rounded-xl">
+              <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center">
+                <BarChart className="w-5 h-5 text-gray-300" />
+              </div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">No activity recorded</p>
             </div>
         ) : (
-            <div className="flex items-end justify-between h-full gap-4 sm:gap-8">
-            {chartData.map((item, index) => {
-                const height = (item.sales / maxSales) * 100;
-
-                return (
-                <div key={index} className="flex-1 flex flex-col items-center group relative h-full justify-end">
-                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-10 translate-y-2 group-hover:translate-y-0 shadow-lg whitespace-nowrap">
-                        Rs. {(item.earnings || 0).toLocaleString()} Net
-                    </div>
-
-                    <div className="flex items-end gap-1 w-full justify-center">
-                        <div
-                            className="w-full max-w-[20px] bg-gray-100 rounded-t-sm sm:rounded-t-md transition-all duration-500 cursor-pointer group-hover:bg-gray-200"
-                            style={{ height: `${Math.max(height, 5)}%` }}
-                        ></div>
-                        <div
-                            className="w-full max-w-[20px] bg-accent rounded-t-sm sm:rounded-t-md transition-all duration-500 cursor-pointer group-hover:bg-[#E65A00]"
-                            style={{ height: `${Math.max(((item.earnings || 0) / maxSales) * 100, 2)}%` }}
-                        ></div>
-                    </div>
-
-                    <span className="text-xs font-medium text-gray-500 mt-4 group-hover:text-gray-900 transition-colors">
-                        {item.day}
-                    </span>
-                </div>
-                );
-            })}
-            </div>
+            <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                    data={chartData} 
+                    margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
+                    barGap={4}
+                >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f9fafb" />
+                    <XAxis 
+                        dataKey="day" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fontSize: 10, fontWeight: 700, fill: '#9ca3af' }}
+                        dy={10}
+                    />
+                    <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fontSize: 10, fontWeight: 600, fill: '#9ca3af' }}
+                        tickFormatter={(value) => `Rs. ${value.toLocaleString()}`}
+                        domain={[0, 'dataMax + 50']}
+                    />
+                    <Tooltip 
+                        content={<CustomTooltip />} 
+                        cursor={{ fill: '#f9fafb', radius: 8 }}
+                        animationDuration={300}
+                    />
+                    <Bar 
+                        dataKey="sales" 
+                        name="Gross Sales" 
+                        fill="#f3f4f6" 
+                        radius={[4, 4, 0, 0]} 
+                        animationBegin={0}
+                        animationDuration={1500}
+                        barSize={14}
+                    />
+                    <Bar 
+                        dataKey="earnings" 
+                        name="Net Earning" 
+                        fill="#ff6b00" 
+                        radius={[4, 4, 0, 0]} 
+                        animationBegin={300}
+                        animationDuration={1500}
+                        barSize={14}
+                    />
+                </BarChart>
+            </ResponsiveContainer>
         )}
       </div>
     </div>
