@@ -50,8 +50,8 @@ const DealProductCard = ({ product }) => {
                 
                 {/* Subtle Discount Badge */}
                 {discountPct && (
-                    <div className="absolute top-3 left-3 bg-gray-900 text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 shadow-lg">
-                        <FaFire className="text-accent text-[8px]" />
+                    <div className="absolute top-3 left-3 bg-accent text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 shadow-xl z-20">
+                        <FaFire className="text-white text-[8px]" />
                         <span>-{discountPct}% OFF</span>
                     </div>
                 )}

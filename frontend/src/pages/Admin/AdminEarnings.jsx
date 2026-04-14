@@ -63,7 +63,7 @@ export default function AdminEarningsPage() {
 
   const totalRevenue = activeVendors.reduce((sum, v) => sum + (v.revenue || 0), 0);
   const totalCommission = activeVendors.reduce((sum, v) => sum + (v.commission || 0), 0);
-  const totalPaid = activeVendors.reduce((sum, v) => sum + (v.paid_balance || 0), 0);
+  const totalPaid = activeVendors.reduce((sum, v) => sum + (v.period_paid || 0), 0);
   const totalPending = activeVendors.reduce((sum, v) => sum + (v.pending_balance || 0), 0);
   const eligibleVendorsCount = activeVendors.filter(v => v.is_eligible).length;
 
@@ -228,7 +228,7 @@ export default function AdminEarningsPage() {
                         <p className="text-sm font-bold text-gray-900">Rs. {(vendor.revenue || 0).toLocaleString()}</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="text-sm font-semibold text-emerald-600">Rs. {(vendor.paid_balance || 0).toLocaleString()}</p>
+                        <p className="text-sm font-semibold text-emerald-600">Rs. {(vendor.period_paid || 0).toLocaleString()}</p>
                         {vendor.last_payout_date && <p className="text-[9px] text-gray-400 mt-0.5">{vendor.last_payout_date}</p>}
                       </td>
                       <td className="px-6 py-4 text-right">

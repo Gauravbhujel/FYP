@@ -284,7 +284,7 @@ const ProductDetailsPage = () => {
                                     </span>
                                 )}
                                 {discountPct > 0 && (
-                                    <span className="bg-primary text-white px-4 py-1.5 rounded font-black text-[10px] uppercase tracking-widest shadow-sm">
+                                    <span className="bg-accent text-white px-4 py-1.5 rounded font-black text-[10px] uppercase tracking-widest shadow-lg shadow-accent/20">
                                         Save {discountPct}%
                                     </span>
                                 )}
@@ -383,7 +383,7 @@ const ProductDetailsPage = () => {
                                         </span>
                                     )}
                                     {discountPct > 0 && (
-                                        <span className="bg-primary text-white text-xs font-black px-2.5 py-1 rounded ml-auto">
+                                        <span className="bg-accent text-white text-[10px] font-black px-2.5 py-1 rounded-lg ml-auto shadow-sm shadow-accent/20">
                                             -{discountPct}% OFF
                                         </span>
                                     )}
@@ -454,7 +454,7 @@ const ProductDetailsPage = () => {
                         <div className="pt-4 border-t border-gray-200">
                             <div className="flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 bg-gray-100 rounded flex items-center justify-center text-primary font-black text-xl border border-gray-200">
+                                    <div className="w-14 h-14 bg-accent/5 rounded-2xl flex items-center justify-center text-accent font-black text-xl border border-accent/10">
                                         {product.vendor_name?.charAt(0)}
                                     </div>
                                     <div>
@@ -503,13 +503,13 @@ const ProductDetailsPage = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${
+                                className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 whitespace-nowrap shadow-sm ${
                                     activeTab === tab.id 
-                                        ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                        : 'bg-white text-gray-400 border border-gray-200 hover:bg-gray-50 hover:text-gray-600'
+                                        ? 'bg-accent text-white shadow-lg shadow-accent/30 scale-[1.05]' 
+                                        : 'bg-white text-gray-400 border border-gray-100 hover:border-accent/30 hover:text-accent hover:bg-accent/5'
                                 }`}
                             >
-                                <span className="text-xs">{tab.icon}</span>
+                                <span className={activeTab === tab.id ? 'opacity-100' : 'opacity-60'}>{tab.icon}</span>
                                 {tab.label}
                             </button>
                         ))}
@@ -519,7 +519,7 @@ const ProductDetailsPage = () => {
                         {activeTab === 'description' && (
                             <div className="animate-fade-up bg-white p-8 sm:p-10 rounded-3xl border border-gray-200 shadow-sm">
                                 <h3 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
-                                    <span className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary text-sm"><FaBoxOpen /></span>
+                                    <span className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center text-accent text-sm"><FaBoxOpen /></span>
                                     Product Details
                                 </h3>
                                 <div className="prose prose-lg max-w-none text-gray-600 leading-loose">
@@ -590,7 +590,7 @@ const ProductDetailsPage = () => {
                                                 <div className="flex justify-between items-start mb-3">
                                                     <div>
                                                         <div className="flex items-center gap-3 mb-1.5">
-                                                            <div className="w-9 h-9 bg-gray-100 rounded flex items-center justify-center text-primary font-bold text-xs border border-gray-200">
+                                                            <div className="w-9 h-9 bg-accent/5 rounded-lg flex items-center justify-center text-accent font-bold text-xs border border-accent/10">
                                                                 {review.customer_name?.charAt(0)}
                                                             </div>
                                                             <div>
@@ -617,7 +617,10 @@ const ProductDetailsPage = () => {
                                 </div>
 
                                 {/* Review Form */}
-                                <div className="bg-primary text-white p-8 sm:p-10 rounded-xl shadow-sm relative overflow-hidden mt-8">
+                                <div className="bg-gradient-to-br from-accent to-accent-dark text-white p-8 sm:p-10 rounded-[2rem] shadow-xl shadow-accent/20 relative overflow-hidden mt-8 border border-accent/20">
+                                    <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
+                                        <FaStar size={120} />
+                                    </div>
                                     <div className="relative z-10">
                                         <h3 className="text-2xl font-black mb-1">Write a Review</h3>
                                         <p className="text-gray-400 mb-8 text-sm">Your feedback helps the community choose the best gear.</p>

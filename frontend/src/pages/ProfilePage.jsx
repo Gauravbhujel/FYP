@@ -72,6 +72,7 @@ const ProfilePage = () => {
       setCancellingOrderId(null);
       setCancelReason("");
       fetchOrders();
+      fetchProfile();
     } catch (err) {
       showMessage(err.response?.data?.error || "Failed to cancel order.", "error");
     }
@@ -340,12 +341,12 @@ const ProfilePage = () => {
 
               <div className="flex items-center justify-around">
                 <div className="flex flex-col items-center">
-                  <span className="text-lg font-black text-gray-900 leading-none">0</span>
+                  <span className="text-lg font-black text-gray-900 leading-none">{user?.orders_count || 0}</span>
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Orders</span>
                 </div>
                 <div className="w-[1px] h-6 bg-gray-100"></div>
                 <div className="flex flex-col items-center">
-                  <span className="text-lg font-black text-gray-900 leading-none">0</span>
+                  <span className="text-lg font-black text-gray-900 leading-none">{user?.reviews_count || 0}</span>
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Reviews</span>
                 </div>
               </div>
@@ -547,35 +548,38 @@ const ProfilePage = () => {
                             </div>
                             <div className="flex-1 text-center md:text-left">
                               <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                                <span className="bg-gray-900 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest">{order.id}</span>
+                                <span className="bg-accent/10 text-accent text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest border border-accent/20">#{order.id}</span>
                                 <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">{order.date}</span>
                               </div>
                               <h4 className="font-black text-gray-900 text-xl tracking-tight mb-1">{order.product_name}</h4>
-                              <p className="text-xs text-gray-400 font-bold flex items-center justify-center md:justify-start gap-2">
-                                <FaStore className="text-primary" /> SOLD BY {order.vendor_name}
+                              <p className="text-xs text-gray-500 font-bold flex items-center justify-center md:justify-start gap-2">
+                                <FaStore className="text-accent" /> 
+                                <span className="opacity-60 uppercase tracking-tighter">Sold by</span> 
+                                <span className="text-gray-900">{order.vendor_name}</span>
                               </p>
-                              <div className="flex flex-wrap items-center gap-2 mt-2 justify-center md:justify-start">
-                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                              <div className="flex flex-wrap items-center gap-2 mt-3 justify-center md:justify-start">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
                                   {order.payment_method}
                                 </span>
-                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border ${
+                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border shadow-sm ${
                                   order.payment_status === 'Paid' 
                                     ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
                                     : 'bg-amber-50 text-amber-600 border-amber-100'
                                 }`}>
                                   {order.payment_status}
                                 </span>
+                                <span className={`px-2.5 py-0.5 text-[9px] font-black rounded-md uppercase tracking-widest border shadow-sm
+                                                ${order.status === 'delivered' ? 'bg-emerald-500 text-white border-emerald-600' :
+                                    order.status === 'shipped' ? 'bg-blue-500 text-white border-blue-600' :
+                                      order.status === 'canceled' ? 'bg-rose-500 text-white border-rose-600' :
+                                      'bg-accent text-white border-accent-dark'}`}>
+                                  {order.status}
+                                </span>
                               </div>
                             </div>
-                            <div className="flex flex-col items-center md:items-end gap-3 min-w-[150px]">
+                            
+                            <div className="flex flex-col items-center md:items-end gap-3 min-w-[200px]">
                               <div className="text-2xl font-black text-gray-900">Rs. {Number(order.amount).toLocaleString()}</div>
-                              <span className={`px-4 py-1.5 text-[9px] font-black rounded-full uppercase tracking-widest shadow-sm
-                                              ${order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                                  order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border border-blue-100' :
-                                    order.status === 'canceled' ? 'bg-rose-50 text-rose-600 border border-rose-100' :
-                                    'bg-amber-50 text-amber-600 border border-amber-100'}`}>
-                                {order.status}
-                              </span>
                               
                               <div className="flex flex-col gap-2 w-full mt-2">
                                 {(order.status === 'shipped' || order.status === 'delivered') && (
@@ -583,8 +587,8 @@ const ProfilePage = () => {
                                     onClick={() => setTrackingOrderId(trackingOrderId === order.id ? null : order.id)}
                                     className={`w-full text-center py-2.5 px-4 text-[10px] font-black rounded transition-all uppercase tracking-widest shadow-sm flex items-center justify-center gap-2 ${
                                       trackingOrderId === order.id 
-                                        ? 'bg-gray-900 text-white' 
-                                        : 'bg-white text-primary border-2 border-primary/10 hover:border-primary/30'
+                                        ? 'bg-accent text-white shadow-lg shadow-accent/20' 
+                                        : 'bg-white text-accent border-2 border-accent/20 hover:bg-accent/5 hover:border-accent/40'
                                     }`}
                                   >
                                     <FaTruck className={trackingOrderId === order.id ? 'animate-bounce' : ''} />
@@ -594,7 +598,7 @@ const ProfilePage = () => {
 
                                 {order.status === 'delivered' ? (
                                     <>
-                                      <Link to={`/product/${order.product}?tab=reviews`} className="w-full text-center py-2.5 px-4 bg-primary text-white text-[10px] font-black rounded hover:bg-primary-dark transition-all no-underline uppercase tracking-widest shadow-sm">
+                                      <Link to={`/product/${order.product}?tab=reviews`} className="w-full text-center py-2.5 px-4 bg-white text-accent border-2 border-accent/20 text-[10px] font-black rounded hover:bg-accent/5 hover:border-accent/40 transition-all no-underline uppercase tracking-widest shadow-sm">
                                         Write Product Review
                                       </Link>
                                       <button 
@@ -606,7 +610,7 @@ const ProfilePage = () => {
                                           });
                                           setIsVendorReviewOpen(true);
                                         }}
-                                        className="w-full text-center py-2.5 px-4 bg-white text-gray-700 border-2 border-gray-200 text-[10px] font-black rounded hover:bg-gray-50 transition-all uppercase tracking-widest shadow-sm"
+                                        className="w-full text-center py-2.5 px-4 bg-white text-accent border-2 border-accent/20 text-[10px] font-black rounded hover:bg-accent/5 hover:border-accent/40 transition-all uppercase tracking-widest shadow-sm"
                                       >
                                         Rate Vendor
                                       </button>

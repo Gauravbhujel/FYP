@@ -14,7 +14,7 @@ export function Button({
     primary:
       "bg-accent text-white shadow-lg border border-transparent hover:bg-accent-dark hover:shadow-accent/40 active:scale-95 transition-all duration-300",
     secondary:
-      "bg-transparent text-gray-900 border-2 border-gray-900 hover:bg-accent hover:text-white hover:border-accent hover:shadow-lg hover:shadow-accent/30 active:scale-95 transition-all duration-300",
+      "bg-transparent text-accent border-2 border-accent/40 hover:bg-accent hover:text-white hover:border-accent hover:shadow-lg hover:shadow-accent/30 active:scale-95 transition-all duration-300",
     outline:
       "bg-transparent text-gray-600 border border-gray-200 hover:border-gray-900 hover:text-gray-900 transition-all duration-300",
   };

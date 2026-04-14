@@ -115,7 +115,7 @@ const VendorProfilePage = () => {
                 <div className="max-w-[1280px] mx-auto px-6">
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
                         {/* Store Avatar */}
-                        <div className="w-32 h-32 bg-gradient-to-br from-primary to-primary-light rounded-[2.5rem] flex items-center justify-center text-white font-black text-5xl shadow-2xl border-4 border-white">
+                        <div className="w-32 h-32 bg-accent rounded-[2rem] flex items-center justify-center text-white font-black text-5xl">
                             {vendor.store_name?.charAt(0)}
                         </div>
                         
@@ -134,9 +134,9 @@ const VendorProfilePage = () => {
                             </p>
                             
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-y-3 gap-x-8 text-sm font-bold text-gray-400 mb-6">
-                                <div className="flex items-center gap-2"><FaEnvelope className="text-primary" /> {vendor.email}</div>
-                                <div className="flex items-center gap-2"><FaPhone className="text-primary" /> {vendor.phone}</div>
-                                <div className="flex items-center gap-2"><FaMapMarkerAlt className="text-primary" /> {vendor.city}, {vendor.address}</div>
+                                <div className="flex items-center gap-2"><FaEnvelope className="text-accent" /> {vendor.email}</div>
+                                <div className="flex items-center gap-2"><FaPhone className="text-accent" /> {vendor.phone}</div>
+                                <div className="flex items-center gap-2"><FaMapMarkerAlt className="text-accent" /> {vendor.city}, {vendor.address}</div>
                             </div>
 
                             <button 
@@ -152,7 +152,7 @@ const VendorProfilePage = () => {
                             <div className="bg-gray-50 rounded-3xl p-6 border border-gray-100 min-w-[150px] text-center">
                                 <span className="block text-3xl font-black text-gray-900 mb-1">{vendor.products_count || 0}</span>
                                 <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
-                                    <FaBoxOpen className="text-primary" /> Products
+                                    <FaBoxOpen className="text-accent" /> Products
                                 </span>
                             </div>
                             <div className="bg-amber-50 rounded-3xl p-6 border border-amber-100 min-w-[150px] text-center">
@@ -172,12 +172,12 @@ const VendorProfilePage = () => {
             {/* ─── TABS ─── */}
             <div className="max-w-[1280px] mx-auto px-6 mt-12">
                 <div className="flex items-center gap-1 sm:gap-2 p-1.5 bg-white border border-gray-100 rounded-3xl w-fit shadow-sm">
-                    <button
+                     <button
                         onClick={() => setActiveTab('products')}
-                        className={`px-8 py-4 rounded-2xl font-black text-sm transition-all flex items-center gap-2.5 ${
+                        className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2.5 ${
                             activeTab === 'products' 
-                                ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                                ? 'bg-accent text-white shadow-lg shadow-accent/20' 
+                                : 'text-gray-400 hover:text-accent hover:bg-accent/5'
                         }`}
                     >
                         <FaBoxOpen className={activeTab === 'products' ? 'text-white' : 'text-gray-200'} />
@@ -185,10 +185,10 @@ const VendorProfilePage = () => {
                     </button>
                     <button
                         onClick={() => setActiveTab('reviews')}
-                        className={`px-8 py-4 rounded-2xl font-black text-sm transition-all flex items-center gap-2.5 ${
+                        className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2.5 ${
                             activeTab === 'reviews' 
-                                ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                                ? 'bg-accent text-white shadow-lg shadow-accent/20' 
+                                : 'text-gray-400 hover:text-accent hover:bg-accent/5'
                         }`}
                     >
                         <FaStar className={activeTab === 'reviews' ? 'text-white' : 'text-gray-200'} />
@@ -203,7 +203,7 @@ const VendorProfilePage = () => {
                     <div className="animate-fade-in">
                         <div className="flex justify-between items-end mb-12">
                             <div>
-                                <p className="text-primary font-bold text-xs uppercase tracking-[0.2em] mb-2">Store Collection</p>
+                                <p className="text-accent font-bold text-xs uppercase tracking-[0.2em] mb-2">Store Collection</p>
                                 <h2 className="text-3xl font-black text-gray-900">Featured Products</h2>
                             </div>
                             <div className="text-gray-400 font-bold text-sm bg-white px-4 py-2 rounded-xl border border-gray-100">
@@ -240,7 +240,7 @@ const VendorProfilePage = () => {
                                     <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all hover:shadow-md">
                                         <div className="flex justify-between items-start mb-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-primary font-black text-sm border border-gray-100">
+                                                <div className="w-12 h-12 bg-accent/5 rounded-2xl flex items-center justify-center text-accent font-black text-sm border border-accent/10">
                                                     {review.customer_name?.charAt(0)}
                                                 </div>
                                                 <div>

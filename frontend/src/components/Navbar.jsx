@@ -97,12 +97,6 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-[1000] w-full">
-      {/* Announcement Bar */}
-      <div className="bg-primary text-white text-xs py-2 text-center font-medium tracking-wide">
-        🚚 Free delivery on orders above{" "}
-        <span className="font-bold text-accent-light">Rs. 999</span>
-        &nbsp;&nbsp;|&nbsp;&nbsp;✨ Trusted by 10,000+ athletes across Nepal
-      </div>
 
       {/* Main Navbar */}
       <nav

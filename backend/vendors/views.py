@@ -264,12 +264,46 @@ def vendor_update_order_status(request):
                     order.generate_tracking()
                     order.shipped_at = timezone.now()
                     order.estimated_delivery = timezone.now() + timedelta(days=3)
+                    
+                    # Notify Customer of Shipment
+                    try:
+                        subject = f"Your order #{order.id:04d} has been shipped!"
+                        message = (
+                            f"Hi {order.customer.first_name or order.customer.username},\n\n"
+                            f"Good news! Your order for '{order.product.name}' has been shipped and is on its way.\n\n"
+                            f"--- Shipping Details ---\n"
+                            f"Tracking ID: {order.tracking_id}\n"
+                            f"Courier: {order.get_courier_name_display()}\n"
+                            f"Est. Delivery: {order.estimated_delivery.strftime('%Y-%m-%d')}\n\n"
+                            f"You can track your package directly from your profile page on GearUpNepal.\n\n"
+                            f"Thank you for shopping with us!\n"
+                            f"GearUpNepal Team"
+                        )
+                        send_mail(subject, message, settings.EMAIL_HOST_USER, [order.customer.email], fail_silently=True)
+                    except Exception:
+                        pass
                 
                 # If newly delivered, add to pending balance ONLY if paid
                 if new_status == 'delivered' and old_status != 'delivered':
                     if order.is_paid:
                         vendor.pending_balance += order.vendor_earning
                         vendor.save()
+                    
+                    # Notify Customer of Delivery
+                    try:
+                        subject = f"Order #{order.id:04d} Delivered!"
+                        message = (
+                            f"Hi {order.customer.first_name or order.customer.username},\n\n"
+                            f"Your order for '{order.product.name}' has been delivered successfully.\n\n"
+                            f"We hope you love your new gear! If you have a moment, we'd love to hear your thoughts. "
+                            f"You can rate the product and the vendor on your profile page.\n\n"
+                            f"Thank you for choosing GearUpNepal!\n"
+                            f"GearUpNepal Team"
+                        )
+                        send_mail(subject, message, settings.EMAIL_HOST_USER, [order.customer.email], fail_silently=True)
+                    except Exception:
+                        pass
+                
                 # If status changed FROM delivered
                 elif old_status == 'delivered' and new_status != 'delivered':
                     # Only deduct if it hasn't been paid yet or it was already successfully added to balance
@@ -375,18 +409,27 @@ def admin_vendors_list(request):
     if to_date:
         f_query &= Q(created_at__date__lte=to_date)
 
+    # Payout Query (for payments released within this period)
+    p_query = Q(payout_status='paid')
+    if from_date:
+        p_query &= Q(payout_date__date__gte=from_date)
+    if to_date:
+        p_query &= Q(payout_date__date__lte=to_date)
+
     # Use Subqueries to prevent join explosion (Cartesian product)
     from django.db.models import OuterRef, Subquery
     
     vendor_revenues = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('total_amount')).values('total')
     vendor_commissions = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('commission_amount')).values('total')
     vendor_payouts = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('vendor_earning')).values('total')
+    vendor_period_paid = Order.objects.filter(p_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('vendor_earning')).values('total')
 
     vendors = Vendor.objects.all().annotate(
         product_count=Count('products', distinct=True),
         total_revenue=Subquery(vendor_revenues[:1]),
         total_commission=Subquery(vendor_commissions[:1]),
-        total_payout=Subquery(vendor_payouts[:1])
+        total_payout=Subquery(vendor_payouts[:1]),
+        period_paid_total=Subquery(vendor_period_paid[:1])
     ).order_by('-created_at')
     
     data = [{
@@ -396,6 +439,7 @@ def admin_vendors_list(request):
         "payout": float(v.total_payout or 0), "status": v.status, "joined": v.created_at.strftime("%Y-%m-%d"),
         "pending_balance": float(v.pending_balance),
         "paid_balance": float(v.paid_balance),
+        "period_paid": float(v.period_paid_total or 0),
         "last_payout_date": v.last_payout_date.strftime("%Y-%m-%d") if v.last_payout_date else None,
         "is_eligible": (not v.last_payout_date or (timezone.now() - v.last_payout_date).days >= 7) and v.pending_balance > 0
     } for v in vendors]
@@ -764,19 +808,42 @@ def admin_report_sales(request):
         )
         
         # Calculate Trend
-        from django.db.models.functions import TruncDay
-        trend_qs = Order.objects.filter(query).exclude(status='canceled').annotate(
-            day=TruncDay('created_at')
-        ).values('day').annotate(
-            revenue=Sum('total_amount'),
-            commission=Sum('commission_amount')
-        ).order_by('day')
+        from datetime import datetime
+        revenue_trend = []
+        if from_date and to_date:
+            try:
+                start_date = datetime.strptime(from_date, "%Y-%m-%d").date()
+                end_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+                delta = end_date - start_date
+                
+                for i in range(delta.days + 1):
+                    day = start_date + timedelta(days=i)
+                    day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                        rev=Sum('total_amount'),
+                        comm=Sum('commission_amount')
+                    )
+                    revenue_trend.append({
+                        "date": day.strftime("%d %b"),
+                        "revenue": float(day_stats['rev'] or 0),
+                        "commission": float(day_stats['comm'] or 0)
+                    })
+            except Exception:
+                pass
         
-        revenue_trend = [{
-            "date": t['day'].strftime("%d %b"),
-            "revenue": float(t['revenue'] or 0),
-            "commission": float(t['commission'] or 0)
-        } for t in trend_qs]
+        if not revenue_trend:
+            # Default to last 7 days if no dates or processing failed
+            today = date.today()
+            for i in range(6, -1, -1):
+                day = today - timedelta(days=i)
+                day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                    rev=Sum('total_amount'),
+                    comm=Sum('commission_amount')
+                )
+                revenue_trend.append({
+                    "date": day.strftime("%d %b"),
+                    "revenue": float(day_stats['rev'] or 0),
+                    "commission": float(day_stats['comm'] or 0)
+                })
         
         # Fetch Top Vendors within the date range
         top_vendors = Vendor.objects.filter(status='approved').annotate(

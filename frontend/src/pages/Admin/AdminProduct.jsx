@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   SearchIcon,
   FilterIcon,
-  EyeIcon,
   Trash2Icon,
-  Edit2Icon,
   PackageIcon,
   StoreIcon,
   TagIcon,
@@ -229,19 +227,6 @@ export function AdminProductsPage() {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-1">
-                                            <button 
-                                              onClick={() => window.open(`/product/${product.id}`, '_blank')}
-                                              className="w-8 h-8 flex flex-shrink-0 items-center justify-center bg-white border border-gray-200 rounded-lg shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-accent/20 cursor-pointer text-gray-500"
-                                              title="View Product"
-                                            >
-                                                <EyeIcon className="w-4 h-4" />
-                                            </button>
-                                            <button 
-                                              className="w-8 h-8 flex flex-shrink-0 items-center justify-center bg-white border border-gray-200 rounded-lg shadow-sm transition-colors hover:bg-gray-50 hover:text-accent focus:ring-2 focus:ring-accent/20 cursor-pointer text-gray-500"
-                                              title="Edit Product (Upcoming)"
-                                            >
-                                                <Edit2Icon className="w-4 h-4" />
-                                            </button>
                                             <button 
                                               onClick={() => handleDelete(product.id)}
                                               className="w-8 h-8 flex flex-shrink-0 items-center justify-center bg-white border border-gray-200 rounded-lg shadow-sm transition-colors hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 focus:ring-2 focus:ring-rose-200 cursor-pointer text-gray-500"

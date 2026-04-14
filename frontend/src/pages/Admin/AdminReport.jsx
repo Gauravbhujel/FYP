@@ -289,7 +289,7 @@ export default function AdminReportsPage() {
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                                             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} dy={10} />
-                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} tickFormatter={(val) => `Rs${val/1000}k`} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} tickFormatter={(val) => `Rs. ${val.toLocaleString()}`} />
                                             <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                                             <Legend verticalAlign="top" height={36} iconType="circle"/>
                                             <Area type="monotone" dataKey="revenue" name="Total Revenue" stroke="#ea580c" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
