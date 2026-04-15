@@ -14,6 +14,7 @@ import {
   Loader2Icon
 } from "lucide-react";
 import { DateRangePicker } from "../../components/dashboard/DateRangePicker";
+import OtpVerificationModal from "../../components/admin/OtpVerificationModal";
 
 export default function AdminEarningsPage() {
   const [vendors, setVendors] = useState([]);
@@ -23,6 +24,11 @@ export default function AdminEarningsPage() {
     start: "",
     end: ""
   });
+
+  // OTP Verification State
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpError, setOtpError] = useState("");
 
   useEffect(() => {
     fetchVendorEarnings();
@@ -41,18 +47,38 @@ export default function AdminEarningsPage() {
     }
   };
 
-  const handleReleasePayouts = async () => {
-    if (!window.confirm("Are you sure you want to release payouts for all eligible vendors?")) return;
+  const handleReleasePayouts = async (e, otpValue = null) => {
+    // If no OTP, start the process
+    if (!otpValue) {
+       if (!window.confirm("Are you sure you want to release payouts for all eligible vendors?")) return;
+    }
+
     try {
-      setLoading(true);
-      const res = await api.post("admin/vendors/release-payouts/");
-      alert(res.data.message);
-      fetchVendorEarnings();
+      if (otpValue) setOtpVerifying(true);
+      else setLoading(true);
+
+      const payload = otpValue ? { otp: otpValue } : {};
+      const res = await api.post("admin/vendors/release-payouts/", payload);
+
+      if (res.data.otp_required) {
+        setShowOtpModal(true);
+        setOtpError("");
+      } else {
+        alert(res.data.message);
+        setShowOtpModal(false);
+        fetchVendorEarnings();
+      }
     } catch (error) {
       console.error("Error releasing payouts:", error);
-      alert(error.response?.data?.error || "Error releasing payouts");
+      const errorMsg = error.response?.data?.error || "Error releasing payouts";
+      if (otpValue) {
+        setOtpError(errorMsg);
+      } else {
+        alert(errorMsg);
+      }
     } finally {
-      setLoading(false);
+      if (otpValue) setOtpVerifying(false);
+      else setLoading(false);
     }
   };
 
@@ -274,6 +300,14 @@ export default function AdminEarningsPage() {
           )}
         </div>
       </div>
+
+      <OtpVerificationModal
+        isOpen={showOtpModal}
+        onClose={() => setShowOtpModal(false)}
+        onVerify={(otp) => handleReleasePayouts(null, otp)}
+        verifying={otpVerifying}
+        error={otpError}
+      />
     </AdminLayout>
   );
 }

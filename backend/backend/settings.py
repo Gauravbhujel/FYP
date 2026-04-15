@@ -174,8 +174,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'gauravbhujel036@gmail.com'  
-EMAIL_HOST_PASSWORD = 'ptni ceyk uond tflx' 
+EMAIL_HOST_USER = 'gearupnepal28@gmail.com'  
+EMAIL_HOST_PASSWORD = 'unjl txpw kyxj owzo' 
 
 # eSewa Configuration (UAT/Sandbox Defaults)
 ESEWA_PRODUCT_CODE = 'EPAYTEST'

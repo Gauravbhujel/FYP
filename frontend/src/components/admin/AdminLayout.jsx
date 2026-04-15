@@ -24,7 +24,7 @@ import { useAuth } from "../../context/AuthContext";
 export function AdminLayout({ children, currentPage }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [adminData, setAdminData] = useState({ name: "Admin User", email: "admin@gearup.com" });
+  const [adminData, setAdminData] = useState({ name: "Admin User", email: "gauravbhujel036@gmail.com" });
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();

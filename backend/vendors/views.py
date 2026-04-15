@@ -976,7 +976,38 @@ def admin_release_weekly_payouts(request):
         user, error = _get_user_from_token(request)
         if error: return error
         if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
+
+        data = json.loads(request.body) if request.body else {}
+        otp = data.get("otp")
+        admin_email = "gauravbhujel036@gmail.com"
         
+        # Phase 1: OTP Generation & Sending
+        if not otp:
+            from users.views import generate_otp
+            token = generate_otp()
+            cache.set(f"payout_otp_{admin_email}", token, timeout=600)  # 10 minutes
+            
+            try:
+                subject = "Payout Authorization Required - GearUpNepal"
+                message = (
+                    f"Hello Admin,\n\n"
+                    f"A request has been initiated to release weekly payouts to eligible vendors.\n\n"
+                    f"Your Authorization Code: {token}\n\n"
+                    f"If you did not initiate this request, please investigate immediately.\n\n"
+                    f"Thank you,\n"
+                    f"GearUpNepal Security"
+                )
+                send_mail(subject, message, settings.EMAIL_HOST_USER, [admin_email], fail_silently=False)
+                return JsonResponse({"otp_required": True, "message": "Verification code sent to your email."}, status=200)
+            except Exception as e:
+                return JsonResponse({"error": f"Failed to send verification email: {str(e)}"}, status=500)
+
+        # Phase 2: OTP Verification
+        cached_otp = cache.get(f"payout_otp_{admin_email}")
+        if not cached_otp or cached_otp != str(otp):
+            return JsonResponse({"error": "Invalid or expired authorization code."}, status=400)
+
+        # Phase 3: Execute Payout Logic
         now = timezone.now()
         vendors = Vendor.objects.all()
         released_count = 0
@@ -1004,6 +1035,9 @@ def admin_release_weekly_payouts(request):
                     
                     released_count += 1
                     total_released_amount += amount
+            
+            # Clear OTP after successful payout
+            cache.delete(f"payout_otp_{admin_email}")
                     
         return JsonResponse({
             "message": f"Successfully released payouts for {released_count} vendors.",
