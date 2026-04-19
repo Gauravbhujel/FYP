@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='vendor_profile', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'db_table': 'LoginSignup_vendor',
+                'db_table': 'vendors',
             },
         ),
         migrations.CreateModel(
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ('vendor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vendor_reviews', to='vendors.vendor')),
             ],
             options={
-                'db_table': 'LoginSignup_vendorreview',
+                'db_table': 'vendor_reviews',
                 'ordering': ['-created_at'],
                 'unique_together': {('customer', 'vendor', 'order')},
             },

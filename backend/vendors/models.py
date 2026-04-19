@@ -28,7 +28,7 @@ class Vendor(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "LoginSignup_vendor"
+        db_table = "vendors"
 
     @property
     def average_rating(self):
@@ -72,14 +72,14 @@ class VendorReview(models.Model):
 
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='vendor_reviews')
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendor_reviews')
-    order = models.ForeignKey('orders.Order', on_delete=models.CASCADE, related_name='vendor_review')
+    order = models.ForeignKey('orders.OrderItem', on_delete=models.CASCADE, related_name='vendor_review')
     rating = models.IntegerField(choices=RATING_CHOICES)
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = "LoginSignup_vendorreview"
+        db_table = "vendor_reviews"
         unique_together = ('customer', 'vendor', 'order')
         ordering = ['-created_at']
 

@@ -12,7 +12,8 @@ from rest_framework.authtoken.models import Token
 from .models import Vendor, VendorReview
 from .serializers import VendorSerializer, VendorReviewSerializer
 from products.models import Product
-from orders.models import Order
+from orders.models import MasterOrder, OrderItem
+from payments.models import Payment
 
 def _get_vendor_from_token(request):
     auth_header = request.headers.get('Authorization')
@@ -142,7 +143,7 @@ def vendor_dashboard_stats(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
 
-        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
+        stats = OrderItem.objects.filter(query).exclude(status='canceled').aggregate(
             total_rev=Sum('total_amount'), 
             total_earn=Sum('vendor_earning'),
             count=Count('id')
@@ -151,7 +152,7 @@ def vendor_dashboard_stats(request):
         # Monthly benchmarks (relative to current date)
         now = timezone.now()
         month_start = now.replace(day=1)
-        this_month = Order.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(
+        this_month = OrderItem.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(
             earn=Sum('vendor_earning'),
             rev=Sum('total_amount'),
             comm=Sum('commission_amount')
@@ -160,7 +161,7 @@ def vendor_dashboard_stats(request):
         # Previous month earnings for month-over-month comparison
         prev_month_end = month_start - timedelta(days=1)
         prev_month_start = prev_month_end.replace(day=1)
-        prev_month = Order.objects.filter(
+        prev_month = OrderItem.objects.filter(
             vendor=vendor,
             created_at__date__gte=prev_month_start,
             created_at__date__lte=prev_month_end
@@ -176,7 +177,7 @@ def vendor_dashboard_stats(request):
         
         # Calculate effective commission rate from actual data
         total_rev_all = float(stats['total_rev'] or 0)
-        total_comm = Order.objects.filter(query, vendor=vendor).exclude(status='canceled').aggregate(comm=Sum('commission_amount'))
+        total_comm = OrderItem.objects.filter(query, vendor=vendor).exclude(status='canceled').aggregate(comm=Sum('commission_amount'))
         total_comm_val = float(total_comm['comm'] or 0)
         if total_rev_all > 0:
             effective_commission_rate = round((total_comm_val / total_rev_all) * 100, 1)
@@ -184,12 +185,13 @@ def vendor_dashboard_stats(request):
             effective_commission_rate = 5.0  # Default platform rate
         
         # Pending Payout: In-transit orders OR Delivered but Unpaid orders
-        pending_q = Q(vendor=vendor) & (~Q(status__in=['delivered', 'canceled']) | Q(status='delivered', is_paid=False))
-        pending_stats = Order.objects.filter(pending_q).aggregate(earn=Sum('vendor_earning'))
+        # Note: We now check mo.payment.payment_status
+        pending_q = Q(vendor=vendor) & (~Q(status__in=['delivered', 'canceled']) | Q(status='delivered', order__payment__payment_status='pending'))
+        pending_stats = OrderItem.objects.filter(pending_q).aggregate(earn=Sum('vendor_earning'))
         
         # Available Balance: Delivered AND Paid orders pending payout
-        available_q = Q(vendor=vendor, status='delivered', is_paid=True, payout_status='pending')
-        available_stats = Order.objects.filter(available_q).aggregate(earn=Sum('vendor_earning'))
+        available_q = Q(vendor=vendor, status='delivered', order__payment__payment_status='paid', payout_status='pending')
+        available_stats = OrderItem.objects.filter(available_q).aggregate(earn=Sum('vendor_earning'))
         
         return JsonResponse({
             "total_revenue": float(stats['total_rev'] or 0), 
@@ -205,7 +207,7 @@ def vendor_dashboard_stats(request):
             "available_balance": float(available_stats['earn'] or 0), # Calculated directly from DB for accuracy
             "total_orders": stats['count'] or 0,
             "products_listed": Product.objects.filter(vendor=vendor, is_active=True).count(),
-            "pending_orders": Order.objects.filter(vendor=vendor, status='pending').count(),
+            "pending_orders": OrderItem.objects.filter(vendor=vendor, status='pending').count(),
             "last_payout_date": vendor.last_payout_date.strftime("%Y-%m-%d") if vendor.last_payout_date else None,
         }, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
@@ -215,11 +217,13 @@ def vendor_recent_orders(request):
     vendor, error = _get_vendor_from_token(request)
     if error: return error
     if request.method == "GET":
-        orders = Order.objects.filter(vendor=vendor).select_related('product', 'customer')[:5]
+        orders = OrderItem.objects.filter(vendor=vendor).select_related('product', 'order__customer', 'order__payment').order_by('-created_at')[:5]
         data = [{
-            "id": f"#ORD-{o.id:04d}", "customer": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
+            "id": f"#ORD-{o.order.id:04d}", 
+            "customer": f"{o.order.customer.first_name} {o.order.customer.last_name}".strip() or o.order.customer.username,
             "product": o.product.name, "amount": float(o.total_amount), "status": o.status, "date": o.created_at.strftime("%Y-%m-%d"),
-            "payment_method": o.get_payment_method_display(), "payment_status": o.get_payment_status_display(),
+            "payment_method": o.order.payment.get_payment_method_display() if hasattr(o.order, 'payment') else "N/A", 
+            "payment_status": o.order.payment.get_payment_status_display() if hasattr(o.order, 'payment') else "N/A",
         } for o in orders]
         return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
@@ -229,13 +233,14 @@ def vendor_orders_list(request):
     vendor, error = _get_vendor_from_token(request)
     if error: return error
     if request.method == "GET":
-        orders = Order.objects.filter(vendor=vendor).select_related('product', 'customer').order_by('-created_at')
+        orders = OrderItem.objects.filter(vendor=vendor).select_related('product', 'order__customer', 'order__payment').order_by('-created_at')
         data = [{
-            "id": f"#ORD-{o.id:04d}", "raw_id": o.id, "customer": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
+            "id": f"#ORD-{o.order.id:04d}", "raw_id": o.id, "customer": f"{o.order.customer.first_name} {o.order.customer.last_name}".strip() or o.order.customer.username,
             "product": o.product.name, "quantity": o.quantity, "amount": float(o.total_amount),
             "commission": float(o.commission_amount), "vendor_earning": float(o.vendor_earning),
-            "status": o.status, "date": o.created_at.strftime("%Y-%m-%d"), "address": o.shipping_address,
-            "payment_method": o.get_payment_method_display(), "payment_status": o.get_payment_status_display(),
+            "status": o.status, "date": o.created_at.strftime("%Y-%m-%d"), "address": o.order.shipping_address,
+            "payment_method": o.order.payment.get_payment_method_display() if hasattr(o.order, 'payment') else "N/A", 
+            "payment_status": o.order.payment.get_payment_status_display() if hasattr(o.order, 'payment') else "N/A",
         } for o in orders]
         return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
@@ -246,18 +251,25 @@ def vendor_update_order_status(request):
     if error: return error
     if request.method == "POST":
         data = json.loads(request.body)
-        order_id = data.get("order_id")
-        if isinstance(order_id, str) and order_id.startswith("#ORD-"):
-            order_id = int(order_id.replace("#ORD-", ""))
         try:
-            order = Order.objects.get(id=order_id, vendor=vendor)
-            if order.status == 'canceled':
-                return JsonResponse({"error": "Cannot update a cancelled order."}, status=400)
-            
-            new_status = data.get("status")
-            if new_status in [c[0] for c in Order.STATUS_CHOICES]:
-                old_status = order.status
-                order.status = new_status
+            # Note: order_id here refers to the flat OrderItem ID if coming from the list, or we handle it by MasterOrder
+            # If it's #ORD-, it's likely a MasterOrder ID.
+            if isinstance(order_id, str) and order_id.startswith("#ORD-"):
+                # If updating by MasterOrder ID, we update all items for this vendor in that order
+                mo_id = int(order_id.replace("#ORD-", ""))
+                items = OrderItem.objects.filter(order_id=mo_id, vendor=vendor)
+                if not items.exists():
+                    return JsonResponse({"error": "Order not found"}, status=404)
+                
+                new_status = data.get("status")
+                if new_status not in [c[0] for c in MasterOrder.STATUS_CHOICES]:
+                    return JsonResponse({"error": "Invalid status"}, status=400)
+
+                for order in items:
+                    if order.status == 'canceled': continue
+                    
+                    old_status = order.status
+                    order.status = new_status
                 
                 # If newly shipped, generate tracking info
                 if new_status == 'shipped' and old_status != 'shipped':
@@ -267,19 +279,19 @@ def vendor_update_order_status(request):
                     
                     # Notify Customer of Shipment
                     try:
-                        subject = f"Your order #{order.id:04d} has been shipped!"
+                        subject = f"Your order #{order.order.id:04d} has been shipped!"
                         message = (
-                            f"Hi {order.customer.first_name or order.customer.username},\n\n"
+                            f"Hi {order.order.customer.first_name or order.order.customer.username},\n\n"
                             f"Good news! Your order for '{order.product.name}' has been shipped and is on its way.\n\n"
                             f"--- Shipping Details ---\n"
                             f"Tracking ID: {order.tracking_id}\n"
-                            f"Courier: {order.get_courier_name_display()}\n"
+                            f"Courier: {order.get_courier_name_display() if order.courier_name else 'Standard'}\n"
                             f"Est. Delivery: {order.estimated_delivery.strftime('%Y-%m-%d')}\n\n"
                             f"You can track your package directly from your profile page on GearUpNepal.\n\n"
                             f"Thank you for shopping with us!\n"
                             f"GearUpNepal Team"
                         )
-                        send_mail(subject, message, settings.EMAIL_HOST_USER, [order.customer.email], fail_silently=True)
+                        send_mail(subject, message, settings.EMAIL_HOST_USER, [order.order.customer.email], fail_silently=True)
                     except Exception:
                         pass
                 
@@ -291,16 +303,16 @@ def vendor_update_order_status(request):
                     
                     # Notify Customer of Delivery
                     try:
-                        subject = f"Order #{order.id:04d} Delivered!"
+                        subject = f"Order #{order.order.id:04d} Delivered!"
                         message = (
-                            f"Hi {order.customer.first_name or order.customer.username},\n\n"
+                            f"Hi {order.order.customer.first_name or order.order.customer.username},\n\n"
                             f"Your order for '{order.product.name}' has been delivered successfully.\n\n"
                             f"We hope you love your new gear! If you have a moment, we'd love to hear your thoughts. "
                             f"You can rate the product and the vendor on your profile page.\n\n"
                             f"Thank you for choosing GearUpNepal!\n"
                             f"GearUpNepal Team"
                         )
-                        send_mail(subject, message, settings.EMAIL_HOST_USER, [order.customer.email], fail_silently=True)
+                        send_mail(subject, message, settings.EMAIL_HOST_USER, [order.order.customer.email], fail_silently=True)
                     except Exception:
                         pass
                 
@@ -352,7 +364,7 @@ def vendor_sales_chart(request):
             today = date.today()
             for i in range(6, -1, -1):
                 day = today - timedelta(days=i)
-                aggr = Order.objects.filter(vendor=vendor, created_at__date=day).exclude(status='canceled').aggregate(
+                aggr = OrderItem.objects.filter(vendor=vendor, created_at__date=day).exclude(status='canceled').aggregate(
                     total=Sum('total_amount'), 
                     earn=Sum('vendor_earning'),
                     count=Count('id')
@@ -380,7 +392,7 @@ def vendor_category_chart(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
 
-        cats = Order.objects.filter(query).exclude(status='canceled').values('product__category').annotate(
+        cats = OrderItem.objects.filter(query).exclude(status='canceled').values('product__category').annotate(
             value=Sum('total_amount')
         ).order_by('-value')
         data = [
@@ -419,10 +431,10 @@ def admin_vendors_list(request):
     # Use Subqueries to prevent join explosion (Cartesian product)
     from django.db.models import OuterRef, Subquery
     
-    vendor_revenues = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('total_amount')).values('total')
-    vendor_commissions = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('commission_amount')).values('total')
-    vendor_payouts = Order.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('vendor_earning')).values('total')
-    vendor_period_paid = Order.objects.filter(p_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('vendor_earning')).values('total')
+    vendor_revenues = OrderItem.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('total_amount')).values('total')
+    vendor_commissions = OrderItem.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('commission_amount')).values('total')
+    vendor_payouts = OrderItem.objects.filter(f_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('vendor_earning')).values('total')
+    vendor_period_paid = OrderItem.objects.filter(p_query, vendor=OuterRef('pk')).values('vendor').annotate(total=Sum('vendor_earning')).values('total')
 
     vendors = Vendor.objects.all().annotate(
         product_count=Count('products', distinct=True),
@@ -453,7 +465,7 @@ def public_vendor_detail(request, vendor_id):
             products = Product.objects.filter(vendor=vendor, is_active=True).order_by('-created_at')
             p_data = [{
                 "id": p.id, "name": p.name, "price": float(p.price),
-                "image": request.build_absolute_uri(p.image.url) if p.image else "",
+                "image": request.build_absolute_uri(p.gallery.first().image.url) if p.gallery.exists() else "",
                 "category": p.get_category_display(),
             } for p in products]
             v_reviews = VendorReview.objects.filter(vendor=vendor).order_by('-created_at')
@@ -477,7 +489,7 @@ def submit_vendor_review(request, vendor_id, order_id):
         if error: return error
         try:
             vendor = Vendor.objects.get(id=vendor_id)
-            order = Order.objects.get(id=order_id, customer=user, vendor=vendor)
+            order = OrderItem.objects.get(id=order_id, order__customer=user, vendor=vendor)
             if order.status != 'delivered':
                 return JsonResponse({"error": "Only delivered orders can be rated"}, status=403)
             data = json.loads(request.body)
@@ -497,8 +509,8 @@ def check_vendor_review_eligibility(request, vendor_id, order_id):
         if error: return JsonResponse({"can_review": False, "reason": "login_required"}, status=200)
         try:
             vendor = Vendor.objects.get(id=vendor_id)
-            order = Order.objects.get(id=order_id, customer=user, vendor=vendor)
-            existing = VendorReview.objects.filter(customer=user, vendor=vendor, order=order).first()
+            order = OrderItem.objects.get(id=order_id, order__customer=user, vendor=vendor)
+            existing = VendorReview.objects.filter(customer=user, vendor=vendor, order_id=order_id).first()
             return JsonResponse({
                 "can_review": order.status == 'delivered',
                 "existing_review": VendorReviewSerializer(existing).data if existing else None
@@ -525,7 +537,7 @@ def admin_dashboard_stats(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
 
-        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
+        stats = OrderItem.objects.filter(query).exclude(status='canceled').aggregate(
             total_rev=Sum('total_amount'), 
             total_comm=Sum('commission_amount'), 
             count=Count('id')
@@ -555,7 +567,7 @@ def admin_dashboard_stats(request):
             today = date.today()
             for i in range(6, -1, -1):
                 day = today - timedelta(days=i)
-                day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                day_stats = OrderItem.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
                     rev=Sum('total_amount'), 
                     orders=Count('id')
                 )
@@ -592,10 +604,10 @@ def admin_top_vendors(request):
         if error: return error
         if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
         top = Vendor.objects.filter(status='approved').annotate(
-            revenue=Sum('vendor_orders__total_amount', filter=~Q(vendor_orders__status='canceled')),
-            commission=Sum('vendor_orders__commission_amount', filter=~Q(vendor_orders__status='canceled')),
-            payout=Sum('vendor_orders__vendor_earning', filter=~Q(vendor_orders__status='canceled')),
-            count=Count('vendor_orders', filter=~Q(vendor_orders__status='canceled'))
+            revenue=Sum('order_items__total_amount', filter=~Q(order_items__status='canceled')),
+            commission=Sum('order_items__commission_amount', filter=~Q(order_items__status='canceled')),
+            payout=Sum('order_items__vendor_earning', filter=~Q(order_items__status='canceled')),
+            count=Count('order_items', filter=~Q(order_items__status='canceled'))
         ).order_by('-revenue')[:4]
         return JsonResponse([
             {
@@ -621,8 +633,8 @@ def admin_recent_activities(request):
         acts = []
         for p in Product.objects.all().select_related('vendor').order_by('-created_at')[:limit]:
             acts.append({"type": "vendor", "action": f"{p.vendor.store_name} added: {p.name}", "timestamp": p.created_at, "color": "bg-gray-900"})
-        for o in Order.objects.all().order_by('-created_at')[:limit]:
-            acts.append({"type": "order", "action": f"Order #ORD-{o.id:04d} completed", "timestamp": o.created_at, "color": "bg-accent"})
+        for o in OrderItem.objects.all().order_by('-created_at')[:limit]:
+            acts.append({"type": "order", "action": f"Order #ORD-{o.order.id:04d} item: {o.product.name}", "timestamp": o.created_at, "color": "bg-accent"})
         User = get_user_model()
         for u in User.objects.filter(role='customer').order_by('-date_joined')[:limit]:
             acts.append({"type": "user", "action": f"New customer: {u.username}", "timestamp": u.date_joined, "color": "bg-gray-400"})
@@ -648,23 +660,23 @@ def admin_reports_stats(request):
         user, error = _get_user_from_token(request)
         if error: return error
         if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
-        totals = Order.objects.aggregate(rev=Sum('total_amount'), comm=Sum('commission_amount'))
+        totals = OrderItem.objects.aggregate(rev=Sum('total_amount'), comm=Sum('commission_amount'))
         User = get_user_model()
         now = timezone.now()
         start = (now - timedelta(days=210)).replace(day=1)
-        history = Order.objects.filter(created_at__gte=start).annotate(month=TruncMonth('created_at')).values('month').annotate(revenue=Sum('total_amount'), commission=Sum('commission_amount'), count=Count('id')).order_by('month')
+        history = OrderItem.objects.filter(created_at__gte=start).annotate(month=TruncMonth('created_at')).values('month').annotate(revenue=Sum('total_amount'), commission=Sum('commission_amount'), count=Count('id')).order_by('month')
         monthly_data = []
         month_map = {h['month'].strftime('%b').upper(): h for h in history}
         for i in range(6, -1, -1):
             m_name = (now - timedelta(days=30*i)).strftime('%b').upper()
             m_d = month_map.get(m_name, {'revenue': 0, 'commission': 0, 'count': 0})
             monthly_data.append({"month": m_name, "revenue": float(m_d['revenue']), "commission": float(m_d['commission']), "orders": m_d['count']})
-        cats = Order.objects.values('product__category').annotate(rev=Sum('total_amount')).order_by('-rev')
+        cats = OrderItem.objects.values('product__category').annotate(rev=Sum('total_amount')).order_by('-rev')
         cat_rev_total = sum(float(c['rev'] or 0) for c in cats) or 1
         cat_breakdown = [{"category": c['product__category'].capitalize() if c['product__category'] else "Other", "revenue": float(c['rev']), "percentage": round((float(c['rev'])/cat_rev_total)*100)} for c in cats]
         return JsonResponse({
             "platform_yield": {"total": float(totals['rev'] or 0), "growth": 14.2}, "platform_commission": {"total": float(totals['comm'] or 0), "growth": 12.5},
-            "total_orders": {"total": Order.objects.count(), "growth": 8.7}, "identity_base": {"total": User.objects.filter(role='customer').count(), "growth": 22.4},
+            "total_orders": {"total": OrderItem.objects.count(), "growth": 8.7}, "identity_base": {"total": User.objects.filter(role='customer').count(), "growth": 22.4},
             "monthly_revenue": monthly_data, "category_breakdown": cat_breakdown or [{"category": "Other", "revenue": 0, "percentage": 0}]
         }, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
@@ -683,9 +695,9 @@ def vendor_report_sales(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
             
-        orders = Order.objects.filter(query).select_related('product', 'customer').order_by('-created_at')
+        orders = OrderItem.objects.filter(query).select_related('product', 'order__customer').order_by('-created_at')
         data = [{
-            "id": f"#ORD-{o.id:04d}", 
+            "id": f"#ORD-{o.order.id:04d}", 
             "product": o.product.name,
             "gross_amount": float(o.total_amount),
             "commission": float(o.commission_amount),
@@ -711,14 +723,14 @@ def vendor_report_customers(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
             
-        customers = Order.objects.filter(query).values('customer__username', 'customer__first_name', 'customer__last_name', 'customer__email').annotate(
+        customers = OrderItem.objects.filter(query).values('order__customer__username', 'order__customer__first_name', 'order__customer__last_name', 'order__customer__email').annotate(
             order_count=Count('id'),
             total_spend=Sum('total_amount')
         ).order_by('-total_spend')
         
         data = [{
-            "customer": f"{c['customer__first_name']} {c['customer__last_name']}".strip() or c['customer__username'],
-            "email": c['customer__email'],
+            "customer": f"{c['order__customer__first_name']} {c['order__customer__last_name']}".strip() or c['order__customer__username'],
+            "email": c['order__customer__email'],
             "order_count": c['order_count'],
             "total_lifetime_value": float(c['total_spend'] or 0)
         } for c in customers]
@@ -740,14 +752,14 @@ def vendor_report_orders(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
             
-        orders = Order.objects.filter(query).select_related('customer', 'product').order_by('-created_at')
+        orders = OrderItem.objects.filter(query).select_related('order__customer', 'product').order_by('-created_at')
         data = [{
-            "order_id": f"#ORD-{o.id:04d}",
-            "customer": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
+            "order_id": f"#ORD-{o.order.id:04d}",
+            "customer": f"{o.order.customer.first_name} {o.order.customer.last_name}".strip() or o.order.customer.username,
             "items_count": o.quantity,
             "total_price": float(o.total_amount),
             "status": o.status,
-            "payment_method": o.get_payment_method_display(),
+            "payment_method": o.order.payment.get_payment_method_display() if hasattr(o.order, 'payment') else "N/A",
             "date": o.created_at.strftime("%Y-%m-%d")
         } for o in orders]
         
@@ -769,7 +781,7 @@ def vendor_report_products(request):
             query &= Q(created_at__date__lte=to_date)
             
         # Group by product
-        products = Order.objects.filter(query).exclude(status='canceled').values('product__name').annotate(
+        products = OrderItem.objects.filter(query).exclude(status='canceled').values('product__name').annotate(
             units_sold=Sum('quantity'),
             total_revenue=Sum('total_amount')
         ).order_by('-units_sold')

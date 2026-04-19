@@ -17,7 +17,7 @@ class CustomUser(AbstractUser):
     email_otp_created_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        db_table = "LoginSignup_customuser"
+        db_table = "users"
 
     def is_suspended(self):
         if self.suspended_until and self.suspended_until > timezone.now():

@@ -46,6 +46,7 @@ urlpatterns = [
     path('vendor/reports/customers/', vendor_views.vendor_report_customers, name='vendor_report_customers'),
     
     # Products
+    path('products/categories/', product_views.public_category_list, name='public_category_list'),
     path('categories/stats/', product_views.public_category_stats, name='public_category_stats'),
     path('products/all/', product_views.public_product_list, name='public_product_list'),
     path('products/search/', product_views.public_product_search, name='public_product_search'),

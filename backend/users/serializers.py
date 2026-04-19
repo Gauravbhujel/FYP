@@ -22,7 +22,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'username', 'email', 'role', 'is_active', 'date_joined']
 
     def get_orders_count(self, obj):
-        return obj.customer_orders.count()
+        return obj.master_orders.count()
 
     def get_reviews_count(self, obj):
         return obj.reviews.count()

@@ -45,8 +45,8 @@ const ProductListPage = () => {
         { id: 'running', label: 'Running' },
         { id: 'basketball', label: 'Basketball' },
         { id: 'football', label: 'Football' },
-        { id: 'tennis', label: 'Tennis' },
-        { id: 'swimming', label: 'Swimming' },
+        { id: 'cricket', label: 'Cricket' },
+        { id: 'gym-equipment', label: 'Gym Equipment' },
         { id: 'cycling', label: 'Cycling' },
     ];
 
@@ -95,12 +95,12 @@ const ProductListPage = () => {
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             result = result.filter(p => 
-                p.name.toLowerCase().includes(query) || 
-                p.category.toLowerCase().includes(query)
+                (p.name && p.name.toLowerCase().includes(query)) || 
+                (p.category && p.category.toLowerCase().includes(query))
             );
         }
         if (selectedCategory !== 'all') {
-            result = result.filter(p => p.category_slug.toLowerCase() === selectedCategory.toLowerCase());
+            result = result.filter(p => p.category_slug && p.category_slug.toLowerCase() === selectedCategory.toLowerCase());
         }
         if (priceRange.min !== "") {
             result = result.filter(p => p.price >= parseFloat(priceRange.min));

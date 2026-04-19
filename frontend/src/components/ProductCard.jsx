@@ -42,8 +42,9 @@ const ProductCard = ({ product }) => {
     };
 
     // Calculate discount percentage if compare_price is available
-    const discountPct = product.discount ||
-        (product.compare_price && product.price && Number(product.compare_price) > 0
+    const discountPct = product.discount 
+        ? Math.round(product.discount)
+        : (product.compare_price && product.price && Number(product.compare_price) > 0
             ? Math.round((1 - product.price / product.compare_price) * 100)
             : null);
 
@@ -54,7 +55,7 @@ const ProductCard = ({ product }) => {
             <div className="relative h-[240px] bg-gray-50 rounded-md overflow-hidden mb-4">
                 <Link to={`/product/${product.id}`}>
                     <img
-                        src={product.image}
+                        src={product.image || (product.gallery && product.gallery.length > 0 ? product.gallery[0].image : '/placeholder.png')}
                         alt={product.name}
                         className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out ${product.quantity <= 0 ? 'grayscale' : ''}`}
                     />

@@ -134,7 +134,7 @@ export function AddProductPage() {
                     value={formData.name}
                     onChange={handleChange}
                     className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg text-sm font-black text-gray-900 focus:ring-4 focus:ring-accent/5 focus:border-accent transition-all outline-none placeholder:text-gray-300 uppercase tracking-widest placeholder:normal-case"
-                    placeholder="e.g., Premium Carbon Fiber Tennis Racket"
+                    placeholder="e.g., Premium Carbon Fiber Cricket Bat"
                     required
                   />
                 </div>
@@ -165,8 +165,8 @@ export function AddProductPage() {
                                 <option value="running">Running</option>
                                 <option value="basketball">Basketball</option>
                                 <option value="football">Football</option>
-                                <option value="tennis">Tennis</option>
-                                <option value="swimming">Swimming</option>
+                                <option value="cricket">Cricket</option>
+                                <option value="gym-equipment">Gym Equipment</option>
                                 <option value="cycling">Cycling</option>
                             </select>
                             <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />

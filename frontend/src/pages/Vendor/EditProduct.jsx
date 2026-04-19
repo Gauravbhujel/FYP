@@ -209,8 +209,8 @@ export function EditProductPage() {
                                 <option value="running">Running</option>
                                 <option value="basketball">Basketball</option>
                                 <option value="football">Football</option>
-                                <option value="tennis">Tennis</option>
-                                <option value="swimming">Swimming</option>
+                                <option value="cricket">Cricket</option>
+                                <option value="gym-equipment">Gym Equipment</option>
                                 <option value="cycling">Cycling</option>
                             </select>
                             <ChevronDownIcon className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />

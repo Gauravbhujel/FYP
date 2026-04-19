@@ -5,7 +5,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 import json
 from rest_framework.authtoken.models import Token
-from .models import Order
+from .models import MasterOrder, OrderItem
+from payments.models import Payment
 
 @csrf_exempt
 def cancel_order(request, order_id):
@@ -15,55 +16,36 @@ def cancel_order(request, order_id):
         if error: return error
         
         try:
-            # Check if order_id is a formatted string like #ORD-0001
             processed_id = order_id
             if isinstance(order_id, str) and order_id.startswith("#ORD-"):
                 processed_id = int(order_id.replace("#ORD-", ""))
             
-            order = Order.objects.get(id=processed_id, customer=user)
-            if order.status not in ['pending', 'processing']:
-                return JsonResponse({"error": f"Cannot cancel order in {order.status} status."}, status=400)
+            mo = MasterOrder.objects.get(id=processed_id, customer=user)
+            if mo.status not in ['pending', 'processing']:
+                return JsonResponse({"error": f"Cannot cancel order in {mo.status} status."}, status=400)
             
-            if order.status == 'canceled':
-                return JsonResponse({"error": "Order is already cancelled."}, status=400)
-
             data = json.loads(request.body)
             reason = data.get("reason", "No reason provided")
             
-            order.status = 'canceled'
-            order.cancelled_by = 'customer'
-            order.cancelled_at = timezone.now()
-            order.cancel_reason = reason
-            order.vendor_earning = 0.00
-            order.commission_amount = 0.00
+            mo.status = 'canceled'
+            mo.save()
             
-            if order.is_paid:
-                order.refund_status = 'pending'
+            # Update all items
+            mo.items.all().update(status='canceled', vendor_earning=0.00, commission_amount=0.00)
             
-            order.save()
-            
-            # Notify Vendor
-            try:
-                send_mail(
-                    'Order Cancelled - GearUpNepal',
-                    f'Customer {user.get_full_name() or user.username} has cancelled Order #ORD-{order.id:04d}.\nReason: {reason}',
-                    settings.EMAIL_HOST_USER,
-                    [order.vendor.user.email],
-                    fail_silently=True,
-                )
-            except Exception:
-                pass
+            # Update payment if exists
+            if hasattr(mo, 'payment'):
+                mo.payment.payment_status = 'failed'
+                mo.payment.save()
                 
             return JsonResponse({
                 "message": "Order cancelled successfully", 
                 "order": {
-                    "id": f"#ORD-{order.id:04d}",
-                    "status": order.status,
-                    "cancelled_by": order.cancelled_by,
-                    "cancelled_at": order.cancelled_at.isoformat() if order.cancelled_at else None
+                    "id": f"#ORD-{mo.id:04d}",
+                    "status": mo.status
                 }
             }, status=200)
-        except Order.DoesNotExist:
+        except MasterOrder.DoesNotExist:
             return JsonResponse({"error": "Order not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
@@ -76,18 +58,26 @@ def customer_orders(request):
         user, error = _get_user_from_token(request)
         if error: return error
         
-        orders = Order.objects.filter(customer=user).select_related('product', 'vendor')
+        # We return a flat list of items for backward compatibility with the frontend
+        items = OrderItem.objects.filter(order__customer=user).select_related('product', 'vendor', 'order', 'order__payment')
         data = [{
-            "id": f"#ORD-{o.id:04d}", "order_id_raw": o.id, "product": o.product.id, "product_name": o.product.name,
-            "vendor": o.vendor.id, "vendor_name": o.vendor.store_name, "amount": float(o.total_amount),
-            "status": o.status, "date": o.created_at.strftime("%Y-%m-%d"),
-            "payment_method": o.get_payment_method_display(), "payment_status": o.get_payment_status_display(),
-            "image": request.build_absolute_uri(o.product.image.url) if o.product.image else "",
-            "tracking_id": o.tracking_id,
-            "courier_name": o.get_courier_name_display() if o.courier_name else None,
-            "shipped_at": o.shipped_at.strftime("%Y-%m-%d %H:%M") if o.shipped_at else None,
-            "estimated_delivery": o.estimated_delivery.strftime("%Y-%m-%d") if o.estimated_delivery else None
-        } for o in orders]
+            "id": f"#ORD-{oi.order.id:04d}", 
+            "item_id": oi.id,
+            "product": oi.product.id, 
+            "product_name": oi.product.name,
+            "vendor": oi.vendor.id, 
+            "vendor_name": oi.vendor.store_name, 
+            "amount": float(oi.total_amount),
+            "status": oi.status, 
+            "date": oi.created_at.strftime("%Y-%m-%d"),
+            "payment_method": oi.order.payment.get_payment_method_display() if hasattr(oi.order, 'payment') else "N/A", 
+            "payment_status": oi.order.payment.get_payment_status_display() if hasattr(oi.order, 'payment') else "N/A",
+            "image": request.build_absolute_uri(oi.product.gallery.first().image.url) if oi.product.gallery.exists() else "",
+            "tracking_id": oi.tracking_id,
+            "courier_name": oi.courier_name,
+            "shipped_at": oi.shipped_at.strftime("%Y-%m-%d %H:%M") if oi.shipped_at else None,
+            "estimated_delivery": oi.estimated_delivery.strftime("%Y-%m-%d") if oi.estimated_delivery else None
+        } for oi in items]
         return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
@@ -99,18 +89,23 @@ def admin_orders_list(request):
         if error: return error
         if not (user.is_superuser or user.is_staff): return JsonResponse({"error": "Forbidden"}, status=403)
         
-        orders = Order.objects.all().select_related('product', 'vendor', 'customer').order_by('-created_at')
+        # In admin, we show OrderItems as it's more granular
+        items = OrderItem.objects.all().select_related('product', 'vendor', 'order', 'order__customer', 'order__payment').order_by('-created_at')
         data = [{
-            "id": f"#ORD-{o.id:04d}", "id_raw": o.id, "transaction_uuid": o.transaction_uuid,
-            "product": {"id": o.product.id, "name": o.product.name, "image": request.build_absolute_uri(o.product.image.url) if o.product.image else ""},
-            "vendor": {"id": o.vendor.id, "store_name": o.vendor.store_name},
-            "customer": {"id": o.customer.id, "name": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username, "email": o.customer.email},
-            "amount": float(o.total_amount), "status": o.status, "is_paid": o.is_paid,
-            "payment_method": o.get_payment_method_display(), "payment_status": o.get_payment_status_display(),
-            "esewa_ref_id": o.esewa_ref_id,
-            "date": o.created_at.strftime("%Y-%m-%d %H:%M"), "shipping_address": o.shipping_address,
-            "commission": float(o.commission_amount), "vendor_earning": float(o.vendor_earning)
-        } for o in orders]
+            "id": f"#ORD-{oi.order.id:04d}", 
+            "item_id": oi.id,
+            "transaction_uuid": oi.order.payment.transaction_uuid if hasattr(oi.order, 'payment') else "N/A",
+            "product": {"id": oi.product.id, "name": oi.product.name, "image": request.build_absolute_uri(oi.product.gallery.first().image.url) if oi.product.gallery.exists() else ""},
+            "vendor": {"id": oi.vendor.id, "store_name": oi.vendor.store_name},
+            "customer": {"id": oi.order.customer.id, "name": f"{oi.order.customer.first_name} {oi.order.customer.last_name}".strip() or oi.order.customer.username, "email": oi.order.customer.email},
+            "amount": float(oi.total_amount), "status": oi.status, 
+            "is_paid": oi.order.payment.payment_status == 'paid' if hasattr(oi.order, 'payment') else False,
+            "payment_method": oi.order.payment.get_payment_method_display() if hasattr(oi.order, 'payment') else "N/A", 
+            "payment_status": oi.order.payment.get_payment_status_display() if hasattr(oi.order, 'payment') else "N/A",
+            "esewa_ref_id": oi.order.payment.esewa_ref_id if hasattr(oi.order, 'payment') else None,
+            "date": oi.created_at.strftime("%Y-%m-%d %H:%M"), "shipping_address": oi.order.shipping_address,
+            "commission": float(oi.commission_amount), "vendor_earning": float(oi.vendor_earning)
+        } for oi in items]
         return JsonResponse(data, safe=False, status=200)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
@@ -128,35 +123,38 @@ def confirm_cod_payment(request, order_id):
             if isinstance(order_id, str) and order_id.startswith("#ORD-"):
                 processed_id = int(order_id.replace("#ORD-", ""))
             
-            order = Order.objects.get(id=processed_id)
+            mo = MasterOrder.objects.get(id=processed_id)
+            payment = mo.payment
             
-            if order.payment_method != 'COD':
+            if payment.payment_method != 'COD':
                 return JsonResponse({"error": "This action is only for Cash on Delivery orders."}, status=400)
             
-            if order.status != 'delivered':
+            if mo.status != 'delivered':
                 return JsonResponse({"error": "Payment can only be confirmed for delivered orders."}, status=400)
             
-            if order.is_paid:
+            if payment.payment_status == 'paid':
                 return JsonResponse({"error": "This order is already marked as paid."}, status=400)
 
-            order.is_paid = True
-            order.payment_status = 'paid'
-            order.save()
+            payment.payment_status = 'paid'
+            payment.save()
             
-            # Now that it's paid, if it was already delivered, we should update the vendor's balance
-            if order.status == 'delivered':
-                vendor = order.vendor
-                vendor.pending_balance += order.vendor_earning
-                vendor.save()
+            # Update vendor balances for all items in this order
+            for item in mo.items.all():
+                if item.status == 'delivered':
+                    vendor = item.vendor
+                    vendor.pending_balance += item.vendor_earning
+                    vendor.save()
             
             return JsonResponse({
                 "message": "COD payment confirmed successfully",
-                "payment_status": order.get_payment_status_display(),
-                "is_paid": order.is_paid
+                "payment_status": payment.get_payment_status_display(),
+                "is_paid": True
             }, status=200)
             
-        except Order.DoesNotExist:
+        except MasterOrder.DoesNotExist:
             return JsonResponse({"error": "Order not found"}, status=404)
+        except Payment.DoesNotExist:
+            return JsonResponse({"error": "Payment record not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Invalid method"}, status=405)

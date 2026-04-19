@@ -185,20 +185,18 @@ export const VendorDashboard = () => {
             title="Total Sales"
             value={`Rs. ${(stats.total_revenue || 0).toLocaleString()}`}
             icon={TrendingUpIcon}
-            change={8.5}
+            change={stats.mom_growth || 0}
           />
           <MetricCard
             title="Orders in Progress"
             value={`Rs. ${(stats.pending_earnings || 0).toLocaleString()}`}
             icon={ActivityIcon}
             variant="accent"
-            change={5.2}
           />
           <MetricCard
             title="Money Received"
             value={`Rs. ${(stats.paid_earnings || 0).toLocaleString()}`}
             icon={CheckCircle2Icon}
-            change={stats.paid_earnings > 0 ? 100 : 0}
           />
         </div>
 
@@ -226,7 +224,6 @@ export const VendorDashboard = () => {
                             tickLine={false} 
                             tick={{ fontSize: 12, fill: '#6b7280' }} 
                             tickFormatter={(val) => `Rs. ${val.toLocaleString()}`} 
-                            domain={[0, 'dataMax + 50']}
                         />
                         <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
                         <Area 

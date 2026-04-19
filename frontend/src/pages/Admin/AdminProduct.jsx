@@ -116,8 +116,8 @@ export function AdminProductsPage() {
                         <option value="football">Football</option>
                         <option value="basketball">Basketball</option>
                         <option value="cycling">Cycling</option>
-                        <option value="swimming">Swimming</option>
-                        <option value="tennis">Tennis</option>
+                        <option value="gym-equipment">Gym Equipment</option>
+                        <option value="cricket">Cricket</option>
                         <option value="running">Running</option>
                     </select>
                     <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
