@@ -34,9 +34,9 @@ const Footer = () => {
             {/* Contact */}
             <div className="flex flex-col gap-2.5">
               {[
-                { icon: <FaMapMarkerAlt />, text: "Kathmandu, Nepal" },
-                { icon: <FaPhoneAlt />, text: "+977-1-XXXXXXX" },
-                { icon: <FaEnvelope />, text: "support@gearupnepal.com" },
+                { icon: <FaMapMarkerAlt />, text: "Pokhara, Nepal" },
+                { icon: <FaPhoneAlt />, text: "9829160908" },
+                { icon: <FaEnvelope />, text: "gearupnepal28@gmail.com" },
               ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-2.5 text-gray-400 text-sm">
                   <span className="text-accent text-xs flex-shrink-0">{icon}</span>
@@ -56,6 +56,7 @@ const Footer = () => {
                 { to: '/', label: 'Home' },
                 { to: '/products', label: 'Shop All Products' },
                 { to: '/categories', label: 'Browse Categories' },
+                { to: '/about', label: 'About Us' },
                 { to: '/vendor/signup', label: 'Become a Vendor' },
               ].map(({ to, label }) => (
                 <li key={to}>

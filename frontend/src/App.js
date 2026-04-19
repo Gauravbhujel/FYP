@@ -43,6 +43,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import AboutPage from "./pages/AboutPage";
 import { VendorLayout } from "./components/vendor/VendorLayout";
 
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -113,6 +114,7 @@ function App() {
           <Route path="/products" element={<CustomerOrPublicRoute><ProductListPage /></CustomerOrPublicRoute>} />
           <Route path="/deals" element={<CustomerOrPublicRoute><DealsPage /></CustomerOrPublicRoute>} />
           <Route path="/categories" element={<CustomerOrPublicRoute><CategoryPage /></CustomerOrPublicRoute>} />
+          <Route path="/about" element={<CustomerOrPublicRoute><AboutPage /></CustomerOrPublicRoute>} />
           <Route path="/cart" element={<CustomerOrPublicRoute><CartPage /></CustomerOrPublicRoute>} />
           <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
           <Route path="/login" element={<PublicAuthRoute><Login /></PublicAuthRoute>} />

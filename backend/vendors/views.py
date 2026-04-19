@@ -149,35 +149,64 @@ def vendor_dashboard_stats(request):
             count=Count('id')
         )
         
-        # Monthly benchmarks (relative to current date)
-        now = timezone.now()
-        month_start = now.replace(day=1)
-        this_month = OrderItem.objects.filter(vendor=vendor, created_at__gte=month_start).exclude(status='canceled').aggregate(
+        # Calculate growth percentage dynamically based on selected date range
+        if from_date and to_date:
+            try:
+                start_dt = datetime.strptime(from_date, "%Y-%m-%d").date()
+                end_dt = datetime.strptime(to_date, "%Y-%m-%d").date()
+                delta = end_dt - start_dt
+                
+                # Previous period of equal length
+                prev_end_dt = start_dt - timedelta(days=1)
+                prev_start_dt = prev_end_dt - delta
+                
+                curr_period = OrderItem.objects.filter(
+                    vendor=vendor, created_at__date__gte=start_dt, created_at__date__lte=end_dt
+                ).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
+                
+                prev_period = OrderItem.objects.filter(
+                    vendor=vendor, created_at__date__gte=prev_start_dt, created_at__date__lte=prev_end_dt
+                ).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
+                
+                curr_earn = float(curr_period['earn'] or 0)
+                prev_earn = float(prev_period['earn'] or 0)
+            except ValueError:
+                curr_earn = prev_earn = 0
+        else:
+            # Default to month-over-month for overall view
+            now = timezone.now()
+            month_start = now.replace(day=1)
+            prev_month_end = month_start - timedelta(days=1)
+            prev_month_start = prev_month_end.replace(day=1)
+            
+            curr_period = OrderItem.objects.filter(
+                vendor=vendor, created_at__gte=month_start
+            ).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'), rev=Sum('total_amount'), comm=Sum('commission_amount'))
+            
+            prev_period = OrderItem.objects.filter(
+                vendor=vendor, created_at__date__gte=prev_month_start, created_at__date__lte=prev_month_end
+            ).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
+            
+            curr_earn = float(curr_period['earn'] or 0)
+            prev_earn = float(prev_period['earn'] or 0)
+
+        if prev_earn > 0:
+            mom_growth = round(((curr_earn - prev_earn) / prev_earn) * 100, 1)
+        else:
+            mom_growth = 100.0 if curr_earn > 0 else 0.0
+            
+        # Re-add this_month to satisfy the JsonResponse contract
+        now_dt = timezone.now()
+        month_start_dt = now_dt.replace(day=1)
+        this_month = OrderItem.objects.filter(vendor=vendor, created_at__gte=month_start_dt).exclude(status='canceled').aggregate(
             earn=Sum('vendor_earning'),
             rev=Sum('total_amount'),
             comm=Sum('commission_amount')
         )
         
-        # Previous month earnings for month-over-month comparison
-        prev_month_end = month_start - timedelta(days=1)
-        prev_month_start = prev_month_end.replace(day=1)
-        prev_month = OrderItem.objects.filter(
-            vendor=vendor,
-            created_at__date__gte=prev_month_start,
-            created_at__date__lte=prev_month_end
-        ).exclude(status='canceled').aggregate(earn=Sum('vendor_earning'))
-        
-        # Calculate month-over-month growth percentage
-        prev_earn = float(prev_month['earn'] or 0)
-        curr_earn = float(this_month['earn'] or 0)
-        if prev_earn > 0:
-            mom_growth = round(((curr_earn - prev_earn) / prev_earn) * 100, 1)
-        else:
-            mom_growth = 100.0 if curr_earn > 0 else 0.0
-        
         # Calculate effective commission rate from actual data
         total_rev_all = float(stats['total_rev'] or 0)
-        total_comm = OrderItem.objects.filter(query, vendor=vendor).exclude(status='canceled').aggregate(comm=Sum('commission_amount'))
+        total_comm = OrderItem.objects.filter(query).exclude(status='canceled').aggregate(comm=Sum('commission_amount'))
         total_comm_val = float(total_comm['comm'] or 0)
         if total_rev_all > 0:
             effective_commission_rate = round((total_comm_val / total_rev_all) * 100, 1)
@@ -185,12 +214,11 @@ def vendor_dashboard_stats(request):
             effective_commission_rate = 5.0  # Default platform rate
         
         # Pending Payout: In-transit orders OR Delivered but Unpaid orders
-        # Note: We now check mo.payment.payment_status
-        pending_q = Q(vendor=vendor) & (~Q(status__in=['delivered', 'canceled']) | Q(status='delivered', order__payment__payment_status='pending'))
+        pending_q = query & (~Q(status__in=['delivered', 'canceled']) | Q(status='delivered', order__payment__payment_status='pending'))
         pending_stats = OrderItem.objects.filter(pending_q).aggregate(earn=Sum('vendor_earning'))
         
         # Available Balance: Delivered AND Paid orders pending payout
-        available_q = Q(vendor=vendor, status='delivered', order__payment__payment_status='paid', payout_status='pending')
+        available_q = query & Q(status='delivered', order__payment__payment_status='paid', payout_status='pending')
         available_stats = OrderItem.objects.filter(available_q).aggregate(earn=Sum('vendor_earning'))
         
         return JsonResponse({
@@ -326,7 +354,7 @@ def vendor_update_order_status(request):
                 order.save()
                 return JsonResponse({"message": "Updated"}, status=200)
             return JsonResponse({"error": "Invalid status"}, status=400)
-        except Order.DoesNotExist: return JsonResponse({"error": "Not found"}, status=404)
+        except OrderItem.DoesNotExist: return JsonResponse({"error": "Not found"}, status=404)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
 @csrf_exempt
@@ -338,17 +366,15 @@ def vendor_sales_chart(request):
         to_date = request.GET.get('to_date')
         
         chart_data = []
-        days_labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
         
         if from_date and to_date:
             start_date = datetime.strptime(from_date, "%Y-%m-%d").date()
             end_date = datetime.strptime(to_date, "%Y-%m-%d").date()
             delta = end_date - start_date
             
-            # If range is small, show days. If range is large, we could group, but for now just show all days in range.
             for i in range(delta.days + 1):
                 day = start_date + timedelta(days=i)
-                aggr = Order.objects.filter(vendor=vendor, created_at__date=day).exclude(status='canceled').aggregate(
+                aggr = OrderItem.objects.filter(vendor=vendor, created_at__date=day).exclude(status='canceled').aggregate(
                     total=Sum('total_amount'), 
                     earn=Sum('vendor_earning'),
                     count=Count('id')
@@ -360,7 +386,7 @@ def vendor_sales_chart(request):
                     "orders": aggr['count']
                 })
         else:
-            # Default to past 7 days
+            # Default to past 7 days (weekly)
             today = date.today()
             for i in range(6, -1, -1):
                 day = today - timedelta(days=i)
@@ -392,12 +418,12 @@ def vendor_category_chart(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
 
-        cats = OrderItem.objects.filter(query).exclude(status='canceled').values('product__category').annotate(
+        cats = OrderItem.objects.filter(query).exclude(status='canceled').values('product__category__name').annotate(
             value=Sum('total_amount')
         ).order_by('-value')
         data = [
             {
-                "name": c['product__category'].capitalize() if c['product__category'] else "Other", 
+                "name": c['product__category__name'].capitalize() if c['product__category__name'] else "Other", 
                 "value": float(c['value'] or 0)
             } for c in cats if (c['value'] or 0) > 0
         ]
@@ -451,7 +477,7 @@ def admin_vendors_list(request):
         "payout": float(v.total_payout or 0), "status": v.status, "joined": v.created_at.strftime("%Y-%m-%d"),
         "pending_balance": float(v.pending_balance),
         "paid_balance": float(v.paid_balance),
-        "period_paid": float(v.period_paid_total or 0),
+        "period_paid": float(v.period_paid_total or 0) if (from_date or to_date) else float(v.paid_balance),
         "last_payout_date": v.last_payout_date.strftime("%Y-%m-%d") if v.last_payout_date else None,
         "is_eligible": (not v.last_payout_date or (timezone.now() - v.last_payout_date).days >= 7) and v.pending_balance > 0
     } for v in vendors]
@@ -498,7 +524,7 @@ def submit_vendor_review(request, vendor_id, order_id):
                 defaults={'rating': data.get('rating'), 'comment': data.get('comment', '')}
             )
             return JsonResponse({"message": "Submitted", "review": VendorReviewSerializer(review).data}, status=201 if created else 200)
-        except (Vendor.DoesNotExist, Order.DoesNotExist): return JsonResponse({"error": "Not found"}, status=404)
+        except (Vendor.DoesNotExist, OrderItem.DoesNotExist): return JsonResponse({"error": "Not found"}, status=404)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
 @csrf_exempt
@@ -515,7 +541,7 @@ def check_vendor_review_eligibility(request, vendor_id, order_id):
                 "can_review": order.status == 'delivered',
                 "existing_review": VendorReviewSerializer(existing).data if existing else None
             }, status=200)
-        except (Vendor.DoesNotExist, Order.DoesNotExist): return JsonResponse({"error": "Not found"}, status=404)
+        except (Vendor.DoesNotExist, OrderItem.DoesNotExist): return JsonResponse({"error": "Not found"}, status=404)
     return JsonResponse({"error": "Invalid method"}, status=405)
 
 @csrf_exempt
@@ -550,10 +576,9 @@ def admin_dashboard_stats(request):
             end_date = datetime.strptime(to_date, "%Y-%m-%d").date()
             delta = end_date - start_date
             
-            # For large ranges, we could truncate by week/month, but for now just show all days
             for i in range(delta.days + 1):
                 day = start_date + timedelta(days=i)
-                day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                day_stats = OrderItem.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
                     rev=Sum('total_amount'), 
                     orders=Count('id')
                 )
@@ -578,11 +603,11 @@ def admin_dashboard_stats(request):
                 })
 
         # Vendor categories distribution
-        cats = Product.objects.filter(is_active=True).values('category').annotate(count=Count('id')).order_by('-count')[:4]
+        cats = Product.objects.filter(is_active=True).values('category__name').annotate(count=Count('id')).order_by('-count')[:4]
         vendor_categories = []
         for c in cats:
             vendor_categories.append({
-                "name": c['category'].capitalize() if c['category'] else "Other",
+                "name": c['category__name'].capitalize() if c['category__name'] else "Other",
                 "value": c['count'] or 0
             })
             
@@ -671,9 +696,9 @@ def admin_reports_stats(request):
             m_name = (now - timedelta(days=30*i)).strftime('%b').upper()
             m_d = month_map.get(m_name, {'revenue': 0, 'commission': 0, 'count': 0})
             monthly_data.append({"month": m_name, "revenue": float(m_d['revenue']), "commission": float(m_d['commission']), "orders": m_d['count']})
-        cats = OrderItem.objects.values('product__category').annotate(rev=Sum('total_amount')).order_by('-rev')
+        cats = OrderItem.objects.values('product__category__name').annotate(rev=Sum('total_amount')).order_by('-rev')
         cat_rev_total = sum(float(c['rev'] or 0) for c in cats) or 1
-        cat_breakdown = [{"category": c['product__category'].capitalize() if c['product__category'] else "Other", "revenue": float(c['rev']), "percentage": round((float(c['rev'])/cat_rev_total)*100)} for c in cats]
+        cat_breakdown = [{"category": c['product__category__name'].capitalize() if c['product__category__name'] else "Other", "revenue": float(c['rev']), "percentage": round((float(c['rev'])/cat_rev_total)*100)} for c in cats]
         return JsonResponse({
             "platform_yield": {"total": float(totals['rev'] or 0), "growth": 14.2}, "platform_commission": {"total": float(totals['comm'] or 0), "growth": 12.5},
             "total_orders": {"total": OrderItem.objects.count(), "growth": 8.7}, "identity_base": {"total": User.objects.filter(role='customer').count(), "growth": 22.4},
@@ -812,7 +837,7 @@ def admin_report_sales(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
             
-        stats = Order.objects.filter(query).exclude(status='canceled').aggregate(
+        stats = OrderItem.objects.filter(query).exclude(status='canceled').aggregate(
             total_orders=Count('id'),
             total_revenue=Sum('total_amount'),
             total_commission=Sum('commission_amount'),
@@ -830,7 +855,7 @@ def admin_report_sales(request):
                 
                 for i in range(delta.days + 1):
                     day = start_date + timedelta(days=i)
-                    day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                    day_stats = OrderItem.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
                         rev=Sum('total_amount'),
                         comm=Sum('commission_amount')
                     )
@@ -847,7 +872,7 @@ def admin_report_sales(request):
             today = date.today()
             for i in range(6, -1, -1):
                 day = today - timedelta(days=i)
-                day_stats = Order.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
+                day_stats = OrderItem.objects.filter(created_at__date=day).exclude(status='canceled').aggregate(
                     rev=Sum('total_amount'),
                     comm=Sum('commission_amount')
                 )
@@ -857,10 +882,17 @@ def admin_report_sales(request):
                     "commission": float(day_stats['comm'] or 0)
                 })
         
+        # Filtering for annotations
+        v_query = Q()
+        if from_date:
+            v_query &= Q(order_items__created_at__date__gte=from_date)
+        if to_date:
+            v_query &= Q(order_items__created_at__date__lte=to_date)
+            
         # Fetch Top Vendors within the date range
         top_vendors = Vendor.objects.filter(status='approved').annotate(
-            revenue=Sum('vendor_orders__total_amount', filter=query & ~Q(vendor_orders__status='canceled')),
-            orders=Count('vendor_orders', filter=query & ~Q(vendor_orders__status='canceled'))
+            revenue=Sum('order_items__total_amount', filter=v_query & ~Q(order_items__status='canceled')),
+            orders=Count('order_items', filter=v_query & ~Q(order_items__status='canceled'))
         ).filter(revenue__gt=0).order_by('-revenue')[:5]
         
         vendors_data = [{
@@ -896,15 +928,15 @@ def admin_report_orders(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
             
-        orders = Order.objects.filter(query).select_related('customer', 'product').order_by('-created_at')
+        orders = OrderItem.objects.filter(query).select_related('order__customer', 'order__payment', 'product').order_by('-created_at')
         data = [{
             "order_id": f"#ORD-{o.id:04d}",
-            "customer_name": f"{o.customer.first_name} {o.customer.last_name}".strip() or o.customer.username,
-            "customer_email": o.customer.email,
+            "customer_name": f"{o.order.customer.first_name} {o.order.customer.last_name}".strip() or o.order.customer.username,
+            "customer_email": o.order.customer.email,
             "items_count": o.quantity,
             "total_amount": float(o.total_amount),
             "status": o.status,
-            "payment_method": o.get_payment_method_display(),
+            "payment_method": o.order.payment.get_payment_method_display() if hasattr(o.order, 'payment') else "N/A",
             "date": o.created_at.strftime("%Y-%m-%d")
         } for o in orders]
         
@@ -928,7 +960,7 @@ def admin_report_products(request):
         if to_date:
             query &= Q(created_at__date__lte=to_date)
             
-        products = Order.objects.filter(query).exclude(status='canceled').values(
+        products = OrderItem.objects.filter(query).exclude(status='canceled').values(
             'product__name', 'vendor__store_name'
         ).annotate(
             units_sold=Sum('quantity'),
@@ -962,20 +994,20 @@ def admin_report_customers(request):
         # Filtering orders for aggregation
         order_query = Q()
         if from_date:
-            order_query &= Q(customer_orders__created_at__date__gte=from_date)
+            order_query &= Q(master_orders__created_at__date__gte=from_date)
         if to_date:
-            order_query &= Q(customer_orders__created_at__date__lte=to_date)
+            order_query &= Q(master_orders__created_at__date__lte=to_date)
             
         # We want all customers who have placed orders in the range
         customers = User.objects.filter(role='customer').annotate(
-            total_orders=Count('customer_orders', filter=order_query),
-            total_spending=Sum('customer_orders__total_amount', filter=order_query)
-        ).filter(total_orders__gt=0).order_by('-total_spending')
+            total_orders_count=Count('master_orders', filter=order_query, distinct=True),
+            total_spending_amt=Sum('master_orders__total_amount', filter=order_query)
+        ).filter(total_orders_count__gt=0).order_by('-total_spending_amt')
         
         data = [{
             "customer_name": f"{c.first_name} {c.last_name}".strip() or c.username,
-            "total_orders": c.total_orders,
-            "total_spending": float(c.total_spending or 0)
+            "total_orders": c.total_orders_count,
+            "total_spending": float(c.total_spending_amt or 0)
         } for c in customers]
         
         return JsonResponse(data, safe=False, status=200)

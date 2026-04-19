@@ -251,7 +251,8 @@ const ProductDetailsPage = () => {
         );
     }
 
-    const discountPct = product.discount || (product.compare_price ? Math.round((1 - product.price / product.compare_price) * 100) : 0);
+    const rawDiscount = product.discount || (product.compare_price ? (1 - product.price / product.compare_price) * 100 : 0);
+    const discountPct = Math.round(rawDiscount);
     const allImages = [product.image, product.image2, product.image3].filter(img => img);
 
     return (
@@ -616,24 +617,20 @@ const ProductDetailsPage = () => {
                                     )}
                                 </div>
 
-                                {/* Review Form */}
-                                <div className="bg-gradient-to-br from-accent to-accent-dark text-white p-8 sm:p-10 rounded-[2rem] shadow-xl shadow-accent/20 relative overflow-hidden mt-8 border border-accent/20">
-                                    <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
-                                        <FaStar size={120} />
-                                    </div>
+                                <div className="bg-white p-8 sm:p-10 rounded-[2rem] border border-gray-200 shadow-sm relative overflow-hidden mt-8">
                                     <div className="relative z-10">
-                                        <h3 className="text-2xl font-black mb-1">Write a Review</h3>
-                                        <p className="text-gray-400 mb-8 text-sm">Your feedback helps the community choose the best gear.</p>
+                                        <h3 className="text-2xl font-black text-gray-900 mb-1">Write a Review</h3>
+                                        <p className="text-gray-500 mb-8 text-sm">Your feedback helps the community choose the best gear.</p>
 
-                                        <form onSubmit={(e) => { e.preventDefault(); if (canReview) handleReviewSubmit(e); }} className="space-y-5">
+                                        <form onSubmit={(e) => { e.preventDefault(); if (canReview) handleReviewSubmit(e); }} className="space-y-6">
                                             <div>
-                                                <label className="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Your Rating</label>
+                                                <label className="block text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Your Rating</label>
                                                 {renderStars(0, isAuthenticated && canReview)}
                                             </div>
                                             <div>
-                                                <label className="block text-gray-400 text-xs font-bold uppercase tracking-widest mb-3">Your Review</label>
+                                                <label className="block text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Your Review</label>
                                                 <textarea 
-                                                    className={`w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-sm focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all min-h-[120px] ${(!isAuthenticated || !canReview) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    className={`w-full bg-gray-50 border-2 border-gray-100 rounded-3xl p-6 text-sm focus:outline-none focus:border-primary/20 focus:bg-white transition-all min-h-[140px] font-medium text-gray-900 ${(!isAuthenticated || !canReview) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     placeholder="Tell us about the performance, durability, and fit..."
                                                     value={userReview.comment}
                                                     onChange={(e) => isAuthenticated && canReview && setUserReview(prev => ({ ...prev, comment: e.target.value }))}
@@ -642,7 +639,7 @@ const ProductDetailsPage = () => {
                                             </div>
                                             
                                             {!isAuthenticated ? (
-                                                <Link to="/login" className="block w-full text-center py-4 bg-white/10 text-white font-black uppercase tracking-wider rounded-lg hover:bg-white/20 transition-all no-underline">
+                                                <Link to="/login" className="block w-full text-center py-4 bg-primary text-white font-black uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all no-underline">
                                                     Login to Leave a Review
                                                 </Link>
                                             ) : (
@@ -650,7 +647,7 @@ const ProductDetailsPage = () => {
                                                     variant="primary"
                                                     type="submit"
                                                     disabled={!canReview || isSubmittingReview}
-                                                    className="w-full h-14 uppercase tracking-wider disabled:opacity-50"
+                                                    className="w-full h-14 uppercase tracking-[0.2em] text-xs font-black disabled:opacity-50 shadow-xl shadow-primary/10"
                                                     title={!canReview ? (hasPurchased ? "You can review this product after delivery" : "Only verified purchasers can leave a review") : ""}
                                                 >
                                                     {!canReview 

@@ -33,10 +33,8 @@ const DealProductCard = ({ product }) => {
         }
     };
 
-    const discountPct = product.discount || 
-        (product.compare_price && product.price 
-            ? Math.round((1 - product.price / product.compare_price) * 100) 
-            : null);
+    const rawDiscount = product.discount || (product.compare_price && product.price ? (1 - product.price / product.compare_price) * 100 : 0);
+    const discountPct = rawDiscount > 0 ? Math.round(rawDiscount) : null;
 
     return (
         <div className="bg-white rounded-2xl p-4 transition-all duration-300 flex flex-col h-full group hover:shadow-xl hover:scale-[1.02] border border-gray-100/50 shadow-sm">

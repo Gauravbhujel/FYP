@@ -186,6 +186,7 @@ export const VendorDashboard = () => {
             value={`Rs. ${(stats.total_revenue || 0).toLocaleString()}`}
             icon={TrendingUpIcon}
             change={stats.mom_growth || 0}
+            trendLabel={dateRange.start && dateRange.end ? "vs previous period" : "vs last month"}
           />
           <MetricCard
             title="Orders in Progress"
@@ -202,11 +203,16 @@ export const VendorDashboard = () => {
 
         {/* Sales Overview Chart (Full Width) */}
         <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-accent/10 rounded-lg">
-                    <ActivityIcon className="w-5 h-5 text-accent" />
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-accent/10 rounded-lg">
+                        <ActivityIcon className="w-5 h-5 text-accent" />
+                    </div>
+                    <h3 className="text-base font-bold text-gray-900">Sales Overview</h3>
                 </div>
-                <h3 className="text-base font-bold text-gray-900">Sales Overview</h3>
+                <span className="text-xs font-medium text-gray-400 italic">
+                    {dateRange.start && dateRange.end ? `${dateRange.start} to ${dateRange.end}` : 'Past 7 Days (Weekly)'}
+                </span>
             </div>
             <div className="h-80 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -246,11 +252,16 @@ export const VendorDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Orders Overview (Bar Chart) */}
             <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-indigo-50 rounded-lg">
-                        <BarChart3Icon className="w-5 h-5 text-indigo-600" />
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-indigo-50 rounded-lg">
+                            <BarChart3Icon className="w-5 h-5 text-indigo-600" />
+                        </div>
+                        <h3 className="text-base font-bold text-gray-900">Orders Overview</h3>
                     </div>
-                    <h3 className="text-base font-bold text-gray-900">Orders Overview</h3>
+                    <span className="text-xs font-medium text-gray-400 italic">
+                        {dateRange.start && dateRange.end ? `${dateRange.start} to ${dateRange.end}` : 'Past 7 Days (Weekly)'}
+                    </span>
                 </div>
                 <div className="h-72 w-full">
                     <ResponsiveContainer width="100%" height="100%">
@@ -267,11 +278,16 @@ export const VendorDashboard = () => {
 
             {/* Category Distribution (Pie Chart) */}
             <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 bg-emerald-50 rounded-lg">
-                        <PieChartIcon className="w-5 h-5 text-emerald-600" />
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-emerald-50 rounded-lg">
+                            <PieChartIcon className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <h3 className="text-base font-bold text-gray-900">Category Distribution</h3>
                     </div>
-                    <h3 className="text-base font-bold text-gray-900">Category Distribution</h3>
+                    <span className="text-xs font-medium text-gray-400 italic">
+                        {dateRange.start && dateRange.end ? 'Custom Range' : 'Overall'}
+                    </span>
                 </div>
                 <div className="h-72 w-full">
                     <ResponsiveContainer width="100%" height="100%">

@@ -50,6 +50,7 @@ class ProductSerializer(serializers.ModelSerializer):
     review_count = serializers.SerializerMethodField()
     discount = serializers.SerializerMethodField()
     is_new = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -57,7 +58,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'vendor', 'vendor_store_name', 'name', 'description', 
             'category', 'category_name', 'category_slug', 'category_display', 
             'price', 'compare_price', 'sku', 'quantity', 
-            'gallery', 'is_active', 'created_at', 'reviews', 
+            'gallery', 'image', 'is_active', 'created_at', 'reviews', 
             'average_rating', 'review_count', 'discount', 'is_new', 'size'
         ]
         read_only_fields = ['vendor', 'created_at']
@@ -79,6 +80,15 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_is_new(self, obj):
         from django.utils import timezone
         return (timezone.now() - obj.created_at).days < 7
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        main_image = obj.gallery.filter(is_main=True).first() or obj.gallery.first()
+        if main_image and main_image.image:
+            if request:
+                return request.build_absolute_uri(main_image.image.url)
+            return main_image.image.url
+        return ""
 
     def to_representation(self, instance):
         # Override to ensure 'category' field in JSON is the name (string) 

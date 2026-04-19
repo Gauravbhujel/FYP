@@ -70,15 +70,14 @@ const VendorEarningsPage = () => {
 
         {/* Simple Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-gray-900 rounded-2xl relative overflow-hidden group shadow-lg flex flex-col justify-between h-48">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150" />
-                <div className="flex items-center justify-between relative z-10">
-                    <h2 className="text-xs font-bold text-accent uppercase tracking-widest">Waiting for Payout</h2>
+            <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col justify-between h-48">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Waiting for Payout</h2>
                     <ClockIcon className="w-5 h-5 text-gray-400" />
                 </div>
-                <div className="relative z-10">
-                    <p className="text-3xl font-bold text-white tracking-tight">Rs. {(stats.available_balance || 0).toLocaleString()}</p>
-                    <p className="text-[10px] text-gray-400 mt-2 font-medium tracking-wide">Money ready to be sent by Admin</p>
+                <div>
+                    <p className="text-3xl font-bold text-gray-900 tracking-tight">Rs. {(stats.available_balance || 0).toLocaleString()}</p>
+                    <p className="text-[11px] font-medium text-gray-400 mt-2 italic">Money ready to be sent by Admin</p>
                 </div>
             </div>
 

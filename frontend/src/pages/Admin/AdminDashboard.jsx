@@ -155,7 +155,9 @@ const AdminDashboard = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h2 className="text-base font-bold text-gray-900">Revenue & Orders Trends</h2>
-                        <p className="text-xs text-gray-500 mt-1">Platform performance for selected period</p>
+                        <p className="text-xs text-gray-500 mt-1 italic">
+                            {dateRange.start && dateRange.end ? `${dateRange.start} to ${dateRange.end}` : 'Past 7 Days (Weekly)'}
+                        </p>
                     </div>
                 </div>
                 <div className="h-72 w-full">
@@ -180,7 +182,9 @@ const AdminDashboard = () => {
             <div className="lg:col-span-1 bg-white border border-gray-200 rounded-xl p-6 shadow-sm flex flex-col">
                 <div className="mb-4">
                     <h2 className="text-base font-bold text-gray-900">Vendor Categories</h2>
-                    <p className="text-xs text-gray-500 mt-1">Distribution across platform</p>
+                    <p className="text-xs text-gray-500 mt-1 italic">
+                        {dateRange.start && dateRange.end ? 'Custom Range' : 'Overall Distribution'}
+                    </p>
                 </div>
                 <div className="h-60 w-full flex-1">
                     <ResponsiveContainer width="100%" height="100%">

@@ -7,6 +7,7 @@ export function MetricCard({
   change,
   icon: Icon,
   variant = "default",
+  trendLabel,
 }) {
   const isPositive = change && change > 0;
   const isNegative = change && change < 0;
@@ -41,7 +42,7 @@ export function MetricCard({
               {isNegative && <ArrowDownRightIcon className="w-3.5 h-3.5 mr-0.5" />}
               {Math.abs(change)}%
             </span>
-            <span className="text-xs font-medium text-gray-500">vs last period</span>
+            <span className="text-xs font-medium text-gray-500">{trendLabel || "vs last period"}</span>
           </div>
         )}
       </div>

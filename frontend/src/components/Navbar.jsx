@@ -130,6 +130,7 @@ const Navbar = () => {
             { to: "/", label: "Home" },
             { to: "/products", label: "Products" },
             { to: "/categories", label: "Categories" },
+            { to: "/about", label: "About" },
           ].map(({ to, label }) => (
             <li key={to}>
               <Link
@@ -359,6 +360,7 @@ const Navbar = () => {
             { to: "/", label: "Home" },
             { to: "/products", label: "Products" },
             { to: "/categories", label: "Categories" },
+            { to: "/about", label: "About" },
           ].map(({ to, label }) => (
             <Link
               key={to}
