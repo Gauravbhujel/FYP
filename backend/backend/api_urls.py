@@ -4,6 +4,7 @@ from vendors import views as vendor_views
 from products import views as product_views
 from orders import views as order_views
 from payments import views as payment_views
+from core import views as core_views
 
 urlpatterns = [
     # Auth / Users
@@ -94,4 +95,7 @@ urlpatterns = [
 
     # Chat
     path('chat/', include('chat.urls')),
+
+    # Static Pages
+    path('', include('core.urls')),
 ]

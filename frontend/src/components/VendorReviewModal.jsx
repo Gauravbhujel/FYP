@@ -13,13 +13,20 @@ const VendorReviewModal = ({ isOpen, onClose, vendorId, orderId, vendorName, onS
     const [canReview, setCanReview] = useState(false);
 
     useEffect(() => {
-        if (isOpen && vendorId && orderId) {
-            checkEligibility();
+        if (isOpen) {
+            if (vendorId && orderId) {
+                checkEligibility();
+            } else {
+                setLoading(false);
+                setError('Missing order or vendor reference.');
+            }
         }
     }, [isOpen, vendorId, orderId]);
 
     const checkEligibility = async () => {
+        if (!vendorId || !orderId) return;
         setLoading(true);
+        setError(null); // Reset error on retry
         try {
             const response = await api.get(`vendors/${vendorId}/review/check-eligibility/${orderId}/`);
             setCanReview(response.data.can_review);

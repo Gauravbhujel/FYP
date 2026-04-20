@@ -75,25 +75,29 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Customer Care */}
+          {/* Policies */}
           <div>
             <h4 className="text-white font-bold text-base mb-5 relative pb-3 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-8 after:h-0.5 after:bg-accent after:rounded">
-              Customer Care
+              Policies
             </h4>
             <ul className="list-none flex flex-col gap-3">
-              {['Contact Us', 'Track My Order', 'Shipping Policy', 'Returns & Exchanges', 'FAQs'].map(
-                (item) => (
-                  <li key={item}>
-                    <span className="text-gray-400 text-sm transition-all duration-300 cursor-pointer flex items-center gap-1.5 group hover:text-accent hover:translate-x-1">
-                      <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0 group-hover:bg-accent" />
-                      <span className="relative">
-                        {item}
-                        <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300 group-hover:w-full" />
-                      </span>
+              {[
+                { to: '/privacy-policy', label: 'Privacy Policy' },
+                { to: '/terms-of-service', label: 'Terms of Service' },
+              ].map(({ to, label }) => (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    className="text-gray-400 no-underline text-sm transition-all duration-300 flex items-center gap-1.5 group hover:text-accent hover:translate-x-1"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-gray-600 transition-colors flex-shrink-0 group-hover:bg-accent" />
+                    <span className="relative">
+                      {label}
+                      <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-accent rounded transition-all duration-300 group-hover:w-full" />
                     </span>
-                  </li>
-                )
-              )}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -123,7 +127,7 @@ const Footer = () => {
               Accepted Payments
             </h5>
             <div className="flex flex-wrap gap-2">
-              {['eSewa', 'Khalti', 'IME Pay', 'Cash on Delivery'].map((method) => (
+              {['eSewa', 'Cash on Delivery'].map((method) => (
                 <span
                   key={method}
                   className="bg-white/8 border border-white/10 text-gray-400 text-[11px] font-medium px-3 py-1.5 rounded-lg"
@@ -136,17 +140,10 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-gray-500 text-xs">
+        <div className="border-t border-white/8 pt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <p className="text-gray-500 text-xs text-center">
             © {new Date().getFullYear()} GearUp Nepal. All rights reserved.
           </p>
-          <div className="flex items-center gap-4 text-gray-500 text-xs">
-            <span className="cursor-pointer transition-colors">Privacy Policy</span>
-            <span className="w-px h-3 bg-gray-700" />
-            <span className="cursor-pointer transition-colors">Terms of Service</span>
-            <span className="w-px h-3 bg-gray-700" />
-            <span className="cursor-pointer transition-colors">Cookie Policy</span>
-          </div>
         </div>
       </div>
     </footer>

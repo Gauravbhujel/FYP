@@ -21,6 +21,10 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     vendor_store_name = serializers.ReadOnlyField(source='vendor.store_name')
+    vendor_id = serializers.ReadOnlyField(source='vendor.id')
+    vendor_name = serializers.ReadOnlyField(source='vendor.store_name') # for compatibility
+    vendor_rating = serializers.ReadOnlyField(source='vendor.average_rating')
+    vendor_review_count = serializers.ReadOnlyField(source='vendor.review_count')
     category_slug = serializers.SerializerMethodField()
     category_name = serializers.SerializerMethodField()
     # For backward compatibility, keep 'category' as a string during read
@@ -55,7 +59,9 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'vendor', 'vendor_store_name', 'name', 'description', 
+            'id', 'vendor', 'vendor_id', 'vendor_name', 'vendor_store_name', 
+            'vendor_rating', 'vendor_review_count',
+            'name', 'description', 
             'category', 'category_name', 'category_slug', 'category_display', 
             'price', 'compare_price', 'sku', 'quantity', 
             'gallery', 'image', 'is_active', 'created_at', 'reviews', 

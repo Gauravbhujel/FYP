@@ -605,7 +605,7 @@ const ProfilePage = () => {
                                         onClick={() => {
                                           setVendorReviewData({
                                             vendorId: order.vendor, 
-                                            orderId: order.order_id_raw, 
+                                            orderId: order.item_id, 
                                             vendorName: order.vendor_name 
                                           });
                                           setIsVendorReviewOpen(true);

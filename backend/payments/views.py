@@ -48,9 +48,14 @@ def initiate_payment(request):
         if error: return error
         try:
             data = json.loads(request.body)
-            cart_data, address = data.get('cart_items', []), data.get('shipping_address', '')
+            cart_data = data.get('cart_items', [])
+            address = data.get('shipping_address', '')
+            payment_method = data.get('payment_method', 'EPAY')
+            
             if not cart_data: return JsonResponse({"error": "Empty cart"}, status=400)
             
+            transaction_uuid = str(uuid.uuid4())
+
             with transaction.atomic():
                 # 1. Create Master Order
                 mo = MasterOrder.objects.create(
@@ -90,7 +95,7 @@ def initiate_payment(request):
                 mo.total_amount = calculated_total
                 mo.save()
 
-                # 2. Prepare Payment placeholder (will be finalized in Success or for COD)
+                # 2. Prepare Payment placeholder
                 payment_record = Payment.objects.create(
                     order=mo,
                     transaction_uuid=transaction_uuid,
@@ -102,10 +107,9 @@ def initiate_payment(request):
             if payment_method == 'COD':
                 # For COD, the order is confirmed immediately. Stock is reduced and cart cleared.
                 with transaction.atomic():
-                    items = Order.objects.filter(transaction_uuid=transaction_uuid)
-                    for o in items:
-                        o.product.quantity = max(0, o.product.quantity - o.quantity)
-                        o.product.save()
+                    for oi in order_items:
+                        oi.product.quantity = max(0, oi.product.quantity - oi.quantity)
+                        oi.product.save()
                     CartItem.objects.filter(customer=user).delete()
                 
                 # Notify vendors for COD
@@ -122,7 +126,7 @@ def initiate_payment(request):
                 # Returns "99" for 99.0, or "99.5" for 99.50
                 return str(float(val)).rstrip('0').rstrip('.') if float(val) % 1 == 0 else f"{val:.2f}".rstrip('0').rstrip('.')
 
-            amt_str = format_amt(total_amount)
+            amt_str = format_amt(mo.total_amount)
             zero_str = format_amt(0)
 
             p_code = getattr(settings, 'ESEWA_PRODUCT_CODE', 'EPAYTEST')

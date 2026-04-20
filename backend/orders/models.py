@@ -62,8 +62,15 @@ class OrderItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def generate_tracking(self):
-        self.tracking_id = f"GUN-{uuid.uuid4().hex[:8].upper()}"
+        if not self.tracking_id:
+            self.tracking_id = f"GUN-{uuid.uuid4().hex[:8].upper()}"
         return self.tracking_id
+
+    def save(self, *args, **kwargs):
+        # Auto-generate tracking if status is shipped/delivered and tracking is missing
+        if self.status in ['shipped', 'delivered'] and not self.tracking_id:
+            self.generate_tracking()
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = "order_items"

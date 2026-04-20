@@ -146,10 +146,7 @@ const CartPage = () => {
                                         <span>Shipping</span>
                                         <span className="text-emerald-600">Calculated at checkout</span>
                                     </div>
-                                    <div className="flex justify-between text-gray-500 font-medium">
-                                        <span>Taxes</span>
-                                        <span className="text-text-dark">Included</span>
-                                    </div>
+
                                     <div className="border-t border-gray-100 pt-5 flex justify-between font-extrabold text-2xl text-text-dark">
                                         <span>Total</span>
                                         <span className="text-primary">Rs. {calculateTotal()}</span>

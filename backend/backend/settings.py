@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'payments',
     'rest_framework',
     'rest_framework.authtoken',
+    'core',
 ]
 
 REST_FRAMEWORK = {

@@ -9,13 +9,26 @@ const CheckoutPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [shippingAddress, setShippingAddress] = useState('');
+    const [savedAddress, setSavedAddress] = useState('');
     const [paymentMethod, setPaymentMethod] = useState(''); // 'EPAY' or 'COD'
     const [processing, setProcessing] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchCart();
+        fetchUserProfile();
     }, []);
+
+    const fetchUserProfile = async () => {
+        try {
+            const response = await api.get('user/profile/');
+            if (response.data.address) {
+                setSavedAddress(response.data.address);
+            }
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+        }
+    };
 
     const fetchCart = async () => {
         try {
@@ -112,7 +125,22 @@ const CheckoutPage = () => {
                     {/* Checkout Details */}
                     <div className="flex-grow">
                         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            <h2 className="text-xl font-bold mb-6 text-text-dark">Shipping Information</h2>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                <h2 className="text-xl font-bold text-text-dark">Shipping Information</h2>
+                                {savedAddress && (
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShippingAddress(savedAddress)}
+                                        className="text-primary text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:opacity-80 transition-all border-b-2 border-primary/20 pb-0.5"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        Use Saved Address
+                                    </button>
+                                )}
+                            </div>
                             <form onSubmit={handleCheckout}>
                                 <div className="mb-6">
                                     <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">
@@ -121,7 +149,7 @@ const CheckoutPage = () => {
                                     <textarea 
                                         required
                                         rows="4"
-                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-0 focus:border-black outline-none transition-all"
                                         placeholder="Full address (Street, City, State, ZIP)"
                                         value={shippingAddress}
                                         onChange={(e) => setShippingAddress(e.target.value)}

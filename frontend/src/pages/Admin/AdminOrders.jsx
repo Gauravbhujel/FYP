@@ -78,6 +78,7 @@ export function AdminOrdersPage() {
         return "bg-amber-100 text-amber-800 border border-amber-200";
       case 'canceled':
       case 'cancelled':
+      case 'failed':
         return "bg-rose-100 text-rose-800 border border-rose-200";
       default:
         return "bg-gray-100 text-gray-800 border border-gray-200";
@@ -249,8 +250,14 @@ export function AdminOrdersPage() {
                                         <div className="space-y-1 text-sm">
                                             <p className="font-medium text-gray-900">{order.payment_method}</p>
                                             <div className="flex items-center gap-1.5">
-                                                <span className={`w-1.5 h-1.5 rounded-full ${order.payment_status === 'Paid' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                                                <p className={`text-xs font-semibold ${order.payment_status === 'Paid' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${
+                                                    order.payment_status === 'Paid' ? 'bg-emerald-500' : 
+                                                    order.payment_status === 'Canceled' ? 'bg-gray-400' : 'bg-amber-500'
+                                                }`} />
+                                                <p className={`text-xs font-semibold ${
+                                                    order.payment_status === 'Paid' ? 'text-emerald-600' : 
+                                                    order.payment_status === 'Canceled' ? 'text-gray-500' : 'text-amber-600'
+                                                }`}>
                                                     {order.payment_status}
                                                 </p>
                                             </div>

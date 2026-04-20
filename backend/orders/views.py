@@ -34,9 +34,7 @@ def cancel_order(request, order_id):
             mo.items.all().update(status='canceled', vendor_earning=0.00, commission_amount=0.00)
             
             # Update payment if exists
-            if hasattr(mo, 'payment'):
-                mo.payment.payment_status = 'failed'
-                mo.payment.save()
+            Payment.objects.filter(order=mo).update(payment_status='canceled')
                 
             return JsonResponse({
                 "message": "Order cancelled successfully", 
@@ -62,7 +60,9 @@ def customer_orders(request):
         items = OrderItem.objects.filter(order__customer=user).select_related('product', 'vendor', 'order', 'order__payment')
         data = [{
             "id": f"#ORD-{oi.order.id:04d}", 
+            "order_id_raw": oi.order.id,
             "item_id": oi.id,
+            "order_item_id": oi.id,
             "product": oi.product.id, 
             "product_name": oi.product.name,
             "vendor": oi.vendor.id, 

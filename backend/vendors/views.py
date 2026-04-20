@@ -280,24 +280,29 @@ def vendor_update_order_status(request):
     if request.method == "POST":
         data = json.loads(request.body)
         try:
-            # Note: order_id here refers to the flat OrderItem ID if coming from the list, or we handle it by MasterOrder
-            # If it's #ORD-, it's likely a MasterOrder ID.
+            order_id = data.get("order_id") # Can be "#ORD-0001" or an integer ID
+            if not order_id: return JsonResponse({"error": "Missing order reference"}, status=400)
+
+            new_status = data.get("status")
+            if new_status not in [c[0] for c in MasterOrder.STATUS_CHOICES]:
+                return JsonResponse({"error": "Invalid status"}, status=400)
+
+            # If it's a string starting with #ORD-, it's a MasterOrder ID reference
             if isinstance(order_id, str) and order_id.startswith("#ORD-"):
-                # If updating by MasterOrder ID, we update all items for this vendor in that order
                 mo_id = int(order_id.replace("#ORD-", ""))
                 items = OrderItem.objects.filter(order_id=mo_id, vendor=vendor)
-                if not items.exists():
-                    return JsonResponse({"error": "Order not found"}, status=404)
-                
-                new_status = data.get("status")
-                if new_status not in [c[0] for c in MasterOrder.STATUS_CHOICES]:
-                    return JsonResponse({"error": "Invalid status"}, status=400)
+            else:
+                # Otherwise assume it's a raw OrderItem ID
+                items = OrderItem.objects.filter(id=order_id, vendor=vendor)
 
-                for order in items:
-                    if order.status == 'canceled': continue
-                    
-                    old_status = order.status
-                    order.status = new_status
+            if not items.exists():
+                return JsonResponse({"error": "Order item not found"}, status=404)
+
+            for order in items:
+                if order.status == 'canceled': continue
+                
+                old_status = order.status
+                order.status = new_status
                 
                 # If newly shipped, generate tracking info
                 if new_status == 'shipped' and old_status != 'shipped':
@@ -320,12 +325,11 @@ def vendor_update_order_status(request):
                             f"GearUpNepal Team"
                         )
                         send_mail(subject, message, settings.EMAIL_HOST_USER, [order.order.customer.email], fail_silently=True)
-                    except Exception:
-                        pass
+                    except Exception: pass
                 
                 # If newly delivered, add to pending balance ONLY if paid
                 if new_status == 'delivered' and old_status != 'delivered':
-                    if order.is_paid:
+                    if hasattr(order.order, 'payment') and order.order.payment.payment_status == 'paid':
                         vendor.pending_balance += order.vendor_earning
                         vendor.save()
                     
@@ -341,18 +345,30 @@ def vendor_update_order_status(request):
                             f"GearUpNepal Team"
                         )
                         send_mail(subject, message, settings.EMAIL_HOST_USER, [order.order.customer.email], fail_silently=True)
-                    except Exception:
-                        pass
+                    except Exception: pass
                 
                 # If status changed FROM delivered
                 elif old_status == 'delivered' and new_status != 'delivered':
-                    # Only deduct if it hasn't been paid yet or it was already successfully added to balance
-                    if order.is_paid and order.payout_status == 'pending':
+                    if hasattr(order.order, 'payment') and order.order.payment.payment_status == 'paid' and order.payout_status == 'pending':
                         vendor.pending_balance = max(0, vendor.pending_balance - order.vendor_earning)
                         vendor.save()
 
+                if new_status == 'canceled':
+                    order.vendor_earning = 0
+                    order.commission_amount = 0
+
                 order.save()
-                return JsonResponse({"message": "Updated"}, status=200)
+
+                # Sync MasterOrder and Payment if EVERYTHING is canceled
+                mo = order.order
+                if new_status == 'canceled':
+                    all_canceled = not mo.items.exclude(status='canceled').exists()
+                    if all_canceled:
+                        mo.status = 'canceled'
+                        mo.save()
+                        Payment.objects.filter(order=mo).update(payment_status='canceled')
+
+            return JsonResponse({"message": "Updated successfully"}, status=200)
             return JsonResponse({"error": "Invalid status"}, status=400)
         except OrderItem.DoesNotExist: return JsonResponse({"error": "Not found"}, status=404)
     return JsonResponse({"error": "Invalid method"}, status=405)
@@ -491,8 +507,8 @@ def public_vendor_detail(request, vendor_id):
             products = Product.objects.filter(vendor=vendor, is_active=True).order_by('-created_at')
             p_data = [{
                 "id": p.id, "name": p.name, "price": float(p.price),
-                "image": request.build_absolute_uri(p.gallery.first().image.url) if p.gallery.exists() else "",
-                "category": p.get_category_display(),
+                "image": request.build_absolute_uri(p.gallery.first().image.url) if p.gallery.exists() and p.gallery.first().image else "",
+                "category": p.category.name if p.category else "Uncategorized",
             } for p in products]
             v_reviews = VendorReview.objects.filter(vendor=vendor).order_by('-created_at')
             return JsonResponse({
